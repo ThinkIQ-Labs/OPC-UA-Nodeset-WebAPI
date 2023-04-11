@@ -6,14 +6,15 @@ namespace OPC_UA_Nodeset_WebAPI.Model
 {
     public class ApiPropertyModel
     {
+        public string NodeId { get; set; }
         public string DisplayName { get; set; }
         
         public ApiPropertyModel() { }
         
         public ApiPropertyModel(PropertyModel aPropertyModel) 
         {
+            NodeId = aPropertyModel.NodeId;
             DisplayName = aPropertyModel.DisplayName.First().Text;
-
         }
 
     }
