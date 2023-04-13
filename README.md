@@ -49,12 +49,16 @@ Azure web app's don't do slashes well in url's of resource-style web api's, we r
 > Roadmap: Be able to load a nodeset from a cloud library by namespace
 >
 > Roadmap: Be able to automatically resolve namespace dependencies from a cloud library
+>
+> Roadmap: Save out xml for nodeset
 
 ### Object Types
 
 We can manage object types in a nodeset.
 
 - GET /NodesetProject/id/NodesetModel/uri/ObjectType: to obtain all object types in a nodeset
+
+> Roadmap: CRUD object types, more detailed information on object type by nodeId
 
 ### Properties
 
@@ -66,6 +70,7 @@ belongs to, use the parent node id, which could point to a data variable or an o
 - GET /NodesetProject/id/NodesetModel/uri/Property: to obtain all object types in a nodeset
 - GET /NodesetProject/id/NodesetModel/uri/Property/nodeId: to obtain an object types in a nodeset by node id
 
+> Roadmap: CRUD properties, more detailed information on property by nodeId
 
 ### Data Variables
 
@@ -75,3 +80,5 @@ We can manage data variables in a nodeset.
 belongs to, use the parent node id, which could point to an object type, for instance.*
 
 - GET /NodesetProject/id/NodesetModel/uri/DataVariable: to obtain all object types in a nodeset
+
+> Roadmap: CRUD data variables, more detailed information on data variable by nodeId
