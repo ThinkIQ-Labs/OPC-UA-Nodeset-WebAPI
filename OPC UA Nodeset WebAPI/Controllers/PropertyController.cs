@@ -44,6 +44,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiPropertyModel>))]
+        [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult Get(string id, string uri)
         {
             var activeNodesetModelResult = ActiveNodeSetModel(id, uri) as ObjectResult;
@@ -63,6 +64,33 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                 return Ok(returnObject);
             }
         }
+
+        [HttpGet("{nodeId}")]
+        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiPropertyModel>))]
+        [ProducesResponseType(404, Type = typeof(NotFoundResult))]
+        public IActionResult GetById(string id, string uri, string nodeId)
+        {
+            var propertiesListResult = Get(id, uri) as ObjectResult;
+
+            if (StatusCodes.Status200OK != propertiesListResult.StatusCode)
+            {
+                return propertiesListResult;
+            }
+            else
+            {
+                var propertiesList = propertiesListResult.Value as List<ApiPropertyModel>;
+                var returnObject = propertiesList.FirstOrDefault(x=>x.NodeId.Split("=").Last()== nodeId);
+                if (returnObject != null)
+                {
+                    return Ok(returnObject);
+                }
+                else
+                {
+                    return NotFound("The node id does not exist.");
+                }
+            }
+        }
+
 
     }
 }
