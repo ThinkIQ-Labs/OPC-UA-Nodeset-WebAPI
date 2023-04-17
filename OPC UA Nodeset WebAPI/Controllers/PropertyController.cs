@@ -66,9 +66,9 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         }
 
         [HttpGet("{nodeId}")]
-        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiPropertyModel>))]
+        [ProducesResponseType(200, Type = typeof(ApiPropertyModel))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public IActionResult GetById(string id, string uri, string nodeId)
+        public IActionResult GetById(string id, string uri, int nodeId)
         {
             var propertiesListResult = Get(id, uri) as ObjectResult;
 
@@ -79,7 +79,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             else
             {
                 var propertiesList = propertiesListResult.Value as List<ApiPropertyModel>;
-                var returnObject = propertiesList.FirstOrDefault(x=>x.NodeId.Split("=").Last()== nodeId);
+                var returnObject = propertiesList.FirstOrDefault(x=>x.Id== nodeId);
                 if (returnObject != null)
                 {
                     return Ok(returnObject);

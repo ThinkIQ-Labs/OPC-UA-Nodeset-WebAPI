@@ -5,9 +5,9 @@ namespace OPC_UA_Nodeset_WebAPI.Model
 {
     public class ApiNodeSetModel
     {
-        public string ModelUri { get; set; }
+        public string? ModelUri { get; set; }
         
-        public string Version { get; set; }
+        public string? Version { get; set; }
         public DateTime? PublicationDate { get; set; }
 
         public int DataTypesCount { get; set; }
@@ -21,10 +21,12 @@ namespace OPC_UA_Nodeset_WebAPI.Model
         public int UnknownNodesCount { get; set; }
         public int VariableTypesCount { get; set; }
 
+        internal NodeSetModel? NodeSetModel { get; set; }
 
         public ApiNodeSetModel() { }
         public ApiNodeSetModel(NodeSetModel aNodeSetModel) 
         {
+            NodeSetModel = aNodeSetModel;
             ModelUri= aNodeSetModel.ModelUri;
             Version= aNodeSetModel.Version;
             PublicationDate = aNodeSetModel.PublicationDate;

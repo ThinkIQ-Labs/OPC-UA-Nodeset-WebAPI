@@ -64,5 +64,32 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             }
         }
 
+        [HttpGet("{nodeId}")]
+        [ProducesResponseType(200, Type = typeof(ApiObjectTypeModel))]
+        [ProducesResponseType(404, Type = typeof(NotFoundResult))]
+        public IActionResult GetById(string id, string uri, int nodeId)
+        {
+            var objectTypesListResult = Get(id, uri) as ObjectResult;
+
+            if (StatusCodes.Status200OK != objectTypesListResult.StatusCode)
+            {
+                return objectTypesListResult;
+            }
+            else
+            {
+                var propertiesList = objectTypesListResult.Value as List<ApiObjectTypeModel>;
+                var returnObject = propertiesList.FirstOrDefault(x => x.Id == nodeId);
+                if (returnObject != null)
+                {
+                    return Ok(returnObject);
+                }
+                else
+                {
+                    return NotFound("The node id does not exist.");
+                }
+            }
+        }
+
+
     }
 }

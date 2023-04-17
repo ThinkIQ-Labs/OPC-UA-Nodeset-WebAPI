@@ -4,17 +4,21 @@ using System.Xml.Linq;
 
 namespace OPC_UA_Nodeset_WebAPI.Model
 {
-    public class ApiPropertyModel
+    public class ApiPropertyModel : ApiUaNodeModel
     {
-        public string NodeId { get; set; }
-        public string DisplayName { get; set; }
-        
+                
+        public int ParentId { get; set; }
+        internal PropertyModel? PropertyModel { get; set; }
         public ApiPropertyModel() { }
+
         
         public ApiPropertyModel(PropertyModel aPropertyModel) 
         {
+            PropertyModel = aPropertyModel;
             NodeId = aPropertyModel.NodeId;
             DisplayName = aPropertyModel.DisplayName.First().Text;
+            Description = aPropertyModel.Description.First().Text;
+            ParentId = int.Parse(aPropertyModel.Parent.NodeId.Split("=").Last());
         }
 
     }

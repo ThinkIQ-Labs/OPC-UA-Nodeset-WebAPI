@@ -64,5 +64,32 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             }
         }
 
+        [HttpGet("{nodeId}")]
+        [ProducesResponseType(200, Type = typeof(ApiDataVariableModel))]
+        [ProducesResponseType(404, Type = typeof(NotFoundResult))]
+        public IActionResult GetById(string id, string uri, int nodeId)
+        {
+            var dataVariablesListResult = Get(id, uri) as ObjectResult;
+
+            if (StatusCodes.Status200OK != dataVariablesListResult.StatusCode)
+            {
+                return dataVariablesListResult;
+            }
+            else
+            {
+                var dataVariablesList = dataVariablesListResult.Value as List<ApiDataVariableModel>;
+                var returnObject = dataVariablesList.FirstOrDefault(x => x.Id == nodeId);
+                if (returnObject != null)
+                {
+                    return Ok(returnObject);
+                }
+                else
+                {
+                    return NotFound("The node id does not exist.");
+                }
+            }
+        }
+
+
     }
 }

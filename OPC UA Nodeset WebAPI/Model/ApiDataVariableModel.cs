@@ -4,19 +4,19 @@ using System.Xml.Linq;
 
 namespace OPC_UA_Nodeset_WebAPI.Model
 {
-    public class ApiDataVariableModel
+    public class ApiDataVariableModel : ApiUaNodeModel
     {
-        public string NodeId { get; set; }
-
-        public string DisplayName { get; set; }
-        
+        public int ParentId { get; set; }
+        internal DataVariableModel? DataVariableModel { get; set; }
         public ApiDataVariableModel() { }
         
         public ApiDataVariableModel(DataVariableModel aDataVariableModel) 
         {
+            DataVariableModel = aDataVariableModel;
             NodeId = aDataVariableModel.NodeId;
             DisplayName = aDataVariableModel.DisplayName.First().Text;
-
+            Description = aDataVariableModel.Description.First().Text;
+            ParentId = int.Parse(aDataVariableModel.Parent.NodeId.Split("=").Last());
         }
 
     }

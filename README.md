@@ -57,6 +57,7 @@ Azure web app's don't do slashes well in url's of resource-style web api's, we r
 We can manage object types in a nodeset.
 
 - GET /NodesetProject/id/NodesetModel/uri/ObjectType: to obtain all object types in a nodeset
+- GET /NodesetProject/id/NodesetModel/uri/ObjectType/nodeId: to obtain an object type in a nodeset by node id
 
 > Roadmap: CRUD object types, more detailed information on object type by nodeId
 
@@ -67,8 +68,8 @@ We can manage properties in a nodeset.
 *Note: Properties are flat-listed for the whole nodeset. To contextualize which node a property
 belongs to, use the parent node id, which could point to a data variable or an object type, for instance.*
 
-- GET /NodesetProject/id/NodesetModel/uri/Property: to obtain all object types in a nodeset
-- GET /NodesetProject/id/NodesetModel/uri/Property/nodeId: to obtain an object types in a nodeset by node id
+- GET /NodesetProject/id/NodesetModel/uri/Property: to obtain all properties in a nodeset
+- GET /NodesetProject/id/NodesetModel/uri/Property/nodeId: to obtain a property in a nodeset by node id
 
 > Roadmap: CRUD properties, more detailed information on property by nodeId
 
@@ -79,6 +80,7 @@ We can manage data variables in a nodeset.
 *Note: Data variables are flat-listed for the whole nodeset. To contextualize which node a data variable
 belongs to, use the parent node id, which could point to an object type, for instance.*
 
-- GET /NodesetProject/id/NodesetModel/uri/DataVariable: to obtain all object types in a nodeset
+- GET /NodesetProject/id/NodesetModel/uri/DataVariable: to obtain all data variables in a nodeset
+- GET /NodesetProject/id/NodesetModel/uri/DataVariable/nodeId: to obtain a data variable in a nodeset by node id
 
 > Roadmap: CRUD data variables, more detailed information on data variable by nodeId
