@@ -20,19 +20,6 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
 
         private ApplicationInstance ApplicationInstance { get; set; }
 
-        private IActionResult ActiveNodeSetProjectInstance(string id)
-        {
-            NodeSetProjectInstance aNodesetProjectInstance;
-            if (ApplicationInstance.NodeSetProjectInstances.TryGetValue(id, out aNodesetProjectInstance))
-            {
-                return Ok(aNodesetProjectInstance);
-            }
-            else
-            {
-                return NotFound($"{id} - not a valid project id."); ; // because the project doesn't exist
-            }
-        }
-
         public NodesetModelController(ILogger<NodesetModelController> logger, ApplicationInstance applicationInstance)
         {
             _logger = logger;
@@ -51,7 +38,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetById(string id)
         {
-            var activeNodesetProjectInstanceResult = ActiveNodeSetProjectInstance(id) as ObjectResult;
+            var activeNodesetProjectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
 
             if (StatusCodes.Status200OK != activeNodesetProjectInstanceResult.StatusCode)
             {
@@ -87,7 +74,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public async Task<IActionResult> LoadNodesetXmlFromServerAsync(string id, string uri)
         {
-            var activeNodesetProjectInstanceResult = ActiveNodeSetProjectInstance(id) as ObjectResult;
+            var activeNodesetProjectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
 
             if (StatusCodes.Status200OK != activeNodesetProjectInstanceResult.StatusCode)
             {
@@ -158,7 +145,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public async Task<IActionResult> PutAsync(string id, string domain, string name)
         {
-            var activeNodesetProjectInstanceResult = ActiveNodeSetProjectInstance(id) as ObjectResult;
+            var activeNodesetProjectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
 
             if (StatusCodes.Status200OK != activeNodesetProjectInstanceResult.StatusCode)
             {

@@ -14,27 +14,27 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
 
         private ApplicationInstance ApplicationInstance { get; set; }
 
-        private IActionResult ActiveNodeSetModel(string id, string uri)
-        {
-            var uriNoSlashes = HttpUtility.UrlDecode(uri).Replace("/", "");
-            NodeSetProjectInstance aNodesetProjectInstance;
-            if (ApplicationInstance.NodeSetProjectInstances.TryGetValue(id, out aNodesetProjectInstance))
-            {
-                NodeSetModel aNodesetModel;
-                if (aNodesetProjectInstance.NodeSetModels.Keys.Select(x=>x.Replace("/","")).Contains(uriNoSlashes))
-                {
-                    return Ok(aNodesetProjectInstance.NodeSetModels.First(x => x.Value.ModelUri.Replace("/", "") == uriNoSlashes).Value);
-                }
-                else
-                {
-                    return NotFound("The model does not exist.");
-                }
-            }
-            else
-            {
-                return NotFound("The project does not exist.");
-            }
-        }
+        //private IActionResult ActiveNodeSetModel(string id, string uri)
+        //{
+        //    var uriNoSlashes = HttpUtility.UrlDecode(uri).Replace("/", "");
+        //    NodeSetProjectInstance aNodesetProjectInstance;
+        //    if (ApplicationInstance.NodeSetProjectInstances.TryGetValue(id, out aNodesetProjectInstance))
+        //    {
+        //        NodeSetModel aNodesetModel;
+        //        if (aNodesetProjectInstance.NodeSetModels.Keys.Select(x=>x.Replace("/","")).Contains(uriNoSlashes))
+        //        {
+        //            return Ok(aNodesetProjectInstance.NodeSetModels.First(x => x.Value.ModelUri.Replace("/", "") == uriNoSlashes).Value);
+        //        }
+        //        else
+        //        {
+        //            return NotFound("The model does not exist.");
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return NotFound("The project does not exist.");
+        //    }
+        //}
 
         public ObjectTypeController(ILogger<NodesetProjectController> logger, ApplicationInstance applicationInstance)
         {
@@ -46,7 +46,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiObjectTypeModel>))]
         public IActionResult Get(string id, string uri)
         {
-            var activeNodesetModelResult = ActiveNodeSetModel(id, uri) as ObjectResult;
+            var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
 
             if (StatusCodes.Status200OK != activeNodesetModelResult.StatusCode)
             {
