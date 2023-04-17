@@ -25,13 +25,16 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
 
         public IActionResult GetNodeSetModel(string id, string uri)
         {
+            //var uriNoSlashes = HttpUtility.UrlDecode(uri); ;
             var uriNoSlashes = HttpUtility.UrlDecode(uri).Replace("/", "");
             NodeSetProjectInstance aNodesetProjectInstance;
             if (NodeSetProjectInstances.TryGetValue(id, out aNodesetProjectInstance))
             {
                 NodeSetModel aNodesetModel;
+                //if (aNodesetProjectInstance.NodeSetModels.Keys.Contains(uriNoSlashes))
                 if (aNodesetProjectInstance.NodeSetModels.Keys.Select(x => x.Replace("/", "")).Contains(uriNoSlashes))
                 {
+                    //return Ok(aNodesetProjectInstance.NodeSetModels.First(x => x.Value.ModelUri == uriNoSlashes).Value);
                     return Ok(aNodesetProjectInstance.NodeSetModels.First(x => x.Value.ModelUri.Replace("/", "") == uriNoSlashes).Value);
                 }
                 else

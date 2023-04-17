@@ -22,7 +22,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             ObjectTypeModel = aOjectTypeModel;
             NodeId = aOjectTypeModel.NodeId;
             DisplayName = aOjectTypeModel.DisplayName.First().Text;
-            Description = aOjectTypeModel.Description.First().Text;
+            Description = aOjectTypeModel.Description.Count==0 ?  "" : aOjectTypeModel.Description.First().Text;
             PropertiesCount = aOjectTypeModel.Properties.Count;
             DataVariablesCount = aOjectTypeModel.DataVariables.Count;
             SuperTypeNodeId = aOjectTypeModel.SuperType == null ? "" : aOjectTypeModel.SuperType.NodeId;

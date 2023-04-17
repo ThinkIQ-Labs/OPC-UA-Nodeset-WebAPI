@@ -50,6 +50,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                 var returnObject = new Dictionary<string, ApiNodeSetModel>();
                 foreach (var aNodeSetKeyValue in activeNodeSetProjectInstance.NodeSetModels)
                 {
+                    //returnObject.Add(aNodeSetKeyValue.Key, new ApiNodeSetModel(aNodeSetKeyValue.Value));
                     returnObject.Add(aNodeSetKeyValue.Key.Replace("/", ""), new ApiNodeSetModel(aNodeSetKeyValue.Value));
                 }
                 return Ok(returnObject);
@@ -93,6 +94,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                 {
                     var aNodesetModel = new ApiNodeSetModel(activeNodeSetProjectInstance.NodeSetModels[modelUriResultString]);
                     activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Success: Add NodeSetModel from file '{uri}'.");
+                    //return Ok(new Dictionary<string, ApiNodeSetModel> { { modelUriResultString, aNodesetModel } });
                     return Ok(new Dictionary<string, ApiNodeSetModel> { { modelUriResultString.Replace("/", ""), aNodesetModel } });
                 }
             }
@@ -167,6 +169,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                 {
                     var aNodesetModel = new ApiNodeSetModel(activeNodeSetProjectInstance.NodeSetModels[modelUriResultString]);
                     activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Success: Add new NodeSetModel '{aModelUri}'.");
+                    //return Ok(new Dictionary<string, ApiNodeSetModel> { { modelUriResultString, aNodesetModel } });
                     return Ok(new Dictionary<string, ApiNodeSetModel> { { modelUriResultString.Replace("/", ""), aNodesetModel } });
                 }
             }
