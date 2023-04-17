@@ -24,10 +24,10 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         }
 
         /// <summary>
-        /// Returns a dictionary of current projects.
+        /// Returns all current nodeset projects.
         /// </summary>
         /// <returns>Returns a dictionary of current projects.</returns>
-        /// <response code="200">Returns a dictionary of current projects.</response>
+        /// <response code="200">All nodeset projects were successfully retrieved.</response>
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiNodeSetProject>))]
         public IActionResult Get()
@@ -40,6 +40,13 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             return Ok(returnObject);
         }
 
+        /// <summary>
+        /// Returns a nodeset project by id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <response code="200">The nodeset project was successfully retrieved.</response>
+        /// <response code="404">The project id was not valid.</response>
         [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(Dictionary<string,ApiNodeSetProject>))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
@@ -57,7 +64,14 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             }
         }
 
-        [HttpPut]
+        /// <summary>
+        /// Creates a new nodeset project.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>Returns the newly created nodeset project with unique id.</returns>
+        /// <response code="200">The nodeset project was successfully created.</response>
+        /// <response code="400">The project could not be created.</response>
+        [HttpPut("{name}")]
         [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiNodeSetProject>))]
         [ProducesResponseType(400, Type = typeof(BadRequestResult))]
         public IActionResult Put(string name)
@@ -77,6 +91,13 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes a nodeset project by id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Returns the deleted project.</returns>
+        /// <response code="200">Project was successfully deleted.</response>
+        /// <response code="404">The project id was not valid.</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiNodeSetProject>))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]

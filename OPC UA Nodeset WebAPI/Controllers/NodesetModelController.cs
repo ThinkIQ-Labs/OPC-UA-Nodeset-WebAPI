@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using OPC_UA_Nodeset_WebAPI.Model;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
+using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Net;
@@ -19,16 +20,16 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
 
         private ApplicationInstance ApplicationInstance { get; set; }
 
-        private NodeSetProjectInstance ActiveNodeSetProjectInstance(string id)
+        private IActionResult ActiveNodeSetProjectInstance(string id)
         {
             NodeSetProjectInstance aNodesetProjectInstance;
             if (ApplicationInstance.NodeSetProjectInstances.TryGetValue(id, out aNodesetProjectInstance))
             {
-                return aNodesetProjectInstance;
+                return Ok(aNodesetProjectInstance);
             }
             else
             {
-                return null; // because the project doesn't exist
+                return NotFound($"{id} - not a valid project id."); ; // because the project doesn't exist
             }
         }
 
@@ -38,51 +39,89 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             ApplicationInstance = applicationInstance;
         }
 
+        /// <summary>
+        /// Retrieves all loaded nodeset models for a nodeset project.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Returns all loaded nodeset models for a nodeset project.</returns>
+        /// <response code="200">All nodeset models were successfully retrieved for a nodeset project.</response>
+        /// <response code="404">The project id was not valid.</response>
         [HttpGet]
-        public Dictionary<string, ApiNodeSetModel> Get(string id)
+        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiNodeSetModel>))]
+        [ProducesResponseType(404, Type = typeof(NotFoundResult))]
+        public IActionResult GetById(string id)
         {
-            var activeNodeSetProjectInstance = ActiveNodeSetProjectInstance(id);
-            if (activeNodeSetProjectInstance == null)
+            var activeNodesetProjectInstanceResult = ActiveNodeSetProjectInstance(id) as ObjectResult;
+
+            if (StatusCodes.Status200OK != activeNodesetProjectInstanceResult.StatusCode)
             {
-                return null;
+                return activeNodesetProjectInstanceResult;
+            }
+            else
+            {
+                var activeNodeSetProjectInstance = activeNodesetProjectInstanceResult.Value as NodeSetProjectInstance;
+                var returnObject = new Dictionary<string, ApiNodeSetModel>();
+                foreach (var aNodeSetKeyValue in activeNodeSetProjectInstance.NodeSetModels)
+                {
+                    returnObject.Add(aNodeSetKeyValue.Key.Replace("/", ""), new ApiNodeSetModel(aNodeSetKeyValue.Value));
+                }
+                return Ok(returnObject);
+
             }
 
-            var returnObject = new Dictionary<string, ApiNodeSetModel>();
-            foreach(var aNodeSetKeyValue in activeNodeSetProjectInstance.NodeSetModels)
-            {
-                returnObject.Add(aNodeSetKeyValue.Key.Replace("/", ""), new ApiNodeSetModel(aNodeSetKeyValue.Value));
-            }
-            return returnObject;
+
         }
 
+        /// <summary>
+        /// Loads a nodeset file from the server.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="uri"></param>
+        /// <returns>Returns a loaded nodeset model for a nodeset project.</returns>
+        /// <response code="200">The nodeset was successfully loaded and parsed as a nodeset model.</response>
+        /// <response code="400">The nodeset could not be loaded.</response>
+        /// <response code="404">The project id was not valid.</response>
         [HttpPost("LoadNodesetXmlFromServerAsync")]
         [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiNodeSetModel>))]
         [ProducesResponseType(400, Type = typeof(BadRequestResult))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public async Task<IActionResult> LoadNodesetXmlFromServerAsync(string id, string uri)
         {
-            var activeNodeSetProjectInstance = ActiveNodeSetProjectInstance(id);
-            if (activeNodeSetProjectInstance == null)
-            {
-                var message = $"{id} - not a valid project id.";
-                activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Fail: Add NodeSetModel from file '{uri}'. {message}");
-                return NotFound(message);
-            }
+            var activeNodesetProjectInstanceResult = ActiveNodeSetProjectInstance(id) as ObjectResult;
 
-            var modelUriResultString = await activeNodeSetProjectInstance.LoadNodeSetFromFileOnServerAsync(uri);
-            if(modelUriResultString.StartsWith("Error"))
+            if (StatusCodes.Status200OK != activeNodesetProjectInstanceResult.StatusCode)
             {
-                activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Fail: Add NodeSetModel from file '{uri}'. {modelUriResultString}");
-                return BadRequest($"{uri} - {modelUriResultString}");
+                return activeNodesetProjectInstanceResult;
             }
             else
             {
-                var aNodesetModel = new ApiNodeSetModel(activeNodeSetProjectInstance.NodeSetModels[modelUriResultString]);
-                activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Success: Add NodeSetModel from file '{uri}'.");
-                return Ok(new Dictionary<string, ApiNodeSetModel> { { modelUriResultString.Replace("/", ""), aNodesetModel } });
+                var activeNodeSetProjectInstance = activeNodesetProjectInstanceResult.Value as NodeSetProjectInstance;
+                var modelUriResultString = await activeNodeSetProjectInstance.LoadNodeSetFromFileOnServerAsync(uri);
+                if(modelUriResultString.StartsWith("Error"))
+                {
+                    activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Fail: Add NodeSetModel from file '{uri}'. {modelUriResultString}");
+                    return BadRequest($"{uri} - {modelUriResultString}");
+                }
+                else
+                {
+                    var aNodesetModel = new ApiNodeSetModel(activeNodeSetProjectInstance.NodeSetModels[modelUriResultString]);
+                    activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Success: Add NodeSetModel from file '{uri}'.");
+                    return Ok(new Dictionary<string, ApiNodeSetModel> { { modelUriResultString.Replace("/", ""), aNodesetModel } });
+                }
             }
+
+
         }
 
+        /// <summary>
+        /// Loads a nodeset file from a file upload.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="file"></param>
+        /// <returns>Returns a loaded nodeset model for a nodeset project.</returns>
+        /// <response code="200">The nodeset was successfully loaded and parsed as a nodeset model.</response>
+        /// <response code="400">The nodeset could not be loaded.</response>
+        /// <response code="404">The project id was not valid.</response>
         //https://medium.com/@niteshsinghal85/testing-file-upload-with-swagger-in-asp-net-core-90269bc24fe8
         [HttpPost("UploadNodesetXmlFromFileAsync")]
         [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiNodeSetModel>))]
@@ -103,32 +142,46 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         }
 
 
+        /// <summary>
+        /// Creates a blank nodeset model.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="domain"></param>
+        /// <param name="name"></param>
+        /// <returns>Returns a newly created blank nodeset model for a nodeset project.</returns>
+        /// <response code="200">The nodeset was successfully loaded and parsed as a nodeset model.</response>
+        /// <response code="400">The nodeset could not be loaded.</response>
+        /// <response code="404">The project id was not valid.</response>
         [HttpPut]
         [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiNodeSetModel>))]
         [ProducesResponseType(400, Type = typeof(BadRequestResult))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public async Task<IActionResult> PutAsync(string id, string domain, string name)
         {
-            var aModelUri = $"{domain}{(domain.EndsWith("/") ? "" : "/")}{name}{(name.EndsWith("/") ? "" : "/")}";
-            var activeNodeSetProjectInstance = ActiveNodeSetProjectInstance(id);
-            if (activeNodeSetProjectInstance == null)
-            {
-                var message = $"{id} - not a valid project id.";
-                activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Fail: Add new NodeSetModel '{aModelUri}'. {message}");
-                return NotFound(message);
-            }
+            var activeNodesetProjectInstanceResult = ActiveNodeSetProjectInstance(id) as ObjectResult;
 
-            var modelUriResultString = activeNodeSetProjectInstance.AddNewNodeSet(domain, name);
-            if(modelUriResultString.StartsWith("Error"))
+            if (StatusCodes.Status200OK != activeNodesetProjectInstanceResult.StatusCode)
             {
-                activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Fail: Add new NodeSetModel '{aModelUri}'. {modelUriResultString}");
-                return BadRequest($"{aModelUri} - {modelUriResultString}");
+                return activeNodesetProjectInstanceResult;
             }
             else
             {
-                var aNodesetModel = new ApiNodeSetModel(activeNodeSetProjectInstance.NodeSetModels[modelUriResultString]);
-                activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Success: Add new NodeSetModel '{aModelUri}'.");
-                return Ok(new Dictionary<string, ApiNodeSetModel> { { modelUriResultString.Replace("/", ""), aNodesetModel } });
+                var activeNodeSetProjectInstance = activeNodesetProjectInstanceResult.Value as NodeSetProjectInstance;
+
+                var aModelUri = $"{domain}{(domain.EndsWith("/") ? "" : "/")}{name}{(name.EndsWith("/") ? "" : "/")}";
+
+                var modelUriResultString = activeNodeSetProjectInstance.AddNewNodeSet(domain, name);
+                if (modelUriResultString.StartsWith("Error"))
+                {
+                    activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Fail: Add new NodeSetModel '{aModelUri}'. {modelUriResultString}");
+                    return BadRequest($"{aModelUri} - {modelUriResultString}");
+                }
+                else
+                {
+                    var aNodesetModel = new ApiNodeSetModel(activeNodeSetProjectInstance.NodeSetModels[modelUriResultString]);
+                    activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Success: Add new NodeSetModel '{aModelUri}'.");
+                    return Ok(new Dictionary<string, ApiNodeSetModel> { { modelUriResultString.Replace("/", ""), aNodesetModel } });
+                }
             }
         }
 
