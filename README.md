@@ -16,6 +16,19 @@ manipulating OPC UA NodeSets.
 The best way to explore the project is to take a look at the 
 [Swagger](https://opcuanodesetwebapi.azurewebsites.net/swagger/index.html) api documentation.
 
+### Locally Stored UA NodeSets
+
+Depending on the use case, some NodeSets are standard dependencies. The system can store, retrieve, 
+upload and delete NodeSet XML files. This endpoint allows a system to be deployed without any local 
+NodeSet files and then casually populated by the user. It also allows the removal of UA NodeSets in 
+order to upload newer versions. Multiple versions of the same NodeSet could be stored, as long as 
+different file names are used.
+
+- GET /LocalNodeset: to retrieve file names, namespaces, version, release dates and dependencies of all locally stored UA NodeSets
+- PUT /LocalNodeset: to upload an XML file, which will get stored on the server once it successfully passes as a legit UA NodeSet file
+- GET /LocalNodeset/fileName: to download the full XML content of a stored UA NodeSet
+- DELETE /LocalNodeset/fileName: to delete a stored UA NodeSet
+
 ### UA NodeSet Projects
 
 The entrance point into the api is the notion of a project. Projects are stored in memory and present 
