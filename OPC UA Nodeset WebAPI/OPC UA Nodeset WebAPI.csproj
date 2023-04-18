@@ -25,13 +25,19 @@
 
   <ItemGroup>
     <None Update="NodeSets\opcfoundation.org.UA.DI.NodeSet2.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NodeSetCache\NodeSets\opcfoundation.org.UA.NodeSet2.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="NodeSetCache\NodeSets\opcfoundation.org.UA.Robotics.NodeSet2.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="NodeSets\opcfoundation.org.UA.NodeSet2.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="NodeSets\opcfoundation.org.UA.Robotics.NodeSet2.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
