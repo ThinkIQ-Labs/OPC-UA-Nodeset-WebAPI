@@ -20,4 +20,12 @@ namespace Opc.Ua.Export
             }
         }
     }
+
+    public class UANodeSetBase64Upload
+    {
+        public string FileName { get; set; }
+        public string XmlBase64 { get; set; }
+
+        public UANodeSetBase64Upload() { }
+    }
 }

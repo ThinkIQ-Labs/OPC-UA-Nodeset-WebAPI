@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using Opc.Ua.Export;
 using OPC_UA_Nodeset_WebAPI.Model;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System;
 using System.Collections.Concurrent;
+using System.Text;
 using System.Xml;
 
 namespace OPC_UA_Nodeset_WebAPI.Controllers
@@ -125,6 +127,101 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                 }
 
                 return BadRequest($"{file.FileName} could not be added to the server. Is it a valid nodeset xml file?");
+
+            }
+        }
+
+        /// <summary>
+        /// Loads a nodeset file from a string that is encoded using base64.
+        /// </summary>
+        /// <returns>Returns a loaded nodeset model for a nodeset project.</returns>
+        /// <response code="200">The nodeset was successfully loaded and parsed as a nodeset model.</response>
+        /// <response code="400">The nodeset could not be loaded.</response>
+        //https://medium.com/@niteshsinghal85/testing-file-upload-with-swagger-in-asp-net-core-90269bc24fe8
+        [HttpPost]
+        [ProducesResponseType(200, Type = typeof(ApiNodeSetInfoWithDependencies))]
+        [ProducesResponseType(400, Type = typeof(BadRequestResult))]
+
+        public async Task<IActionResult> UploadNodesetXmlFromBase64([FromBody] UANodeSetBase64Upload data)
+        {
+
+            var filePath = $"{AppContext.BaseDirectory}/NodeSets/{data.FileName}";
+
+            try
+            {
+                var valueBytes = Convert.FromBase64String(data.XmlBase64);
+                var xml = Encoding.UTF8.GetString(valueBytes);
+
+                System.IO.File.WriteAllText(filePath, xml);
+
+                // we saved a file. now we need to verify it's a legit nodeset
+                string aXmlString = System.IO.File.ReadAllText(filePath);
+                var aNodeSet = UANodeSetFromString.Read(aXmlString);
+                var returnObject = new ApiNodeSetInfoWithDependencies(aNodeSet);
+
+                // since we added a nodeset we have to update the listing of all available nodesets
+                ApplicationInstance.ScanNodesetFiles();
+
+                return Ok(returnObject);
+
+            }
+            catch (Exception ex)
+            {
+
+                // if we're here something went wrong and we need to delete the file
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+
+                return BadRequest($"{data.FileName} could not be added to the server. Is it a valid nodeset xml file?");
+
+            }
+        }
+
+        /// <summary>
+        /// Loads a nodeset file from a string that is encoded using base64.
+        /// </summary>
+        /// <returns>Returns a loaded nodeset model for a nodeset project.</returns>
+        /// <response code="200">The nodeset was successfully loaded and parsed as a nodeset model.</response>
+        /// <response code="400">The nodeset could not be loaded.</response>
+        //https://medium.com/@niteshsinghal85/testing-file-upload-with-swagger-in-asp-net-core-90269bc24fe8
+        [HttpPost("GetInfoNodesetXmlFromBase64")]
+        [ProducesResponseType(200, Type = typeof(ApiNodeSetInfoWithDependencies))]
+        [ProducesResponseType(400, Type = typeof(BadRequestResult))]
+
+        public async Task<IActionResult> GetInfoNodesetXmlFromBase64([FromBody] UANodeSetBase64Upload data)
+        {
+
+            var filePath = Path.GetTempFileName();
+
+            try
+            {
+                var valueBytes = Convert.FromBase64String(data.XmlBase64);
+                var xml = Encoding.UTF8.GetString(valueBytes);
+
+                System.IO.File.WriteAllText(filePath, xml);
+
+                // we saved a file. now we need to verify it's a legit nodeset
+                string aXmlString = System.IO.File.ReadAllText(filePath);
+                var aNodeSet = UANodeSetFromString.Read(aXmlString);
+                var returnObject = new ApiNodeSetInfoWithDependencies(aNodeSet);
+
+                System.IO.File.Delete(filePath);
+
+                return Ok(returnObject);
+
+            }
+            catch (Exception ex)
+            {
+
+                // if we're here something went wrong and we need to delete the file
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+
+                return BadRequest($"{data.FileName} could not be parsed. Is it a valid nodeset xml file?");
 
             }
         }

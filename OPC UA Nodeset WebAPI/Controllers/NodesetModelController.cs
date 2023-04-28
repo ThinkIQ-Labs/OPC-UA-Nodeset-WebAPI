@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Opc.Ua.Export;
 using OPC_UA_Nodeset_WebAPI.Model;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Net;
+using System.Text;
 using System.Xml.Linq;
 
 namespace OPC_UA_Nodeset_WebAPI.Controllers
@@ -124,6 +126,35 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             {
                 await file.CopyToAsync(stream);
             }
+            var response = await LoadNodesetXmlFromServerAsync(id, filePath);
+            System.IO.File.Delete(filePath);
+
+            return response;
+        }
+
+        /// <summary>
+        /// Loads a nodeset file from a string that is encoded using base64.
+        /// </summary>
+        /// <returns>Returns a loaded nodeset model for a nodeset project.</returns>
+        /// <response code="200">The nodeset was successfully loaded and parsed as a nodeset model.</response>
+        /// <response code="400">The nodeset could not be loaded.</response>
+        /// <response code="404">The project id was not valid.</response>
+        //https://medium.com/@niteshsinghal85/testing-file-upload-with-swagger-in-asp-net-core-90269bc24fe8
+        [HttpPost("UploadNodesetXmlFromBase64")]
+        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiNodeSetModel>))]
+        [ProducesResponseType(400, Type = typeof(BadRequestResult))]
+        [ProducesResponseType(404, Type = typeof(NotFoundResult))]
+
+        public async Task<IActionResult> UploadNodesetXmlFromBase64(string id, [FromBody] UANodeSetBase64Upload data)
+        {
+
+            var filePath = Path.GetTempFileName();
+
+            var valueBytes = Convert.FromBase64String(data.XmlBase64);
+            var xml = Encoding.UTF8.GetString(valueBytes);
+
+            System.IO.File.WriteAllText(filePath, xml);
+
             var response = await LoadNodesetXmlFromServerAsync(id, filePath);
             System.IO.File.Delete(filePath);
 

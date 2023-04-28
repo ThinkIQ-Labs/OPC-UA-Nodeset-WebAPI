@@ -57,7 +57,7 @@ is important. Nodesets can be loaded from the server, if available, or by upload
 *Note: When nodesets are added to a project we use the namespace uri as a key for further drill down. Because 
 Azure web app's don't do slashes well in url's of resource-style web api's, we remove the slashes.*
 
-> Roadmap: Be able to view, add, and remove nodeset files on the server
+> ~~Roadmap: Be able to view, add, and remove nodeset files on the server~~
 >
 > Roadmap: Be able to load a nodeset from a cloud library by namespace
 >
