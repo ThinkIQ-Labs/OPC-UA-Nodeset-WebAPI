@@ -70,6 +70,13 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
         }
         private async Task<string> TryImportOfNodeset(UANodeSet nodeSet, ModelTableEntry modelEntry)
         {
+            // check if namespace is already present
+            if (NodeSetModels.Where(x => x.Value.ModelUri == modelEntry.ModelUri).Count() > 0)
+            {
+                return $"Error: NodeSet {modelEntry.ModelUri} already exists.";
+            }
+
+            // check if all requirements are in place
             bool allowImport = true;
             if (modelEntry.RequiredModel != null)
             {
@@ -82,6 +89,8 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
                     }
                 }
             }
+
+            // attempt import of nodeset
             if (allowImport)
             {
                 await importer.LoadNodeSetModelAsync(opcContext, nodeSet);
