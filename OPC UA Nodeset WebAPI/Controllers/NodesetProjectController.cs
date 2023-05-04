@@ -68,16 +68,17 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         /// Creates a new nodeset project.
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="owner"></param>
         /// <returns>Returns the newly created nodeset project with unique id.</returns>
         /// <response code="200">The nodeset project was successfully created.</response>
         /// <response code="400">The project could not be created.</response>
         [HttpPut("{name}")]
         [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiNodeSetProject>))]
         [ProducesResponseType(400, Type = typeof(BadRequestResult))]
-        public IActionResult Put(string name)
+        public IActionResult Put(string name, string owner)
         {
             var key = Guid.NewGuid().ToString().Split("-")[0];
-            var result = ApplicationInstance.NodeSetProjectInstances.TryAdd(key, new NodeSetProjectInstance(name));
+            var result = ApplicationInstance.NodeSetProjectInstances.TryAdd(key, new NodeSetProjectInstance(name, owner));
             if (result)
             {
                 var getByIdResult = GetById(key) as OkObjectResult;

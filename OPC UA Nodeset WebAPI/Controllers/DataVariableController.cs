@@ -14,28 +14,6 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
 
         private ApplicationInstance ApplicationInstance { get; set; }
 
-        //private IActionResult ActiveNodeSetModel(string id, string uri)
-        //{
-        //    var uriNoSlashes = HttpUtility.UrlDecode(uri).Replace("/", "");
-        //    NodeSetProjectInstance aNodesetProjectInstance;
-        //    if (ApplicationInstance.NodeSetProjectInstances.TryGetValue(id, out aNodesetProjectInstance))
-        //    {
-        //        NodeSetModel aNodesetModel;
-        //        if (aNodesetProjectInstance.NodeSetModels.Keys.Select(x=>x.Replace("/","")).Contains(uriNoSlashes))
-        //        {
-        //            return Ok(aNodesetProjectInstance.NodeSetModels.First(x => x.Value.ModelUri.Replace("/", "") == uriNoSlashes).Value);
-        //        }
-        //        else
-        //        {
-        //            return NotFound("The model does not exist.");
-        //        }
-        //    }
-        //    else
-        //    {
-        //        return NotFound("The project does not exist.");
-        //    }
-        //}
-
         public DataVariableController(ILogger<NodesetProjectController> logger, ApplicationInstance applicationInstance)
         {
             _logger = logger;
@@ -90,6 +68,31 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             }
         }
 
+        [HttpGet("ByParentId")]
+        [ProducesResponseType(200, Type = typeof(List<ApiDataVariableModel>))]
+        [ProducesResponseType(404, Type = typeof(NotFoundResult))]
+        public IActionResult GetByParentId(string id, string uri, int parentId)
+        {
+            var dataVariablesListResult = Get(id, uri) as ObjectResult;
+
+            if (StatusCodes.Status200OK != dataVariablesListResult.StatusCode)
+            {
+                return dataVariablesListResult;
+            }
+            else
+            {
+                var dataVariablesList = dataVariablesListResult.Value as List<ApiDataVariableModel>;
+                var returnObject = dataVariablesList.Where(x => x.ParentId == parentId);
+                if (returnObject != null)
+                {
+                    return Ok(returnObject);
+                }
+                else
+                {
+                    return NotFound("The node id does not exist.");
+                }
+            }
+        }
 
     }
 }

@@ -12,7 +12,10 @@ namespace OPC_UA_Nodeset_WebAPI.Model
         public int PropertiesCount { get; set; }
         public int DataVariablesCount { get; set; }
 
-        public string? SuperTypeNodeId { get; set; }
+        public string SuperTypeNodeId { get; set; }
+
+        public List<string> ObjectsNodeIds { get; set; }
+
         internal ObjectTypeModel? ObjectTypeModel { get; set; }
         
         public ApiObjectTypeModel() { }
@@ -26,6 +29,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             PropertiesCount = aOjectTypeModel.Properties.Count;
             DataVariablesCount = aOjectTypeModel.DataVariables.Count;
             SuperTypeNodeId = aOjectTypeModel.SuperType == null ? "" : aOjectTypeModel.SuperType.NodeId;
+            ObjectsNodeIds = aOjectTypeModel.Objects == null ? new List<string>() : aOjectTypeModel.Objects.Select(x=>x.NodeId).ToList();
         }
 
     }

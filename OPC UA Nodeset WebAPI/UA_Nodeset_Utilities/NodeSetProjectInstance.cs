@@ -14,6 +14,7 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
         const string strNodeSetDirectory = "NodeSets";
 
         public string Name { get; set; }
+        public string Owner { get; set; }
 
         public Dictionary<string, string> Log { get; set; }
 
@@ -23,9 +24,10 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
 
         UANodeSetModelImporter importer { get; set; }
 
-        public NodeSetProjectInstance(string name)
+        public NodeSetProjectInstance(string name, string owner)
         {
             Name = name;
+            Owner = owner;
             importer = new UANodeSetModelImporter(NullLogger.Instance);
             NodeSetModels = new();
             opcContext = new DefaultOpcUaContext(NodeSetModels, NullLogger.Instance);

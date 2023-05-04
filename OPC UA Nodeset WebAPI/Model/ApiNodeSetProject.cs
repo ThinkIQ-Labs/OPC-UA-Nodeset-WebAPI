@@ -11,6 +11,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
     public class ApiNodeSetProject
     {
         public string Name { get; set; }
+        public string Owner { get; set; }
         public Dictionary<string, string> Log { get; set; }
 
         public void AddToLog(string msg)
@@ -24,6 +25,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
         public ApiNodeSetProject(NodeSetProjectInstance aNodesetProjectInstance)
         {
             Name= aNodesetProjectInstance.Name;
+            Owner= aNodesetProjectInstance.Owner;
             NodeSetModelCount=aNodesetProjectInstance.NodeSetModels.Count;
             Log = aNodesetProjectInstance.Log;
         }
