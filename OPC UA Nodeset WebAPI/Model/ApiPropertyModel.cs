@@ -18,7 +18,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             NodeId = aPropertyModel.NodeId;
             DisplayName = aPropertyModel.DisplayName.First().Text;
             Description = aPropertyModel.Description.Count == 0 ? "" : aPropertyModel.Description.First().Text;
-            ParentId = int.Parse(aPropertyModel.Parent.NodeId.Split("=").Last());
+            ParentId = aPropertyModel.Parent == null ? 0 : int.Parse(aPropertyModel.Parent.NodeId.Split("=").Last());
         }
 
     }

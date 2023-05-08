@@ -8,12 +8,8 @@ using System.Text.Json.Serialization;
 
 namespace OPC_UA_Nodeset_WebAPI.Model
 {
-    public class ApiNodeSetInfoWithDependencies
+    public class ApiNodeSetInfoWithDependencies : ApiNodeSetInfo
     {
-        public string? ModelUri { get; set; }
-
-        public string? Version { get; set; }
-        public DateTime? PublicationDate { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public List<ApiNodeSetInfoWithDependencies> RequiredNodeSets { get; set; }

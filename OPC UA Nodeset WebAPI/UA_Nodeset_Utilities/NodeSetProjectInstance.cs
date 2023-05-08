@@ -103,7 +103,7 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
                 return "Error: NodeSet can not be imported.";
             }
         }
-        public string AddNewNodeSet(string domain, string name)
+        public string AddNewNodeSet(string aModelUri)
         {
             NodeSetModel uaBaseModel;
             if (NodeSetModels.ContainsKey(Namespaces.OpcUa))
@@ -117,7 +117,7 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
 
             var newNodeSetModel = new NodeSetModel
             {
-                ModelUri = $"{domain}{(domain.EndsWith("/") ? "" : "/")}{name}{(name.EndsWith("/") ? "" : "/")}",
+                ModelUri = aModelUri,
                 RequiredModels = new List<RequiredModelInfo>
                 {
                     new RequiredModelInfo { ModelUri= uaBaseModel.ModelUri, PublicationDate = uaBaseModel.PublicationDate, Version = uaBaseModel.Version}
