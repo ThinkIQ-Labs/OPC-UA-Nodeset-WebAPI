@@ -232,30 +232,36 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
 
                 var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
                 var activeNodesetProject = (((ApplicationInstance.GetNodeSetProjectInstance(id)) as ObjectResult).Value as NodeSetProjectInstance).NodeSetModels;
-                
+                //activeNodesetProject.Remove(uri);
+
+                //var namespaceUris = activeNodesetModel.AllNodesByNodeId.Values.Select(v => v.Namespace).Distinct().ToList();
+
+               // activeNodesetModel.UpdateIndices();
+
                 var exportedNodeSetXml = UANodeSetModelExporter.ExportNodeSetAsXml(activeNodesetModel, activeNodesetProject);
 
 
                 var filePath = Path.GetTempFileName();
-
                 System.IO.File.WriteAllText(filePath, exportedNodeSetXml);
-
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.Load(filePath);
-
                 System.IO.File.Delete(filePath);
+                return Ok(xmlDoc);
+
+                // xmlDoc.load failed with a invalid starting character complaint
+                // https://stackoverflow.com/questions/17795167/xml-loaddata-data-at-the-root-level-is-invalid-line-1-position-1
 
                 // remove header line before load
                 // string xmlNoHeaderLine = exportedNodeSetXml.Substring(exportedNodeSetXml.IndexOf(Environment.NewLine));
 
                 // remove preamble
-                // string _byteOrderMarkUtf8 = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
-                // if (exportedNodeSetXml.StartsWith(_byteOrderMarkUtf8))
-                // {
-                //     exportedNodeSetXml = exportedNodeSetXml.Remove(0, _byteOrderMarkUtf8.Length);
-                // }
+                //string _byteOrderMarkUtf8 = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
+                //if (exportedNodeSetXml.StartsWith(_byteOrderMarkUtf8))
+                //{
+                //    exportedNodeSetXml = exportedNodeSetXml.Remove(0, _byteOrderMarkUtf8.Length);
+                //}
 
-                return Ok(xmlDoc);
+                //return Ok(exportedNodeSetXml);
 
             }
         }

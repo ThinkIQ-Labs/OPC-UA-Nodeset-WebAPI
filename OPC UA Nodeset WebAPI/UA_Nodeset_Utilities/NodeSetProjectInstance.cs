@@ -19,6 +19,7 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
         public Dictionary<string, string> Log { get; set; }
 
         public Dictionary<string, NodeSetModel> NodeSetModels { get; set; }
+        public Dictionary<string, uint> NextNodeIds { get; set; }
 
         DefaultOpcUaContext opcContext { get; set; }
 
@@ -30,6 +31,7 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
             Owner = owner;
             importer = new UANodeSetModelImporter(NullLogger.Instance);
             NodeSetModels = new();
+            NextNodeIds = new();
             opcContext = new DefaultOpcUaContext(NodeSetModels, NullLogger.Instance);
             Log = new();
         }
@@ -51,7 +53,6 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
             return await TryImportOfNodeset(nodeSet, modelEntry);
         }
 
-
         public async Task<string> LoadNodeSetFromFileUploadAsync(string xml)
         {
             UANodeSet nodeSet;
@@ -70,6 +71,7 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
 
             return await TryImportOfNodeset(nodeSet, modelEntry);
         }
+
         private async Task<string> TryImportOfNodeset(UANodeSet nodeSet, ModelTableEntry modelEntry)
         {
             // check if namespace is already present
@@ -96,6 +98,9 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
             if (allowImport)
             {
                 await importer.LoadNodeSetModelAsync(opcContext, nodeSet);
+
+                NextNodeIds.Add(modelEntry.ModelUri, 10000);
+
                 return modelEntry.ModelUri;
             }
             else
@@ -103,6 +108,7 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
                 return "Error: NodeSet can not be imported.";
             }
         }
+
         public string AddNewNodeSet(string aModelUri)
         {
             NodeSetModel uaBaseModel;
@@ -125,9 +131,23 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
             };
 
             NodeSetModels.Add(newNodeSetModel.ModelUri, newNodeSetModel);
+
+            NextNodeIds.Add(newNodeSetModel.ModelUri, 10000);
             
             return newNodeSetModel.ModelUri;
             
+        }
+
+        public ObjectTypeModel GetObjectTypeModelByNodeId(string nodeId)
+        {
+            var id = int.Parse(nodeId.Split("=").Last());
+            var uri = nodeId.Split("=")[1].Split(";").First();
+
+            var nodeset = NodeSetModels[uri];
+            var objectType = nodeset.ObjectTypes.FirstOrDefault(x => x.NodeId == nodeId);
+
+            return objectType;
+
         }
     }
 }
