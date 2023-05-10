@@ -215,7 +215,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         /// </summary>
         /// <returns>Returns a nodeset xml file.</returns>
         /// <response code="200">The nodeset was successfully delivered.</response>
-        [HttpGet("GenerateXml/{uri}")]
+        [HttpGet("{uri}/GenerateXml")]
         [Produces("application/xml")]
         [ProducesResponseType(200, Type = typeof(ConcurrentDictionary<string, ApiNodeSetInfoWithDependencies>))]
         public IActionResult GenerateXml(string id, string uri)
@@ -236,7 +236,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
 
                 //var namespaceUris = activeNodesetModel.AllNodesByNodeId.Values.Select(v => v.Namespace).Distinct().ToList();
 
-               // activeNodesetModel.UpdateIndices();
+                activeNodesetModel.UpdateIndices();
 
                 var exportedNodeSetXml = UANodeSetModelExporter.ExportNodeSetAsXml(activeNodesetModel, activeNodesetProject);
 

@@ -98,16 +98,17 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
 
                     var newObjectTypeModel = new ObjectTypeModel
                     {
-                        DisplayName = new List<NodeModel.LocalizedText> { apiObjectTypeModel.DisplayName },
-                        SuperType = activeProjectInstance.GetObjectTypeModelByNodeId(apiObjectTypeModel.SuperTypeNodeId),
                         NodeSet = activeNodesetModel,
                         NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++, activeNodesetModel.ModelUri),
+                        SuperType = activeProjectInstance.GetObjectTypeModelByNodeId(apiObjectTypeModel.SuperTypeNodeId),
+                        DisplayName = new List<NodeModel.LocalizedText> { apiObjectTypeModel.DisplayName },
                         Description = new List<NodeModel.LocalizedText> { apiObjectTypeModel.Description == null ? "" : apiObjectTypeModel.Description },
                         Properties = new List<VariableModel>(),
                         DataVariables = new List<DataVariableModel>(),
                     };
 
                     activeNodesetModel.ObjectTypes.Add(newObjectTypeModel);
+                    activeNodesetModel.UpdateIndices();
                     return Ok(new ApiObjectTypeModel(newObjectTypeModel));
                 }
                 else

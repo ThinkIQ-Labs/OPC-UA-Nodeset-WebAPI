@@ -95,5 +95,55 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             }
         }
 
+
+        [HttpPut]
+        [ProducesResponseType(200, Type = typeof(ApiPropertyModel))]
+        [ProducesResponseType(404, Type = typeof(NotFoundResult))]
+        public IActionResult PutAsync(string id, string uri, [FromBody] ApiNewPropertyModel apiPropertyModel)
+        {
+
+            var propertiesListResult = Get(id, uri) as ObjectResult;
+
+            if (StatusCodes.Status200OK != propertiesListResult.StatusCode)
+            {
+                return propertiesListResult;
+            }
+            else
+            {
+                var properties = propertiesListResult.Value as List<ApiPropertyModel>;
+                var existingProperty = properties.Where(x=>x.ParentId== apiPropertyModel.ParentId).FirstOrDefault(x => x.DisplayName == apiPropertyModel.DisplayName);
+                if (existingProperty == null)
+                {
+                    // add new property
+                    var projectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
+                    var activeProjectInstance = projectInstanceResult.Value as NodeSetProjectInstance;
+
+                    var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
+                    var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
+
+                    // look up parent object
+                    var parentNode = activeNodesetModel.AllNodesByNodeId[ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(apiPropertyModel.ParentId, activeNodesetModel.ModelUri)];
+
+                    var newPropertyModel = new PropertyModel
+                    {
+                        NodeSet = activeNodesetModel,
+                        NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++, activeNodesetModel.ModelUri),
+                        Parent = parentNode,
+                        DisplayName = new List<NodeModel.LocalizedText> { apiPropertyModel.DisplayName },
+                        Description = new List<NodeModel.LocalizedText> { }
+                    };
+
+                    parentNode.Properties.Add(newPropertyModel);
+                    activeNodesetModel.UpdateIndices();
+                    return Ok(new ApiPropertyModel(newPropertyModel));
+                }
+                else
+                {
+                    return BadRequest("A property with this name exists.");
+                }
+            }
+        }
+
+
     }
 }
