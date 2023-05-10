@@ -9,10 +9,10 @@ using System.Xml;
 // create client
 HttpClient client = new HttpClient();
 client.BaseAddress = new Uri("https://localhost:7074/");
+HttpResponseMessage response;
 
 // get local nodesets
-var response = await client.GetAsync($"LocalNodeset");
-var localNodesets = await response.Content.ReadFromJsonAsync<Dictionary<string, ApiNodeSetInfoWithDependencies>>();
+var localNodesets = await client.GetFromJsonAsync<Dictionary<string, ApiNodeSetInfoWithDependencies>>($"LocalNodeset");
 var uaFileName = localNodesets.First(x => x.Value.ModelUri == "http://opcfoundation.org/UA/").Key;
 
 // get session
@@ -24,8 +24,7 @@ response = await client.PostAsync($"NodesetProject/{sessionKey}/NodesetModel/Loa
 var uaModelInfo = (await response.Content.ReadFromJsonAsync<Dictionary<string, ApiNodeSetModel>>()).First();
 
 // get ua object types
-response = await client.GetAsync($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/ObjectType");
-var uaObjectTypes = await response.Content.ReadFromJsonAsync<List<ApiObjectTypeModel>>();
+var uaObjectTypes = await client.GetFromJsonAsync<List<ApiObjectTypeModel>>($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/ObjectType");
 var uaBaseObjectType = uaObjectTypes.First(x => x.DisplayName == "BaseObjectType");
 
 // create new model
