@@ -25,6 +25,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             ObjectTypeModel = aOjectTypeModel;
             NodeId = aOjectTypeModel.NodeId;
             DisplayName = aOjectTypeModel.DisplayName.First().Text;
+            BrowseName = aOjectTypeModel.BrowseName;
             Description = aOjectTypeModel.Description.Count==0 ?  "" : aOjectTypeModel.Description.First().Text;
             PropertiesCount = aOjectTypeModel.Properties.Count;
             DataVariablesCount = aOjectTypeModel.DataVariables.Count;

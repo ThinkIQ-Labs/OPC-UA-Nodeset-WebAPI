@@ -6,19 +6,21 @@ namespace OPC_UA_Nodeset_WebAPI.Model
 {
     public class ApiPropertyModel : ApiUaNodeModel
     {
-                
         public uint ParentId { get; set; }
+        internal NodeModel? ParentModel { get; set; }
         internal PropertyModel? PropertyModel { get; set; }
         public ApiPropertyModel() { }
 
-        
-        public ApiPropertyModel(PropertyModel aPropertyModel) 
+
+        public ApiPropertyModel(PropertyModel aPropertyModel)
         {
             PropertyModel = aPropertyModel;
             NodeId = aPropertyModel.NodeId;
             DisplayName = aPropertyModel.DisplayName.First().Text;
+            BrowseName = aPropertyModel.BrowseName;
             Description = aPropertyModel.Description.Count == 0 ? "" : aPropertyModel.Description.First().Text;
-            ParentId = aPropertyModel.Parent == null ? 0 : uint.Parse(aPropertyModel.Parent.NodeId.Split("=").Last());
+            ParentModel = aPropertyModel.Parent;
+            ParentId = ParentModel == null ? 0 : ApiUaNodeModel.GetIdFromNodeId(ParentModel.NodeId);
         }
 
     }

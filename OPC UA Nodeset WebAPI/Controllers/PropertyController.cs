@@ -130,6 +130,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                         NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++, activeNodesetModel.ModelUri),
                         Parent = parentNode,
                         DisplayName = new List<NodeModel.LocalizedText> { apiPropertyModel.DisplayName },
+                        BrowseName= apiPropertyModel.BrowseName,
                         Description = new List<NodeModel.LocalizedText> { }
                     };
 

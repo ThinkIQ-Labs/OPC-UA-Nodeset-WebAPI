@@ -102,6 +102,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                         NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++, activeNodesetModel.ModelUri),
                         SuperType = activeProjectInstance.GetObjectTypeModelByNodeId(apiObjectTypeModel.SuperTypeNodeId),
                         DisplayName = new List<NodeModel.LocalizedText> { apiObjectTypeModel.DisplayName },
+                        BrowseName = apiObjectTypeModel.BrowseName,
                         Description = new List<NodeModel.LocalizedText> { apiObjectTypeModel.Description == null ? "" : apiObjectTypeModel.Description },
                         Properties = new List<VariableModel>(),
                         DataVariables = new List<DataVariableModel>(),

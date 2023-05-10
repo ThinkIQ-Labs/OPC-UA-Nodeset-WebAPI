@@ -7,7 +7,7 @@ using System.Xml.Linq;
 
 namespace OPC_UA_Nodeset_WebAPI.Model
 {
-    public class ApiNewObjectTypeModel
+    public class ApiNewDataVariableModel
     {
         public string DisplayName { get; set; }
         public string BrowseName { get; set; }
@@ -16,7 +16,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
 
         public string SuperTypeNodeId { get; set; }
 
-        public ApiNewObjectTypeModel() { }
+        public ApiNewDataVariableModel() { }
 
 
     }

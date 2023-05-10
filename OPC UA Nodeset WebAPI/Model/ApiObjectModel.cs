@@ -20,6 +20,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             ObjectTypeModel = aOjectModel;
             NodeId = aOjectModel.NodeId;
             DisplayName = aOjectModel.DisplayName.First().Text;
+            BrowseName = aOjectModel.BrowseName;
             Description = aOjectModel.Description.Count==0 ?  "" : aOjectModel.Description.First().Text;
             TypeDefinitionNodeId = aOjectModel.TypeDefinition == null ? "" : aOjectModel.TypeDefinition.NodeId;
         }
