@@ -9,7 +9,8 @@ using System.Xml;
 // create client
 HttpClient client = new HttpClient();
 //client.BaseAddress = new Uri("https://localhost:7074/");
-client.BaseAddress = new Uri("https://opcuanodesetwebapi.azurewebsites.net/");
+client.BaseAddress = new Uri("https://localhost:5001/");
+//client.BaseAddress = new Uri("https://opcuanodesetwebapi.azurewebsites.net/");
 HttpResponseMessage response;
 
 // get local nodesets
@@ -44,7 +45,8 @@ response = await client.PutAsJsonAsync<ApiNewObjectTypeModel>(
     $"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/ObjectType",
     new ApiNewObjectTypeModel
     {
-        DisplayName = "new type",
+        DisplayName = "New Type",
+        BrowseName = "new_type",
         Description = "fancy type",
         SuperTypeNodeId = uaBaseObjectType.NodeId
     });
@@ -56,6 +58,7 @@ response = await client.PutAsJsonAsync<ApiNewPropertyModel>(
     new ApiNewPropertyModel
     {
         DisplayName = "prop 1",
+        BrowseName = "prop_1",
         Description = "fancy prop",
         ParentId = newObjectType.Id
     });

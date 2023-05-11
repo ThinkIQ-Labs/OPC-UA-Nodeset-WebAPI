@@ -1,6 +1,7 @@
 using OPC_UA_Nodeset_WebAPI.Controllers;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Reflection;
+using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
