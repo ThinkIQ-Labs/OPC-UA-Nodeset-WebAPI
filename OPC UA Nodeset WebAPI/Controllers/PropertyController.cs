@@ -111,7 +111,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             else
             {
                 var properties = propertiesListResult.Value as List<ApiPropertyModel>;
-                var existingProperty = properties.Where(x=>x.ParentId== apiPropertyModel.ParentId).FirstOrDefault(x => x.DisplayName == apiPropertyModel.DisplayName);
+                var existingProperty = properties.Where(x => x.ParentId == apiPropertyModel.ParentId).FirstOrDefault(x => x.DisplayName == apiPropertyModel.DisplayName);
                 if (existingProperty == null)
                 {
                     // add new property
@@ -130,8 +130,8 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                         NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++, activeNodesetModel.ModelUri),
                         Parent = parentNode,
                         DisplayName = new List<NodeModel.LocalizedText> { apiPropertyModel.DisplayName },
-                        BrowseName= apiPropertyModel.BrowseName,
-                        Description = new List<NodeModel.LocalizedText> { }
+                        BrowseName = apiPropertyModel.BrowseName,
+                        Description = new List<NodeModel.LocalizedText> { apiPropertyModel.Description == null ? "" : apiPropertyModel.Description },
                     };
 
                     parentNode.Properties.Add(newPropertyModel);

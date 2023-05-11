@@ -9,12 +9,14 @@ namespace OPC_UA_Nodeset_WebAPI.Model
 {
     public class ApiNewPropertyModel
     {
-        public string DisplayName { get; set; }
-        public string BrowseName { get; set; }
-
-        public string Description { get; set; }
-
         public uint ParentId { get; set; }
+
+        public string DisplayName { get; set; }
+
+        public string? BrowseName { get; set; }
+
+        public string? Description { get; set; }
+
 
         public ApiNewPropertyModel() { }
 

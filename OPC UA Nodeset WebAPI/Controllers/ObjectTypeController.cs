@@ -1,5 +1,6 @@
 ﻿using CESMII.OpcUa.NodeSetModel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Opc.Ua;
 using OPC_UA_Nodeset_WebAPI.Model;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;

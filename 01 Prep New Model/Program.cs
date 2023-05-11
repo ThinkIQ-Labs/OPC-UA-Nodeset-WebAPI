@@ -8,8 +8,8 @@ using System.Xml;
 
 // create client
 HttpClient client = new HttpClient();
-//client.BaseAddress = new Uri("https://localhost:7074/");
-client.BaseAddress = new Uri("https://localhost:5001/");
+client.BaseAddress = new Uri("https://localhost:7074/");
+//client.BaseAddress = new Uri("https://localhost:5001/");
 //client.BaseAddress = new Uri("https://opcuanodesetwebapi.azurewebsites.net/");
 HttpResponseMessage response;
 
