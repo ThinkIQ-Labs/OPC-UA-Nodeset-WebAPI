@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OPC_UA_Nodeset_WebAPI.Model;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
+using System;
 using System.Web;
 
 namespace OPC_UA_Nodeset_WebAPI.Controllers
@@ -124,15 +125,27 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                     // look up parent object
                     var parentNode = activeNodesetModel.AllNodesByNodeId[ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(apiPropertyModel.ParentId, activeNodesetModel.ModelUri)];
 
+                    // look up data type
+                    var aDataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == apiPropertyModel.DataType);
+
                     var newPropertyModel = new PropertyModel
                     {
                         NodeSet = activeNodesetModel,
                         NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++, activeNodesetModel.ModelUri),
                         Parent = parentNode,
+                        DataType = aDataType,
                         DisplayName = new List<NodeModel.LocalizedText> { apiPropertyModel.DisplayName },
                         BrowseName = apiPropertyModel.BrowseName,
                         Description = new List<NodeModel.LocalizedText> { apiPropertyModel.Description == null ? "" : apiPropertyModel.Description },
                     };
+
+                    // add value
+                    if (apiPropertyModel.DefaultValue != null)
+                    {
+                        newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(apiPropertyModel.DefaultValue);
+                    }
+
+
 
                     parentNode.Properties.Add(newPropertyModel);
                     activeNodesetModel.UpdateIndices();

@@ -21,7 +21,22 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
         public Dictionary<string, NodeSetModel> NodeSetModels { get; set; }
         public Dictionary<string, uint> NextNodeIds { get; set; }
 
-        DefaultOpcUaContext opcContext { get; set; }
+        public NodeSetModel UaBaseModel
+        {
+            get
+            {
+                if (NodeSetModels.ContainsKey("http://opcfoundation.org/UA/"))
+                {
+                    return NodeSetModels["http://opcfoundation.org/UA/"];
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        public DefaultOpcUaContext opcContext { get; set; }
 
         UANodeSetModelImporter importer { get; set; }
 

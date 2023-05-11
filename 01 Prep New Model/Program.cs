@@ -60,7 +60,9 @@ response = await client.PutAsJsonAsync<ApiNewPropertyModel>(
         DisplayName = "prop 1",
         BrowseName = "prop_1",
         Description = "fancy prop",
-        ParentId = newObjectType.Id
+        ParentId = newObjectType.Id,
+        //DataType="String",
+        //DefaultValue="tata"
     });
 var newProperty = await response.Content.ReadFromJsonAsync<ApiPropertyModel>();
 
