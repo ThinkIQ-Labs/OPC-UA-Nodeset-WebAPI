@@ -10,7 +10,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
     {
         public uint ParentId { get; set; }
         public string? DataType { get; set; }
-        public string? DefaultValue { get; set; }    
+        public string? Value { get; set; }    
 
         internal NodeModel? ParentModel { get; set; }
         internal PropertyModel? PropertyModel { get; set; }
@@ -30,15 +30,24 @@ namespace OPC_UA_Nodeset_WebAPI.Model
 
             if (aPropertyModel.Value != null)
             {
-                var defaultValue = JsonConvert.DeserializeObject<JObject>(aPropertyModel.Value);
-                var valueTypeId = defaultValue["Value"]["Type"].Value<int>();
-                var valueBody = defaultValue["Value"]["Body"].Value<string>();
+                var aPropertyModelValue = JsonConvert.DeserializeObject<JObject>(aPropertyModel.Value);
+                var valueTypeId = aPropertyModelValue["Value"]["Type"].Value<int>();
 
-                DefaultValue = valueBody;
+                //switch (aPropertyModelValue["Value"]["Body"].Type.ToString())
+                //{
+                //    case "Array":
+                //    case "Object":
+                        Value = aPropertyModelValue["Value"]["Body"].ToString();
+                //        break;
+                //    default:
+                //        Value = aPropertyModelValue["Value"]["Body"].Value<string>();
+                //        break;
+                //}
+
             }
             else
             {
-                DefaultValue = null;
+                Value = null;
             }
         }
 

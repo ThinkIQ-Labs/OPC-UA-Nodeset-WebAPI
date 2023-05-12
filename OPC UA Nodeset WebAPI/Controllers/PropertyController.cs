@@ -133,16 +133,42 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                         NodeSet = activeNodesetModel,
                         NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++, activeNodesetModel.ModelUri),
                         Parent = parentNode,
-                        DataType = aDataType,
                         DisplayName = new List<NodeModel.LocalizedText> { apiPropertyModel.DisplayName },
                         BrowseName = apiPropertyModel.BrowseName,
                         Description = new List<NodeModel.LocalizedText> { apiPropertyModel.Description == null ? "" : apiPropertyModel.Description },
                     };
 
                     // add value
-                    if (apiPropertyModel.DefaultValue != null)
+                    if (apiPropertyModel.Value != null)
                     {
-                        newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(apiPropertyModel.DefaultValue);
+                        switch (aDataType.DisplayName.First().Text)
+                        {
+                            case "Integer":
+                            case "Int16":
+                            case "Int32":
+                            case "Int64":
+                            case "SByte":
+                                newPropertyModel.DataType = aDataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Int32");
+                                int aIntValue;
+                                if (Int32.TryParse(apiPropertyModel.Value, out aIntValue))
+                                {
+                                    newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aIntValue);
+                                }
+                                break;
+                            case "Boolean":
+                            case "Bool":
+                                newPropertyModel.DataType = aDataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Boolean");
+                                Boolean aBoolValue;
+                                if (Boolean.TryParse(apiPropertyModel.Value, out aBoolValue))
+                                {
+                                    newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aBoolValue);
+                                }
+                                break;
+                            default:
+                                newPropertyModel.DataType = aDataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Int32");
+                                newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(apiPropertyModel.Value);
+                                break;
+                        }
                     }
 
 

@@ -15,7 +15,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
 
         public string? DataType { get; set; }
 
-        public string? DefaultValue { get; set; }
+        public string? Value { get; set; }
 
         public string? BrowseName { get; set; }
 
