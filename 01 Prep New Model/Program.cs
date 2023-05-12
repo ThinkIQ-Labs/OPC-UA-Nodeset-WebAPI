@@ -61,8 +61,8 @@ response = await client.PutAsJsonAsync<ApiNewPropertyModel>(
         BrowseName = "prop_1",
         Description = "fancy prop",
         ParentId = newObjectType.Id,
-        DataType = "Boolean",
-        Value = "False"
+        DataType = "DateTime",
+        Value = "2023-04-09T00:00:00Z"
     });
 var newProperty = await response.Content.ReadFromJsonAsync<ApiPropertyModel>();
 

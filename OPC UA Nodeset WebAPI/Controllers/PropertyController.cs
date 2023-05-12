@@ -164,6 +164,15 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                                     newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aBoolValue);
                                 }
                                 break;
+                            case "DateTime":
+                            case "UtcTime":
+                                newPropertyModel.DataType = aDataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "DateTime");
+                                DateTime aDateTimeValue;
+                                if (DateTime.TryParse(apiPropertyModel.Value, out aDateTimeValue))
+                                {
+                                    newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aDateTimeValue);
+                                }
+                                break;
                             default:
                                 newPropertyModel.DataType = aDataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Int32");
                                 newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(apiPropertyModel.Value);
