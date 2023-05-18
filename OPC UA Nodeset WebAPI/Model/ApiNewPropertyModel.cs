@@ -9,7 +9,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
 {
     public class ApiNewPropertyModel
     {
-        public uint ParentId { get; set; }
+        public string ParentNodeId { get; set; }
 
         public string DisplayName { get; set; }
 

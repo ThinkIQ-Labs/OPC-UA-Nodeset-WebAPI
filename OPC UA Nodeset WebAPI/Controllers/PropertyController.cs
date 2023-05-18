@@ -47,7 +47,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [HttpGet("{nodeId}")]
         [ProducesResponseType(200, Type = typeof(ApiPropertyModel))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public IActionResult GetById(string id, string uri, int nodeId)
+        public IActionResult GetById(string id, string uri, string nodeId)
         {
             var propertiesListResult = Get(id, uri) as ObjectResult;
 
@@ -58,7 +58,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             else
             {
                 var propertiesList = propertiesListResult.Value as List<ApiPropertyModel>;
-                var returnObject = propertiesList.FirstOrDefault(x=>x.Id== nodeId);
+                var returnObject = propertiesList.FirstOrDefault(x=>x.NodeId== nodeId);
                 if (returnObject != null)
                 {
                     return Ok(returnObject);
@@ -73,7 +73,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [HttpGet("ByParentId")]
         [ProducesResponseType(200, Type = typeof(List<ApiPropertyModel>))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public IActionResult GetByParentId(string id, string uri, int parentId)
+        public IActionResult GetByParentId(string id, string uri, string parentNodeId)
         {
             var propertiesListResult = Get(id, uri) as ObjectResult;
 
@@ -84,7 +84,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             else
             {
                 var propertiesList = propertiesListResult.Value as List<ApiPropertyModel>;
-                var returnObject = propertiesList.Where(x=>x.ParentId== parentId);
+                var returnObject = propertiesList.Where(x=>x.ParentNodeId== parentNodeId);
                 if (returnObject != null)
                 {
                     return Ok(returnObject);
@@ -112,7 +112,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             else
             {
                 var properties = propertiesListResult.Value as List<ApiPropertyModel>;
-                var existingProperty = properties.Where(x => x.ParentId == apiPropertyModel.ParentId).FirstOrDefault(x => x.DisplayName == apiPropertyModel.DisplayName);
+                var existingProperty = properties.Where(x => x.ParentNodeId == apiPropertyModel.ParentNodeId).FirstOrDefault(x => x.DisplayName == apiPropertyModel.DisplayName);
                 if (existingProperty == null)
                 {
                     // add new property
@@ -123,7 +123,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                     var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
 
                     // look up parent object
-                    var parentNode = activeNodesetModel.AllNodesByNodeId[ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(apiPropertyModel.ParentId, activeNodesetModel.ModelUri)];
+                    var parentNode = activeNodesetModel.AllNodesByNodeId[apiPropertyModel.ParentNodeId];
 
                     // look up data type
                     var aDataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == apiPropertyModel.DataType);
@@ -131,7 +131,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                     var newPropertyModel = new PropertyModel
                     {
                         NodeSet = activeNodesetModel,
-                        NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++, activeNodesetModel.ModelUri),
+                        NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
                         Parent = parentNode,
                         DisplayName = new List<NodeModel.LocalizedText> { apiPropertyModel.DisplayName },
                         BrowseName = apiPropertyModel.BrowseName,
@@ -148,7 +148,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                             case "Int32":
                             case "Int64":
                             case "SByte":
-                                newPropertyModel.DataType = aDataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Int32");
+                                newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Int32");
                                 int aIntValue;
                                 if (Int32.TryParse(apiPropertyModel.Value, out aIntValue))
                                 {
@@ -157,7 +157,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                                 break;
                             case "Boolean":
                             case "Bool":
-                                newPropertyModel.DataType = aDataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Boolean");
+                                newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Boolean");
                                 Boolean aBoolValue;
                                 if (Boolean.TryParse(apiPropertyModel.Value, out aBoolValue))
                                 {
@@ -166,7 +166,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                                 break;
                             case "DateTime":
                             case "UtcTime":
-                                newPropertyModel.DataType = aDataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "DateTime");
+                                newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "DateTime");
                                 DateTime aDateTimeValue;
                                 if (DateTime.TryParse(apiPropertyModel.Value, out aDateTimeValue))
                                 {
@@ -174,7 +174,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                                 }
                                 break;
                             default:
-                                newPropertyModel.DataType = aDataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Int32");
+                                newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Int32");
                                 newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(apiPropertyModel.Value);
                                 break;
                         }

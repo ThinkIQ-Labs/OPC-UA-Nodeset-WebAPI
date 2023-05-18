@@ -8,7 +8,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
 {
     public class ApiPropertyModel : ApiUaNodeModel
     {
-        public uint ParentId { get; set; }
+        public string ParentNodeId { get; set; }
         public string? DataType { get; set; }
         public string? Value { get; set; }    
 
@@ -25,7 +25,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             BrowseName = aPropertyModel.BrowseName;
             Description = aPropertyModel.Description.Count == 0 ? "" : aPropertyModel.Description.First().Text;
             ParentModel = aPropertyModel.Parent;
-            ParentId = ParentModel == null ? 0 : ApiUaNodeModel.GetIdFromNodeId(ParentModel.NodeId);
+            ParentNodeId = ParentModel == null ? "" : ParentModel.NodeId;
             DataType = aPropertyModel.DataType == null ? null : aPropertyModel.DataType.DisplayName.First().Text;
 
             if (aPropertyModel.Value != null)

@@ -19,7 +19,7 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
         public Dictionary<string, string> Log { get; set; }
 
         public Dictionary<string, NodeSetModel> NodeSetModels { get; set; }
-        public Dictionary<string, uint> NextNodeIds { get; set; }
+        public Dictionary<string, int> NextNodeIds { get; set; }
 
         public NodeSetModel UaBaseModel
         {

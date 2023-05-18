@@ -48,7 +48,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [HttpGet("{nodeId}")]
         [ProducesResponseType(200, Type = typeof(ApiObjectTypeModel))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public IActionResult GetById(string id, string uri, int nodeId)
+        public IActionResult GetById(string id, string uri, string nodeId)
         {
             var objectTypesListResult = Get(id, uri) as ObjectResult;
 
@@ -59,7 +59,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             else
             {
                 var objectTypes = objectTypesListResult.Value as List<ApiObjectTypeModel>;
-                var returnObject = objectTypes.FirstOrDefault(x => x.Id == nodeId);
+                var returnObject = objectTypes.FirstOrDefault(x => x.NodeId == nodeId);
                 if (returnObject != null)
                 {
                     return Ok(returnObject);
@@ -100,7 +100,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                     var newObjectTypeModel = new ObjectTypeModel
                     {
                         NodeSet = activeNodesetModel,
-                        NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++, activeNodesetModel.ModelUri),
+                        NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
                         SuperType = activeProjectInstance.GetObjectTypeModelByNodeId(apiObjectTypeModel.SuperTypeNodeId),
                         DisplayName = new List<NodeModel.LocalizedText> { apiObjectTypeModel.DisplayName },
                         BrowseName = apiObjectTypeModel.BrowseName,

@@ -9,20 +9,29 @@ namespace OPC_UA_Nodeset_WebAPI.Model
 {
     public class ApiObjectModel : ApiUaNodeModel
     {
+        public string ParentNodeId { get; set; }
+
         public string TypeDefinitionNodeId { get; set; }
 
-        internal ObjectModel? ObjectTypeModel { get; set; }
+        internal ObjectModel? ObjectModel { get; set; }
+        internal ObjectTypeModel? TypeDefinition { get; set; }
+        internal NodeModel? ParentNodeModel { get; set; }
         
         public ApiObjectModel() { }
 
-        public ApiObjectModel(ObjectModel aOjectModel)
+        public ApiObjectModel(ObjectModel aObjectModel)
         {
-            ObjectTypeModel = aOjectModel;
-            NodeId = aOjectModel.NodeId;
-            DisplayName = aOjectModel.DisplayName.First().Text;
-            BrowseName = aOjectModel.BrowseName;
-            Description = aOjectModel.Description.Count==0 ?  "" : aOjectModel.Description.First().Text;
-            TypeDefinitionNodeId = aOjectModel.TypeDefinition == null ? "" : aOjectModel.TypeDefinition.NodeId;
+            ObjectModel = aObjectModel;
+            NodeId = aObjectModel.NodeId;
+            DisplayName = aObjectModel.DisplayName.First().Text;
+            BrowseName = aObjectModel.BrowseName;
+            Description = aObjectModel.Description.Count == 0 ? "" : aObjectModel.Description.First().Text;
+
+            TypeDefinition = aObjectModel.TypeDefinition == null ? null : aObjectModel.TypeDefinition;
+            TypeDefinitionNodeId = aObjectModel.TypeDefinition == null ? "" : aObjectModel.TypeDefinition.NodeId;
+            
+            ParentNodeModel = aObjectModel.Parent == null ? null : aObjectModel.Parent;
+            ParentNodeId = aObjectModel.Parent == null ? "" : aObjectModel.Parent.NodeId;
         }
 
     }

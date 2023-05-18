@@ -2,20 +2,20 @@
 {
     public class ApiUaNodeModel
     {
-        public static string GetNodeIdFromIdAndNameSpace(uint id, string ns)
+        public static string GetNodeIdFromIdAndNameSpace(string id, string ns)
         {
             //nsu=http://opcfoundation.org/UA/;i=58
             return $"nsu={ns};i={id}";
         }
         public string? NodeId { get; set; }
 
-        public static uint GetIdFromNodeId(string nodeId)
+        public static string GetIdFromNodeId(string nodeId)
         {
-                if (nodeId == null) return 0;
-                if (!nodeId.Contains("=")) return 0;
-                return uint.Parse(nodeId.Split("=").Last());
+                if (nodeId == null) return "";
+                if (!nodeId.Contains("=")) return "";
+                return nodeId.Split("=").Last();
         }
-        public uint Id
+        public string Id
         {
             get
             {

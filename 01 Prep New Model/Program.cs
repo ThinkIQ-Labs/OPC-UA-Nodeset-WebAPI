@@ -60,7 +60,7 @@ response = await client.PutAsJsonAsync<ApiNewPropertyModel>(
         DisplayName = "prop 1",
         BrowseName = "prop_1",
         Description = "fancy prop",
-        ParentId = newObjectType.Id,
+        ParentNodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(newObjectType.Id, newModel.Value.ModelUri),
         DataType = "DateTime",
         Value = "2023-04-09T00:00:00Z"
     });

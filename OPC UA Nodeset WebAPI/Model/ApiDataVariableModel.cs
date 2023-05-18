@@ -6,7 +6,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
 {
     public class ApiDataVariableModel : ApiUaNodeModel
     {
-        public uint ParentId { get; set; }
+        public string ParentNodeId { get; set; }
         internal NodeModel? ParentModel { get; set; }
         internal DataVariableModel? DataVariableModel { get; set; }
         public ApiDataVariableModel() { }
@@ -18,7 +18,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             DisplayName = aDataVariableModel.DisplayName.First().Text;
             Description = aDataVariableModel.Description.Count == 0 ? "" : aDataVariableModel.Description.First().Text;
             ParentModel = aDataVariableModel.Parent;
-            ParentId = ParentModel == null ? 0 : ApiUaNodeModel.GetIdFromNodeId(ParentModel.NodeId);
+            ParentNodeId = ParentModel == null ? "" : ParentModel.NodeId;
         }
 
     }
