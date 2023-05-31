@@ -36,9 +36,10 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             {
                 var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
                 var returnObject = new List<ApiPropertyModel>();
-                foreach (var aProperty in activeNodesetModel.Properties)
+                //foreach (var aProperty in activeNodesetModel.Properties)
+                foreach (var aProperty in activeNodesetModel.AllNodesByNodeId.Where(x => x.Value.GetType() == typeof(PropertyModel)))
                 {
-                    returnObject.Add(new ApiPropertyModel(aProperty));
+                    returnObject.Add(new ApiPropertyModel((PropertyModel)aProperty.Value));
                 }
                 return Ok(returnObject);
             }

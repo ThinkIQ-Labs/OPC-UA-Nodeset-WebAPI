@@ -94,7 +94,7 @@ response = await client.PutAsJsonAsync<ApiNewObjectModel>(
 var newObjectData = await response.Content.ReadFromJsonAsync<ApiObjectTypeModel>();
 
 // get properties of the meta data object
-var metaDataProperties = await client.GetFromJsonAsync<List<ApiPropertyModel>>($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Property/ByParentNodeId?parentNodeId=\"{newObjectData.NodeId}\"");
+var metaDataProperties = await client.GetFromJsonAsync<List<ApiPropertyModel>>($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Property/ByParentNodeId?parentNodeId={newObjectData.NodeId}");
 
 
 
