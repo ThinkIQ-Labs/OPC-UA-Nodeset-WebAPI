@@ -55,7 +55,6 @@ motorType.Properties.Add(prop1);
 
 newNodeSetModel.ObjectTypes.Add(motorType);
 
-newNodeSetModel.UpdateAllNodes();
 newNodeSetModel.UpdateIndices();
 
 Console.WriteLine(newNodeSetModel.Properties.Count);
