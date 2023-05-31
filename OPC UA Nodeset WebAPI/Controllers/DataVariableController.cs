@@ -68,10 +68,10 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             }
         }
 
-        [HttpGet("ByParentId")]
+        [HttpGet("ByParentNodeId")]
         [ProducesResponseType(200, Type = typeof(List<ApiDataVariableModel>))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public IActionResult GetByParentId(string id, string uri, string parentNodeId)
+        public IActionResult GetByParentNodeId(string id, string uri, string parentNodeId)
         {
             var dataVariablesListResult = Get(id, uri) as ObjectResult;
 
