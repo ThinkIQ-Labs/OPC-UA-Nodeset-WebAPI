@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OPC_UA_Nodeset_WebAPI.Model;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
-using System.Web;
 
 namespace OPC_UA_Nodeset_WebAPI.Controllers
 {
@@ -86,7 +85,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                 var existingObject = objects.Where(x => x.ParentNodeId == apiObjectModel.ParentNodeId).FirstOrDefault(x => x.DisplayName == apiObjectModel.DisplayName);
                 if (existingObject == null)
                 {
-                    // add new property
+                    // add new object
                     var projectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
                     var activeProjectInstance = projectInstanceResult.Value as NodeSetProjectInstance;
 
@@ -113,6 +112,40 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                         Properties = new List<VariableModel>(),
                         DataVariables = new List<DataVariableModel>()
                     };
+
+                    if (apiObjectModel.GenerateChildren.HasValue)
+                    {
+                        if (apiObjectModel.GenerateChildren.Value)
+                        {
+                            aObjectTypeDefinition.Properties.ForEach(aProperty =>
+                            {
+                                newObjectModel.Properties.Add(new PropertyModel
+                                {
+                                    NodeSet = activeNodesetModel,
+                                    NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                                    Parent = newObjectModel,
+                                    DisplayName = aProperty.DisplayName,
+                                    BrowseName = aProperty.BrowseName,
+                                    Description = aProperty.Description,
+                                    Value = aProperty.Value
+                                });
+                            });
+                            aObjectTypeDefinition.DataVariables.ForEach(aDataVariable =>
+                            {
+                                newObjectModel.DataVariables.Add(new DataVariableModel
+                                {
+                                    NodeSet = activeNodesetModel,
+                                    NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                                    Parent = newObjectModel,
+                                    DisplayName = aDataVariable.DisplayName,
+                                    BrowseName = aDataVariable.BrowseName,
+                                    Description = aDataVariable.Description,
+                                    Value = aDataVariable.Value,
+                                    EngineeringUnit = aDataVariable.EngineeringUnit,
+                                });
+                            });
+                        }
+                    }
 
                     parentNode.Objects.Add(newObjectModel);
                     activeNodesetModel.UpdateIndices();

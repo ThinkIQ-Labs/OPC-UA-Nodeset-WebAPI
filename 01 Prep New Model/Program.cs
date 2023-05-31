@@ -45,33 +45,76 @@ response = await client.PutAsJsonAsync<ApiNewObjectTypeModel>(
     $"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/ObjectType",
     new ApiNewObjectTypeModel
     {
-        DisplayName = "New Type",
-        BrowseName = "new_type",
-        Description = "fancy type",
+        DisplayName = "Equipment",
+        BrowseName = "equipment",
+        Description = "Base type for all equipments",
         SuperTypeNodeId = uaBaseObjectType.NodeId
     });
 var newObjectType = await response.Content.ReadFromJsonAsync<ApiObjectTypeModel>();
 
-// add a property to the new type
+// add new object type for meta data
+response = await client.PutAsJsonAsync<ApiNewObjectTypeModel>(
+    $"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/ObjectType",
+    new ApiNewObjectTypeModel
+    {
+        DisplayName = "Type Meta Data",
+        BrowseName = "type_meta_data",
+        Description = "Meta data for all type definitions",
+        SuperTypeNodeId = uaBaseObjectType.NodeId
+    });
+var newObjectTypeMetaData = await response.Content.ReadFromJsonAsync<ApiObjectTypeModel>();
+
+// add a property to the meta data type
 response = await client.PutAsJsonAsync<ApiNewPropertyModel>(
     $"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Property",
     new ApiNewPropertyModel
     {
-        DisplayName = "prop 1",
-        BrowseName = "prop_1",
-        Description = "fancy prop",
-        ParentNodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(newObjectType.Id, newModel.Value.ModelUri),
-        DataType = "DateTime",
-        Value = "2023-04-09T00:00:00Z"
+        DisplayName = "Importance",
+        BrowseName = "importance",
+        Description = "The ranking order of attributes",
+        ParentNodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(newObjectTypeMetaData.Id, newModel.Value.ModelUri),
+        DataType = "Integer",
+        Value = "10"
     });
 var newProperty = await response.Content.ReadFromJsonAsync<ApiPropertyModel>();
+
+// add object to type to store metadata
+// add new object type for meta data
+response = await client.PutAsJsonAsync<ApiNewObjectModel>(
+    $"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Object",
+    new ApiNewObjectModel
+    {
+        DisplayName = "Type Meta Data",
+        BrowseName = "type_meta_data",
+        Description = "Meta data for all type definitions",
+        TypeDefinitionNodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(newObjectTypeMetaData.Id, newModel.Value.ModelUri),
+        ParentNodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(newObjectType.Id, newModel.Value.ModelUri),
+        GenerateChildren = true,
+    });
+var newObjectData = await response.Content.ReadFromJsonAsync<ApiObjectTypeModel>();
+
+// add a property to the meta data type instance
+//response = await client.PutAsJsonAsync<ApiNewPropertyModel>(
+//    $"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Property",
+//    new ApiNewPropertyModel
+//    {
+//        DisplayName = "Importance",
+//        BrowseName = "importance",
+//        Description = "The ranking order of attributes",
+//        ParentNodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(newObjectData.Id, newModel.Value.ModelUri),
+//        DataType = "Integer",
+//        Value = "3"
+//    });
+//var newPropertyOnInstance = await response.Content.ReadFromJsonAsync<ApiPropertyModel>();
 
 // get xml
 response = await client.GetAsync($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/GenerateXml");
 var xml = await response.Content.ReadAsStringAsync();
+
 XmlDocument xmlDoc = new XmlDocument();
 xmlDoc.LoadXml(xml);
 xmlDoc.Save(Console.Out);
+xmlDoc.Save("out.xml");
 
 // delete session
 response = await client.DeleteAsync($"NodesetProject/{sessionKey}");

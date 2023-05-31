@@ -19,6 +19,8 @@ namespace OPC_UA_Nodeset_WebAPI.Model
 
         public string? Description { get; set; }
 
+        public bool? GenerateChildren { get; set; }
+
 
         public ApiNewObjectModel() { }
 
