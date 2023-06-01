@@ -1,9 +1,11 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using CESMII.OpcUa.NodeSetModel;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OPC_UA_Nodeset_WebAPI.Model;
 using System.Collections.Generic;
 using System.Net.Http.Json;
+using System.Text;
 using System.Xml;
 
 // create client
@@ -95,8 +97,12 @@ var newObjectData = await response.Content.ReadFromJsonAsync<ApiObjectTypeModel>
 
 // get properties of the meta data object
 var metaDataProperties = await client.GetFromJsonAsync<List<ApiPropertyModel>>($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Property/ByParentNodeId?parentNodeId={newObjectData.NodeId}");
-
-
+var aProp = metaDataProperties.First();
+aProp.Value = "2";
+var serializedDoc = JsonConvert.SerializeObject(aProp);
+var requestContent = new StringContent(serializedDoc, Encoding.UTF8, "application/json-patch+json");
+var fristProp = await client.GetFromJsonAsync<ApiPropertyModel>($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Property/GetByNodeId?nodeId={metaDataProperties.First().NodeId}");
+response = await client.PatchAsync($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Property/PatchByNodeId?nodeId={metaDataProperties.First().NodeId}", requestContent);
 
 // add a property to the meta data type instance
 //response = await client.PutAsJsonAsync<ApiNewPropertyModel>(

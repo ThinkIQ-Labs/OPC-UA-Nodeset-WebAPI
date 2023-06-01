@@ -127,7 +127,9 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                                     DisplayName = aProperty.DisplayName,
                                     BrowseName = aProperty.BrowseName,
                                     Description = aProperty.Description,
-                                    Value = aProperty.Value
+                                    DataType = aProperty.DataType,
+                                    Value = aProperty.Value,
+                                    EngineeringUnit = aProperty.EngineeringUnit,
                                 });
                             });
                             aObjectTypeDefinition.DataVariables.ForEach(aDataVariable =>
@@ -140,6 +142,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                                     DisplayName = aDataVariable.DisplayName,
                                     BrowseName = aDataVariable.BrowseName,
                                     Description = aDataVariable.Description,
+                                    DataType = aDataVariable.DataType,
                                     Value = aDataVariable.Value,
                                     EngineeringUnit = aDataVariable.EngineeringUnit,
                                 });
