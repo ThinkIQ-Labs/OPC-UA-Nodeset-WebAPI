@@ -2,6 +2,7 @@
 using CESMII.OpcUa.NodeSetModel;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
+using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 
 const string nodeSetDirectory = "NodeSets";
 
@@ -58,6 +59,8 @@ newNodeSetModel.ObjectTypes.Add(motorType);
 newNodeSetModel.UpdateIndices();
 
 Console.WriteLine(newNodeSetModel.Properties.Count);
+
+Console.WriteLine(newNodeSetModel.GetProperties().Count());
 
 Console.WriteLine(newNodeSetModel.AllNodesByNodeId.Where(x => x.Value.GetType() == typeof(PropertyModel)).Count());
 

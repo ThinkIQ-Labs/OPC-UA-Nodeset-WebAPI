@@ -15,6 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OPC UA Nodeset WebAPI\OPC UA Nodeset WebAPI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Nodesets\opcfoundation.org.UA.NodeSet2.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -33,7 +33,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             {
                 var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
                 var returnObject = new List<ApiObjectModel>();
-                foreach (var aObject in activeNodesetModel.Objects)
+                foreach (var aObject in activeNodesetModel.GetObjects())
                 {
                     returnObject.Add(new ApiObjectModel(aObject));
                 }

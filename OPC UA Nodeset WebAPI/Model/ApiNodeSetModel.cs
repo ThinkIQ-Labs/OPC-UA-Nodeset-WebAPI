@@ -1,4 +1,5 @@
 ﻿using CESMII.OpcUa.NodeSetModel;
+using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.ComponentModel.DataAnnotations;
 
 namespace OPC_UA_Nodeset_WebAPI.Model
@@ -31,11 +32,11 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             Version= aNodeSetModel.Version;
             PublicationDate = aNodeSetModel.PublicationDate;
             DataTypesCount = aNodeSetModel.DataTypes.Count;
-            DataVariablesCount=aNodeSetModel.DataVariables.Count;
+            DataVariablesCount=aNodeSetModel.GetDataVariables().Count();
             InterfacesCount= aNodeSetModel.Interfaces.Count;
             ObjectTypesCount= aNodeSetModel.ObjectTypes.Count;
-            ObjectsCount= aNodeSetModel.Objects.Count;
-            PropertiesCount= aNodeSetModel.Properties.Count;
+            ObjectsCount= aNodeSetModel.GetObjects().Count();
+            PropertiesCount= aNodeSetModel.GetProperties().Count();
             ReferenceTypesCount=aNodeSetModel.ReferenceTypes.Count;
             RequiredModelsCount=aNodeSetModel.RequiredModels.Count;
             UnknownNodesCount=aNodeSetModel.UnknownNodes.Count;
