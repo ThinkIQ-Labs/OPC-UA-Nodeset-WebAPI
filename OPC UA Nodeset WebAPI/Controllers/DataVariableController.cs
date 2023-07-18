@@ -56,7 +56,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             else
             {
                 var dataVariablesList = dataVariablesListResult.Value as List<ApiDataVariableModel>;
-                var returnObject = dataVariablesList.FirstOrDefault(x => x.NodeId == nodeId);
+                var returnObject = dataVariablesList.FirstOrDefault(x => x.NodeId == HttpUtility.UrlDecode(nodeId));
                 if (returnObject != null)
                 {
                     return Ok(returnObject);

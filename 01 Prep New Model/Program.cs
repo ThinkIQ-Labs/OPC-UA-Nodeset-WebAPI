@@ -1,9 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using CESMII.OpcUa.NodeSetModel;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Opc.Ua.Export;
 using OPC_UA_Nodeset_WebAPI.Model;
-using System.Collections.Generic;
+using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 using System.Xml;
@@ -31,6 +30,10 @@ var uaModelInfo = (await response.Content.ReadFromJsonAsync<Dictionary<string, A
 var uaObjectTypes = await client.GetFromJsonAsync<List<ApiObjectTypeModel>>($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/ObjectType");
 var uaBaseObjectType = uaObjectTypes.First(x => x.DisplayName == "BaseObjectType");
 
+// get ua data types
+var uaDataTypes = await client.GetFromJsonAsync<List<ApiObjectTypeModel>>($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/DataType");
+var uaEnumDataType = uaDataTypes.First(x => x.DisplayName == "Enumeration");
+
 // create new model
 response = await client.PutAsJsonAsync<ApiNodeSetInfo>(
     $"NodesetProject/{sessionKey}/NodesetModel",
@@ -41,6 +44,50 @@ response = await client.PutAsJsonAsync<ApiNodeSetInfo>(
         Version = "1.0"
     });
 var newModel = (await response.Content.ReadFromJsonAsync<Dictionary<string, ApiNodeSetModel>>()).First();
+
+// add a new enum data type
+response = await client.PutAsJsonAsync<ApiNewDataTypeModel>(
+    $"NodesetProject/{sessionKey}/NodesetModel/{WebUtility.UrlEncode(newModel.Key)}/DataType", 
+    new ApiNewDataTypeModel
+    {
+        SuperTypeNodeId = uaEnumDataType.NodeId,
+        DisplayName= "ThinkIQ Work Status",
+        BrowseName= "ThinkIQ_Work_Status",
+        Description= "A small integer to capture status of item: -(0), In Work(1), Review(2), Approved(3), Done(4).",
+        EnumFields=new List<UAEnumField>
+        {
+            new UAEnumField
+            {
+                Name = "-",
+                Value = 0
+            },
+            new UAEnumField
+            {
+                Name = "Work",
+                Value = 1
+            },
+            new UAEnumField
+            {
+                Name = "Review",
+                Value = 2
+            },
+            new UAEnumField
+            {
+                Name = "Approved",
+                Value = 3
+            },
+            new UAEnumField
+            {
+                Name = "Done",
+                Value = 4
+            }
+        },
+    });
+var newDataType = await response.Content.ReadFromJsonAsync<ApiDataTypeModel>();
+
+// get data types
+var newDataTypes = await client.GetFromJsonAsync<List<ApiObjectTypeModel>>($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/DataType");
+
 
 // add new object type
 response = await client.PutAsJsonAsync<ApiNewObjectTypeModel>(

@@ -59,7 +59,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             else
             {
                 var objectTypes = objectTypesListResult.Value as List<ApiObjectTypeModel>;
-                var returnObject = objectTypes.FirstOrDefault(x => x.NodeId == nodeId);
+                var returnObject = objectTypes.FirstOrDefault(x => x.NodeId == HttpUtility.UrlDecode(nodeId));
                 if (returnObject != null)
                 {
                     return Ok(returnObject);

@@ -34,7 +34,7 @@ var newNodeSetModel = new NodeSetModel
 var newNodeId = 1000;
 
 // create enum datatype
-var myEnum = new DataTypeModel
+var workStatusEnum = new DataTypeModel
 {
     NodeSet = newNodeSetModel,
     NodeId = $"nsu={newNodeSetModel.ModelUri};i={newNodeId++}",
@@ -42,29 +42,121 @@ var myEnum = new DataTypeModel
     DisplayName = new List<NodeModel.LocalizedText> { "ThinkIQ Work Status" },
     BrowseName = "ThinkIQ_Work_Status",
     Description = new List<NodeModel.LocalizedText> { "A small integer to capture status of item: -(0), In Work(1), Review(2), Approved(3), Done(4)." },
+    EnumFields = new List<DataTypeModel.UaEnumField>
+    {
+        new DataTypeModel.UaEnumField
+        {
+            Name = "-",
+            Value = 0
+        },
+        new DataTypeModel.UaEnumField
+        {
+            Name = "Work",
+            Value = 1
+        },
+        new DataTypeModel.UaEnumField
+        {
+            Name = "Review",
+            Value = 2
+        },
+        new DataTypeModel.UaEnumField
+        {
+            Name = "Approved",
+            Value = 3
+        },
+        new DataTypeModel.UaEnumField
+        {
+            Name = "Done",
+            Value = 4
+        }
+    }
 };
 
-myEnum.EnumFields = new List<DataTypeModel.UaEnumField>();
-myEnum.EnumFields.Add(new DataTypeModel.UaEnumField
+
+newNodeSetModel.DataTypes.Add(workStatusEnum);
+
+var tiqTypesMetaDataType = new VariableTypeModel
 {
-    Name = "InWork",
-    Value = 0
-});
-myEnum.EnumFields.Add(new DataTypeModel.UaEnumField
+    NodeSet = newNodeSetModel,
+    NodeId = $"nsu={newNodeSetModel.ModelUri};i={newNodeId++}",
+    SuperType = uaBaseModel.VariableTypes.First(x => x.DisplayName.First().Text == "BaseDataVariableType"),
+    DisplayName = new List<NodeModel.LocalizedText> { "ThinkIQ Types MetaData Type" },
+    BrowseName = "ThinkIQ_Types_MetaData_Type",
+    Description = new List<NodeModel.LocalizedText> { "A variable type to capture meta data for ThinkIQ type definitions." },
+    Properties = new List<VariableModel>()
+};
+
+tiqTypesMetaDataType.Properties.Add(new PropertyModel
 {
-    Name = "UnderReview",
-    Value = 1
+    NodeSet = newNodeSetModel,
+    NodeId = $"nsu={newNodeSetModel.ModelUri};i={newNodeId++}",
+    Parent = tiqTypesMetaDataType,
+    DisplayName = new List<NodeModel.LocalizedText> { "Work Status" },
+    BrowseName = "Work_Status",
+    Description = new List<NodeModel.LocalizedText> { "Variable for work status." },
+    DataType = workStatusEnum,
+    Value = null
 });
-
-myEnum.EnumFields.Add(new DataTypeModel.UaEnumField
+tiqTypesMetaDataType.Properties.Add(new PropertyModel
 {
-    Name = "Done",
-    Value = 2
+    NodeSet = newNodeSetModel,
+    NodeId = $"nsu={newNodeSetModel.ModelUri};i={newNodeId++}",
+    Parent = tiqTypesMetaDataType,
+    DisplayName = new List<NodeModel.LocalizedText> { "Last Update" },
+    BrowseName = "Last_Update",
+    Description = new List<NodeModel.LocalizedText> { "Variable last update timestamp." },
+    DataType = uaBaseModel.DataTypes.First(x => x.DisplayName.First().Text == "DateTime"),
+    Value = null
 });
 
+newNodeSetModel.VariableTypes.Add(tiqTypesMetaDataType);
 
-newNodeSetModel.DataTypes.Add(myEnum);
+var tiqAttributesMetaDataType = new VariableTypeModel
+{
+    NodeSet = newNodeSetModel,
+    NodeId = $"nsu={newNodeSetModel.ModelUri};i={newNodeId++}",
+    SuperType = uaBaseModel.VariableTypes.First(x => x.DisplayName.First().Text == "BaseDataVariableType"),
+    DisplayName = new List<NodeModel.LocalizedText> { "ThinkIQ Attributes MetaData Type" },
+    BrowseName = "ThinkIQ_Attributes_MetaData_Type",
+    Description = new List<NodeModel.LocalizedText> { "A variable type to capture meta data for ThinkIQ attributes." },
+    Properties = new List<VariableModel>()
+};
 
+tiqAttributesMetaDataType.Properties.Add(new PropertyModel
+{
+    NodeSet = newNodeSetModel,
+    NodeId = $"nsu={newNodeSetModel.ModelUri};i={newNodeId++}",
+    Parent = tiqAttributesMetaDataType,
+    DisplayName = new List<NodeModel.LocalizedText> { "Work Status" },
+    BrowseName = "Work_Status",
+    Description = new List<NodeModel.LocalizedText> { "Variable for work status." },
+    DataType = workStatusEnum,
+    Value = null
+});
+tiqAttributesMetaDataType.Properties.Add(new PropertyModel
+{
+    NodeSet = newNodeSetModel,
+    NodeId = $"nsu={newNodeSetModel.ModelUri};i={newNodeId++}",
+    Parent = tiqAttributesMetaDataType,
+    DisplayName = new List<NodeModel.LocalizedText> { "Last Update" },
+    BrowseName = "Last_Update",
+    Description = new List<NodeModel.LocalizedText> { "Variable last update timestamp." },
+    DataType = uaBaseModel.DataTypes.First(x => x.DisplayName.First().Text == "DateTime"),
+    Value = null
+});
+tiqAttributesMetaDataType.Properties.Add(new PropertyModel
+{
+    NodeSet = newNodeSetModel,
+    NodeId = $"nsu={newNodeSetModel.ModelUri};i={newNodeId++}",
+    Parent = tiqAttributesMetaDataType,
+    DisplayName = new List<NodeModel.LocalizedText> { "Hidden" },
+    BrowseName = "Hidden",
+    Description = new List<NodeModel.LocalizedText> { "Variable is hidden." },
+    DataType = uaBaseModel.DataTypes.First(x => x.DisplayName.First().Text == "Boolean"),
+    Value = null
+});
+
+newNodeSetModel.VariableTypes.Add(tiqAttributesMetaDataType);
 
 
 var motorType = new ObjectTypeModel
@@ -80,29 +172,108 @@ var motorType = new ObjectTypeModel
 
 };
 
-var prop1 = new PropertyModel
+var prop1 = new DataVariableModel
 {
     NodeSet = newNodeSetModel,
     NodeId = $"nsu={newNodeSetModel.ModelUri};i={newNodeId++}",
     Parent = motorType,
-    DisplayName = new List<NodeModel.LocalizedText> { "Prop1" },
-    BrowseName = "Prop1",
+    DisplayName = new List<NodeModel.LocalizedText> { "Horse Power" },
+    BrowseName = "Horse_Power",
     Description = new List<NodeModel.LocalizedText> { "Fancy Prop1" },
+    DataType = uaBaseModel.DataTypes.First(x => x.DisplayName.First().Text == "Double"),
+    Properties = new List<VariableModel>(),
+    DataVariables = new List<DataVariableModel>(),
+    EngineeringUnit = new VariableModel.EngineeringUnitInfo
+    {
+        //DisplayName = "horsepower (electric)"
+        DisplayName = "electric hp"
+    }
 };
+
+var var2 = new DataVariableModel
+{
+    NodeSet = newNodeSetModel,
+    NodeId = $"nsu={newNodeSetModel.ModelUri};i={newNodeId++}",
+    Parent = prop1,
+    DisplayName = new List<NodeModel.LocalizedText> { "ThinkIQ Attribute MetaData" },
+    BrowseName = "ThinkIQ_Attributes_MetaData",
+    Description = new List<NodeModel.LocalizedText> { "A variable type to capture meta data for ThinkIQ attributes." },
+    TypeDefinition = tiqAttributesMetaDataType,
+    Properties = new List<VariableModel>()
+};
+
+prop1.DataVariables.Add(var2);
+
+var2.Properties.Add(new PropertyModel
+{
+    NodeSet = newNodeSetModel,
+    NodeId = $"nsu={newNodeSetModel.ModelUri};i={newNodeId++}",
+    Parent = var2,
+    DisplayName = new List<NodeModel.LocalizedText> { "Work Status" },
+    BrowseName = "Work_Status",
+    Description = new List<NodeModel.LocalizedText> { "Variable for work status." },
+    DataType = workStatusEnum,
+    Value = opcContext.JsonEncodeVariant(Int32.Parse("2"))
+
+});
+var2.Properties.Add(new PropertyModel
+{
+    NodeSet = newNodeSetModel,
+    NodeId = $"nsu={newNodeSetModel.ModelUri};i={newNodeId++}",
+    Parent = var2,
+    DisplayName = new List<NodeModel.LocalizedText> { "Last Update" },
+    BrowseName = "Last_Update",
+    Description = new List<NodeModel.LocalizedText> { "Variable last update timestamp." },
+    DataType = uaBaseModel.DataTypes.First(x => x.DisplayName.First().Text == "DateTime"),
+    Value = opcContext.JsonEncodeVariant(DateTime.Parse("2023-06-25"))
+});
+var2.Properties.Add(new PropertyModel
+{
+    NodeSet = newNodeSetModel,
+    NodeId = $"nsu={newNodeSetModel.ModelUri};i={newNodeId++}",
+    Parent = var2,
+    DisplayName = new List<NodeModel.LocalizedText> { "Hidden" },
+    BrowseName = "Hidden",
+    Description = new List<NodeModel.LocalizedText> { "Variable is hidden." },
+    DataType = uaBaseModel.DataTypes.First(x => x.DisplayName.First().Text == "Boolean"),
+    Value = opcContext.JsonEncodeVariant(Boolean.Parse("True"))
+});
 
 var var1 = new DataVariableModel
 {
     NodeSet = newNodeSetModel,
     NodeId = $"nsu={newNodeSetModel.ModelUri};i={newNodeId++}",
     Parent = motorType,
+    DisplayName = new List<NodeModel.LocalizedText> { "ThinkIQ Type MetaData" },
+    BrowseName = "ThinkIQ_Types_MetaData",
+    Description = new List<NodeModel.LocalizedText> { "A variable type to capture meta data for ThinkIQ type definitions." },
+    TypeDefinition = tiqTypesMetaDataType,
+    Properties = new List<VariableModel>()
+};
+
+var1.Properties.Add(new PropertyModel
+{
+    NodeSet = newNodeSetModel,
+    NodeId = $"nsu={newNodeSetModel.ModelUri};i={newNodeId++}",
+    Parent = var1,
     DisplayName = new List<NodeModel.LocalizedText> { "Work Status" },
     BrowseName = "Work_Status",
     Description = new List<NodeModel.LocalizedText> { "Variable for work status." },
-    DataType = myEnum,
-    
-};
+    DataType = workStatusEnum,
+    Value = opcContext.JsonEncodeVariant(Int32.Parse("2"))
 
-var1.Value = opcContext.JsonEncodeVariant(Int32.Parse("2"));
+});
+var1.Properties.Add(new PropertyModel
+{
+    NodeSet = newNodeSetModel,
+    NodeId = $"nsu={newNodeSetModel.ModelUri};i={newNodeId++}",
+    Parent = var1,
+    DisplayName = new List<NodeModel.LocalizedText> { "Last Update" },
+    BrowseName = "Last_Update",
+    Description = new List<NodeModel.LocalizedText> { "Variable last update timestamp." },
+    DataType = uaBaseModel.DataTypes.First(x => x.DisplayName.First().Text == "DateTime"),
+    Value = opcContext.JsonEncodeVariant(DateTime.Parse("2023-06-25"))
+});
 
 motorType.Properties.Add(prop1);
 motorType.DataVariables.Add(var1);

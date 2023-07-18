@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OPC_UA_Nodeset_WebAPI.Model;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
+using System.Web;
 
 namespace OPC_UA_Nodeset_WebAPI.Controllers
 {
@@ -55,7 +56,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             else
             {
                 var objectsList = objectsListResult.Value as List<ApiObjectModel>;
-                var returnObject = objectsList.FirstOrDefault(x => x.NodeId == nodeId);
+                var returnObject = objectsList.FirstOrDefault(x => x.NodeId == HttpUtility.UrlDecode(nodeId));
                 if (returnObject != null)
                 {
                     return Ok(returnObject);
