@@ -9,7 +9,6 @@ namespace OPC_UA_Nodeset_WebAPI.Model
     {
         public string SuperTypeNodeId { get; set; }
         public List<UAEnumField> EnumFields { get; set; }
-        internal NodeModel? ParentModel { get; set; }
         internal DataTypeModel? DataTypeModel { get; set; }
         public ApiDataTypeModel() { }
 

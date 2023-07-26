@@ -9,28 +9,28 @@ namespace OPC_UA_Nodeset_WebAPI.Model
     public class ApiPropertyModel : ApiUaNodeModel
     {
         public string ParentNodeId { get; set; }
-        public string? DataType { get; set; }
+        public string DataTypeNodeId { get; set; }
         public string? Value { get; set; }    
 
-        internal NodeModel? ParentModel { get; set; }
-        internal PropertyModel? PropertyModel { get; set; }
+        internal NodeModel ParentModel { get; set; }
+        internal PropertyModel PropertyModel { get; set; }
         public ApiPropertyModel() { }
 
 
-        public ApiPropertyModel(PropertyModel aPropertyModel)
+        public ApiPropertyModel(VariableModel aVariableModel)
         {
-            PropertyModel = aPropertyModel;
-            NodeId = aPropertyModel.NodeId;
-            DisplayName = aPropertyModel.DisplayName.First().Text;
-            BrowseName = aPropertyModel.BrowseName;
-            Description = aPropertyModel.Description.Count == 0 ? "" : aPropertyModel.Description.First().Text;
-            ParentModel = aPropertyModel.Parent;
-            ParentNodeId = ParentModel == null ? "" : ParentModel.NodeId;
-            DataType = aPropertyModel.DataType == null ? null : aPropertyModel.DataType.DisplayName.First().Text;
+            PropertyModel = aVariableModel as PropertyModel;
+            NodeId = aVariableModel.NodeId;
+            DisplayName = aVariableModel.DisplayName.First().Text;
+            BrowseName = aVariableModel.BrowseName;
+            Description = aVariableModel.Description.Count == 0 ? "" : aVariableModel.Description.First().Text;
+            ParentModel = aVariableModel.Parent;
+            ParentNodeId = ParentModel.NodeId;
+            DataTypeNodeId = aVariableModel.DataType.NodeId;
 
-            if (aPropertyModel.Value != null)
+            if (aVariableModel.Value != null)
             {
-                var aPropertyModelValue = JsonConvert.DeserializeObject<JObject>(aPropertyModel.Value);
+                var aPropertyModelValue = JsonConvert.DeserializeObject<JObject>(aVariableModel.Value);
                 var valueTypeId = aPropertyModelValue["Value"]["Type"].Value<int>();
 
                 //switch (aPropertyModelValue["Value"]["Body"].Type.ToString())

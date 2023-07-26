@@ -11,20 +11,20 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
 {
     [ApiController]
     [Route("NodesetProject/{id}/NodesetModel/{uri}/[controller]")]
-    public class ObjectTypeController : ControllerBase
+    public class VariableTypeController : ControllerBase
     {
         private readonly ILogger<NodesetProjectController> _logger;
 
         private ApplicationInstance ApplicationInstance { get; set; }
 
-        public ObjectTypeController(ILogger<NodesetProjectController> logger, ApplicationInstance applicationInstance)
+        public VariableTypeController(ILogger<NodesetProjectController> logger, ApplicationInstance applicationInstance)
         {
             _logger = logger;
             ApplicationInstance = applicationInstance;
         }
 
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiObjectTypeModel>))]
+        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiVariableTypeModel>))]
         public IActionResult Get(string id, string uri)
         {
             var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
@@ -36,30 +36,30 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             else
             {
                 var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
-                var returnObject = new List<ApiObjectTypeModel>();
-                foreach (var aObjectType in activeNodesetModel.ObjectTypes)
+                var returnObject = new List<ApiVariableTypeModel>();
+                foreach (var aVariableType in activeNodesetModel.VariableTypes)
                 {
-                    returnObject.Add(new ApiObjectTypeModel(aObjectType));
+                    returnObject.Add(new ApiVariableTypeModel(aVariableType));
                 }
                 return Ok(returnObject);
             }
         }
 
         [HttpGet("{nodeId}")]
-        [ProducesResponseType(200, Type = typeof(ApiObjectTypeModel))]
+        [ProducesResponseType(200, Type = typeof(ApiVariableTypeModel))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetById(string id, string uri, string nodeId)
         {
-            var objectTypesListResult = Get(id, uri) as ObjectResult;
+            var variableTypesListResult = Get(id, uri) as ObjectResult;
 
-            if (StatusCodes.Status200OK != objectTypesListResult.StatusCode)
+            if (StatusCodes.Status200OK != variableTypesListResult.StatusCode)
             {
-                return objectTypesListResult;
+                return variableTypesListResult;
             }
             else
             {
-                var objectTypes = objectTypesListResult.Value as List<ApiObjectTypeModel>;
-                var returnObject = objectTypes.FirstOrDefault(x => x.NodeId == HttpUtility.UrlDecode(nodeId));
+                var variableTypes = variableTypesListResult.Value as List<ApiVariableTypeModel>;
+                var returnObject = variableTypes.FirstOrDefault(x => x.NodeId == HttpUtility.UrlDecode(nodeId));
                 if (returnObject != null)
                 {
                     return Ok(returnObject);
@@ -73,49 +73,47 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
 
 
         [HttpPut]
-        [ProducesResponseType(200, Type = typeof(ApiObjectTypeModel))]
+        [ProducesResponseType(200, Type = typeof(ApiVariableTypeModel))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public IActionResult PutAsync(string id, string uri, [FromBody] ApiNewObjectTypeModel apiObjectTypeModel)
+        public IActionResult PutAsync(string id, string uri, [FromBody] ApiNewVariableTypeModel apiVariableTypeModel)
         {
 
-            var objectTypesListResult = Get(id, uri) as ObjectResult;
+            var variableTypesListResult = Get(id, uri) as ObjectResult;
 
-            if (StatusCodes.Status200OK != objectTypesListResult.StatusCode)
+            if (StatusCodes.Status200OK != variableTypesListResult.StatusCode)
             {
-                return objectTypesListResult;
+                return variableTypesListResult;
             }
             else
             {
-                var objectTypes = objectTypesListResult.Value as List<ApiObjectTypeModel>;
-                var existingObjectType = objectTypes.FirstOrDefault(x => x.DisplayName == apiObjectTypeModel.DisplayName);
-                if (existingObjectType == null)
+                var variableTypes = variableTypesListResult.Value as List<ApiVariableTypeModel>;
+                var existingVariableType = variableTypes.FirstOrDefault(x => x.DisplayName == apiVariableTypeModel.DisplayName);
+                if (existingVariableType == null)
                 {
-                    // add new object type
+                    // add new variable type
                     var projectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
                     var activeProjectInstance = projectInstanceResult.Value as NodeSetProjectInstance;
 
                     var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
                     var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
 
-                    var newObjectTypeModel = new ObjectTypeModel
+                    var newVariableTypeModel = new VariableTypeModel
                     {
                         NodeSet = activeNodesetModel,
                         NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
-                        SuperType = activeProjectInstance.GetNodeModelByNodeId(apiObjectTypeModel.SuperTypeNodeId) as ObjectTypeModel,
-                        DisplayName = new List<NodeModel.LocalizedText> { apiObjectTypeModel.DisplayName },
-                        BrowseName = apiObjectTypeModel.BrowseName,
-                        Description = new List<NodeModel.LocalizedText> { apiObjectTypeModel.Description == null ? "" : apiObjectTypeModel.Description },
-                        Properties = new List<VariableModel>(),
-                        DataVariables = new List<DataVariableModel>(),
+                        SuperType = activeProjectInstance.GetNodeModelByNodeId(apiVariableTypeModel.SuperTypeNodeId) as VariableTypeModel,
+                        DisplayName = new List<NodeModel.LocalizedText> { apiVariableTypeModel.DisplayName == null ? "" : apiVariableTypeModel.DisplayName },
+                        BrowseName = apiVariableTypeModel.BrowseName,
+                        Description = new List<NodeModel.LocalizedText> { apiVariableTypeModel.Description == null ? "" : apiVariableTypeModel.Description },
                     };
 
-                    activeNodesetModel.ObjectTypes.Add(newObjectTypeModel);
+                    activeNodesetModel.VariableTypes.Add(newVariableTypeModel);
                     activeNodesetModel.UpdateIndices();
-                    return Ok(new ApiObjectTypeModel(newObjectTypeModel));
+                    return Ok(new ApiVariableTypeModel(newVariableTypeModel));
                 }
                 else
                 {
-                    return BadRequest("An object type with this name exists.");
+                    return BadRequest("A variable type with this name exists.");
                 }
             }
         }

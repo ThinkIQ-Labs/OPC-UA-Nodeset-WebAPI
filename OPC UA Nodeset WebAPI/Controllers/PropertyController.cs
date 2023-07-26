@@ -101,7 +101,9 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                     existingProperty.PropertyModel.Description = new List<NodeModel.LocalizedText> { apiPropertyModel.Description };
 
                     // look up data type
-                    var aDataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == apiPropertyModel.DataType);
+                    //var aDataType = activeProjectInstance.UaBaseModel.AllNodesByNodeId[apiPropertyModel.DataTypeNodeId];
+                    var nodeFromDataTypeNodeId = new ApiUaNodeModel { NodeId = apiPropertyModel.DataTypeNodeId };
+                    var aDataType = activeProjectInstance.NodeSetModels.FirstOrDefault(x=>x.Value.ModelUri== nodeFromDataTypeNodeId.NameSpace).Value.AllNodesByNodeId[apiPropertyModel.DataTypeNodeId];
 
                     // patch datatype and value
                     if (apiPropertyModel.Value != null)
@@ -209,10 +211,10 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                     var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
 
                     // look up parent object
-                    var parentNode = activeNodesetModel.AllNodesByNodeId[apiPropertyModel.ParentNodeId];
+                    var parentNode = activeProjectInstance.GetNodeModelByNodeId(apiPropertyModel.ParentNodeId);
 
                     // look up data type
-                    var aDataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == apiPropertyModel.DataType);
+                    var aDataType = activeProjectInstance.GetNodeModelByNodeId(apiPropertyModel.DataTypeNodeId) as DataTypeModel;
 
                     var newPropertyModel = new PropertyModel
                     {
@@ -222,6 +224,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                         DisplayName = new List<NodeModel.LocalizedText> { apiPropertyModel.DisplayName },
                         BrowseName = apiPropertyModel.BrowseName,
                         Description = new List<NodeModel.LocalizedText> { apiPropertyModel.Description == null ? "" : apiPropertyModel.Description },
+                        DataType = aDataType as DataTypeModel
                     };
 
                     // add value
@@ -234,7 +237,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                             case "Int32":
                             case "Int64":
                             case "SByte":
-                                newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Int32");
+                                //newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Int32");
                                 int aIntValue;
                                 if (Int32.TryParse(apiPropertyModel.Value, out aIntValue))
                                 {
@@ -243,7 +246,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                                 break;
                             case "Boolean":
                             case "Bool":
-                                newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Boolean");
+                                //newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Boolean");
                                 Boolean aBoolValue;
                                 if (Boolean.TryParse(apiPropertyModel.Value, out aBoolValue))
                                 {
@@ -252,7 +255,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                                 break;
                             case "DateTime":
                             case "UtcTime":
-                                newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "DateTime");
+                                //newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "DateTime");
                                 DateTime aDateTimeValue;
                                 if (DateTime.TryParse(apiPropertyModel.Value, out aDateTimeValue))
                                 {
@@ -260,7 +263,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                                 }
                                 break;
                             default:
-                                newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Int32");
+                                //newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Int32");
                                 newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(apiPropertyModel.Value);
                                 break;
                         }

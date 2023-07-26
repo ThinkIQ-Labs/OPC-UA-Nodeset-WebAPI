@@ -1,4 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using CESMII.OpcUa.NodeSetModel;
 using Newtonsoft.Json;
 using Opc.Ua.Export;
 using OPC_UA_Nodeset_WebAPI.Model;
@@ -9,9 +10,9 @@ using System.Xml;
 
 // create client
 HttpClient client = new HttpClient();
-client.BaseAddress = new Uri("https://localhost:7074/");
+//client.BaseAddress = new Uri("https://localhost:7074/");
 //client.BaseAddress = new Uri("https://localhost:5001/");
-//client.BaseAddress = new Uri("https://opcuanodesetwebapi.azurewebsites.net/");
+client.BaseAddress = new Uri("https://opcuanodesetwebapi.azurewebsites.net/");
 HttpResponseMessage response;
 
 // get local nodesets
@@ -34,6 +35,10 @@ var uaBaseObjectType = uaObjectTypes.First(x => x.DisplayName == "BaseObjectType
 var uaDataTypes = await client.GetFromJsonAsync<List<ApiObjectTypeModel>>($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/DataType");
 var uaEnumDataType = uaDataTypes.First(x => x.DisplayName == "Enumeration");
 
+// get ua variable types
+var uaVariableTypes = await client.GetFromJsonAsync<List<ApiVariableTypeModel>>($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/VariableType");
+var uaBaseDataVariableType = uaVariableTypes.First(x => x.DisplayName == "BaseDataVariableType");
+
 // create new model
 response = await client.PutAsJsonAsync<ApiNodeSetInfo>(
     $"NodesetProject/{sessionKey}/NodesetModel",
@@ -47,7 +52,7 @@ var newModel = (await response.Content.ReadFromJsonAsync<Dictionary<string, ApiN
 
 // add a new enum data type
 response = await client.PutAsJsonAsync<ApiNewDataTypeModel>(
-    $"NodesetProject/{sessionKey}/NodesetModel/{WebUtility.UrlEncode(newModel.Key)}/DataType", 
+    $"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/DataType", 
     new ApiNewDataTypeModel
     {
         SuperTypeNodeId = uaEnumDataType.NodeId,
@@ -86,8 +91,53 @@ response = await client.PutAsJsonAsync<ApiNewDataTypeModel>(
 var newDataType = await response.Content.ReadFromJsonAsync<ApiDataTypeModel>();
 
 // get data types
-var newDataTypes = await client.GetFromJsonAsync<List<ApiObjectTypeModel>>($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/DataType");
+var newDataTypes = await client.GetFromJsonAsync<List<ApiDataTypeModel>>($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/DataType");
 
+// add new variable type
+response = await client.PutAsJsonAsync<ApiNewVariableTypeModel>(
+    $"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/VariableType",
+    new ApiNewVariableTypeModel
+    {
+        SuperTypeNodeId = uaBaseDataVariableType.NodeId,
+        DisplayName = "ThinkIQ Types MetaData Type",
+        BrowseName = "ThinkIQ_Types_MetaData_Type",
+        Description = "A variable type to capture meta data for ThinkIQ type definitions.",
+    });
+var newVariableType = await response.Content.ReadFromJsonAsync<ApiVariableTypeModel>();
+
+// get variable types
+var newVariableTypes = await client.GetFromJsonAsync<List<ApiVariableTypeModel>>($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/VariableType");
+
+// add work status property to new variable type
+response = await client.PutAsJsonAsync<ApiNewPropertyModel>(
+    $"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Property",
+    new ApiNewPropertyModel
+    {
+        ParentNodeId = newVariableType.NodeId,
+        DisplayName = "Work Status",
+        BrowseName = "Work_Status",
+        Description = "Variable for work status.",
+        DataTypeNodeId = newDataType.NodeId,
+        Value = null
+    });
+var newProperty = await response.Content.ReadFromJsonAsync<ApiPropertyModel>();
+
+// add importance property to the meta data type
+response = await client.PutAsJsonAsync<ApiNewPropertyModel>(
+    $"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Property",
+    new ApiNewPropertyModel
+    {
+        ParentNodeId = newVariableType.NodeId,
+        DisplayName = "Importance",
+        BrowseName = "importance",
+        Description = "The ranking order of attributes",
+        DataTypeNodeId = uaDataTypes.First(x => x.DisplayName == "Integer").NodeId,
+        Value = "10"
+    });
+newProperty = await response.Content.ReadFromJsonAsync<ApiPropertyModel>();
+
+// get variable types
+newVariableTypes = await client.GetFromJsonAsync<List<ApiVariableTypeModel>>($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/VariableType");
 
 // add new object type
 response = await client.PutAsJsonAsync<ApiNewObjectTypeModel>(
@@ -101,69 +151,6 @@ response = await client.PutAsJsonAsync<ApiNewObjectTypeModel>(
     });
 var newObjectType = await response.Content.ReadFromJsonAsync<ApiObjectTypeModel>();
 
-// add new object type for meta data
-response = await client.PutAsJsonAsync<ApiNewObjectTypeModel>(
-    $"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/ObjectType",
-    new ApiNewObjectTypeModel
-    {
-        DisplayName = "Type Meta Data",
-        BrowseName = "type_meta_data",
-        Description = "Meta data for all type definitions",
-        SuperTypeNodeId = uaBaseObjectType.NodeId
-    });
-var newObjectTypeMetaData = await response.Content.ReadFromJsonAsync<ApiObjectTypeModel>();
-
-// add a property to the meta data type
-response = await client.PutAsJsonAsync<ApiNewPropertyModel>(
-    $"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Property",
-    new ApiNewPropertyModel
-    {
-        DisplayName = "Importance",
-        BrowseName = "importance",
-        Description = "The ranking order of attributes",
-        ParentNodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(newObjectTypeMetaData.Id, newModel.Value.ModelUri),
-        DataType = "Integer",
-        Value = "10"
-    });
-var newProperty = await response.Content.ReadFromJsonAsync<ApiPropertyModel>();
-
-// add object to type to store metadata
-// add new object type for meta data
-response = await client.PutAsJsonAsync<ApiNewObjectModel>(
-    $"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Object",
-    new ApiNewObjectModel
-    {
-        DisplayName = "Type Meta Data",
-        BrowseName = "type_meta_data",
-        Description = "Meta data for all type definitions",
-        TypeDefinitionNodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(newObjectTypeMetaData.Id, newModel.Value.ModelUri),
-        ParentNodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(newObjectType.Id, newModel.Value.ModelUri),
-        GenerateChildren = true,
-    });
-var newObjectData = await response.Content.ReadFromJsonAsync<ApiObjectTypeModel>();
-
-// get properties of the meta data object
-var metaDataProperties = await client.GetFromJsonAsync<List<ApiPropertyModel>>($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Property/ByParentNodeId?parentNodeId={newObjectData.NodeId}");
-var aProp = metaDataProperties.First();
-aProp.Value = "2";
-var serializedDoc = JsonConvert.SerializeObject(aProp);
-var requestContent = new StringContent(serializedDoc, Encoding.UTF8, "application/json-patch+json");
-var fristProp = await client.GetFromJsonAsync<ApiPropertyModel>($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Property/GetByNodeId?nodeId={metaDataProperties.First().NodeId}");
-response = await client.PatchAsync($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Property/PatchByNodeId?nodeId={metaDataProperties.First().NodeId}", requestContent);
-
-// add a property to the meta data type instance
-//response = await client.PutAsJsonAsync<ApiNewPropertyModel>(
-//    $"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Property",
-//    new ApiNewPropertyModel
-//    {
-//        DisplayName = "Importance",
-//        BrowseName = "importance",
-//        Description = "The ranking order of attributes",
-//        ParentNodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace(newObjectData.Id, newModel.Value.ModelUri),
-//        DataType = "Integer",
-//        Value = "3"
-//    });
-//var newPropertyOnInstance = await response.Content.ReadFromJsonAsync<ApiPropertyModel>();
 
 // get xml
 response = await client.GetAsync($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/GenerateXml");

@@ -47,27 +47,37 @@ var workStatusEnum = new DataTypeModel
         new DataTypeModel.UaEnumField
         {
             Name = "-",
-            Value = 0
+            Value = 0,
+            Description = new List<NodeModel.LocalizedText>(),
+            DisplayName = new List<NodeModel.LocalizedText>()
         },
         new DataTypeModel.UaEnumField
         {
             Name = "Work",
-            Value = 1
+            Value = 1,
+            Description = new List<NodeModel.LocalizedText>(),
+            DisplayName = new List<NodeModel.LocalizedText>()
         },
         new DataTypeModel.UaEnumField
         {
             Name = "Review",
-            Value = 2
+            Value = 2,
+            Description = new List<NodeModel.LocalizedText>(),
+            DisplayName = new List<NodeModel.LocalizedText>()
         },
         new DataTypeModel.UaEnumField
         {
             Name = "Approved",
-            Value = 3
+            Value = 3,
+            Description = new List<NodeModel.LocalizedText>(),
+            DisplayName = new List<NodeModel.LocalizedText>()
         },
         new DataTypeModel.UaEnumField
         {
             Name = "Done",
-            Value = 4
+            Value = 4,
+            Description = new List<NodeModel.LocalizedText>(),
+            DisplayName = new List<NodeModel.LocalizedText>()
         }
     }
 };
@@ -75,7 +85,7 @@ var workStatusEnum = new DataTypeModel
 
 newNodeSetModel.DataTypes.Add(workStatusEnum);
 
-var tiqTypesMetaDataType = new VariableTypeModel
+var tiqTypesMetaDataVariableType = new VariableTypeModel
 {
     NodeSet = newNodeSetModel,
     NodeId = $"nsu={newNodeSetModel.ModelUri};i={newNodeId++}",
@@ -86,22 +96,22 @@ var tiqTypesMetaDataType = new VariableTypeModel
     Properties = new List<VariableModel>()
 };
 
-tiqTypesMetaDataType.Properties.Add(new PropertyModel
+tiqTypesMetaDataVariableType.Properties.Add(new PropertyModel
 {
     NodeSet = newNodeSetModel,
     NodeId = $"nsu={newNodeSetModel.ModelUri};i={newNodeId++}",
-    Parent = tiqTypesMetaDataType,
+    Parent = tiqTypesMetaDataVariableType,
     DisplayName = new List<NodeModel.LocalizedText> { "Work Status" },
     BrowseName = "Work_Status",
     Description = new List<NodeModel.LocalizedText> { "Variable for work status." },
     DataType = workStatusEnum,
     Value = null
 });
-tiqTypesMetaDataType.Properties.Add(new PropertyModel
+tiqTypesMetaDataVariableType.Properties.Add(new PropertyModel
 {
     NodeSet = newNodeSetModel,
     NodeId = $"nsu={newNodeSetModel.ModelUri};i={newNodeId++}",
-    Parent = tiqTypesMetaDataType,
+    Parent = tiqTypesMetaDataVariableType,
     DisplayName = new List<NodeModel.LocalizedText> { "Last Update" },
     BrowseName = "Last_Update",
     Description = new List<NodeModel.LocalizedText> { "Variable last update timestamp." },
@@ -109,7 +119,7 @@ tiqTypesMetaDataType.Properties.Add(new PropertyModel
     Value = null
 });
 
-newNodeSetModel.VariableTypes.Add(tiqTypesMetaDataType);
+newNodeSetModel.VariableTypes.Add(tiqTypesMetaDataVariableType);
 
 var tiqAttributesMetaDataType = new VariableTypeModel
 {
@@ -247,7 +257,7 @@ var var1 = new DataVariableModel
     DisplayName = new List<NodeModel.LocalizedText> { "ThinkIQ Type MetaData" },
     BrowseName = "ThinkIQ_Types_MetaData",
     Description = new List<NodeModel.LocalizedText> { "A variable type to capture meta data for ThinkIQ type definitions." },
-    TypeDefinition = tiqTypesMetaDataType,
+    TypeDefinition = tiqTypesMetaDataVariableType,
     Properties = new List<VariableModel>()
 };
 

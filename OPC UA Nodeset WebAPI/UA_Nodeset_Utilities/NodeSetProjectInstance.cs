@@ -6,6 +6,7 @@ using OPC_UA_Nodeset_WebAPI.Model;
 using Opc.Ua;
 using static System.Net.Mime.MediaTypeNames;
 using System.Text;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
 {
@@ -153,16 +154,51 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
             
         }
 
-        public ObjectTypeModel GetObjectTypeModelByNodeId(string nodeId)
+        public NodeModel GetNodeModelByNodeId(string nodeId)
         {
-            var id = int.Parse(nodeId.Split("=").Last());
-            var uri = nodeId.Split("=")[1].Split(";").First();
-
-            var nodeset = NodeSetModels[uri];
-            var objectType = nodeset.ObjectTypes.FirstOrDefault(x => x.NodeId == nodeId);
-
-            return objectType;
-
+            var nodeFromNodeId = new ApiUaNodeModel { NodeId = nodeId };
+            var aNode = NodeSetModels.FirstOrDefault(x => x.Value.ModelUri == nodeFromNodeId.NameSpace).Value.AllNodesByNodeId[nodeId];
+            return aNode;
         }
+
+        //public ObjectTypeModel GetObjectTypeModelByNodeId(string nodeId)
+        //{
+        //    //var id = int.Parse(nodeId.Split("=").Last());
+        //    //var uri = nodeId.Split("=")[1].Split(";").First();
+
+        //    //var nodeset = NodeSetModels[uri];
+        //    //var objectType = nodeset.ObjectTypes.FirstOrDefault(x => x.NodeId == nodeId);
+
+        //    var aNode = GetNodeModelByNodeId(nodeId);
+        //    var aObjectTypeModel = aNode as ObjectTypeModel;
+
+        //    return aObjectTypeModel;
+
+        //}
+        //public DataTypeModel GetDataTypeModelByNodeId(string nodeId)
+        //{
+        //    //var id = int.Parse(nodeId.Split("=").Last());
+        //    //var uri = nodeId.Split("=")[1].Split(";").First();
+
+        //    //var nodeset = NodeSetModels[uri];
+        //    //var dataType = nodeset.DataTypes.FirstOrDefault(x => x.NodeId == nodeId);
+
+        //    var aNode = GetNodeModelByNodeId(nodeId);
+        //    var aDataTypeModel = aNode as DataTypeModel;
+
+        //    return aDataTypeModel;
+
+        //}
+        //public VariableTypeModel GetVariableTypeModelByNodeId(string nodeId)
+        //{
+        //    var id = int.Parse(nodeId.Split("=").Last());
+        //    var uri = nodeId.Split("=")[1].Split(";").First();
+
+        //    var nodeset = NodeSetModels[uri];
+        //    var variableType = nodeset.VariableTypes.FirstOrDefault(x => x.NodeId == nodeId);
+
+        //    return variableType;
+
+        //}
     }
 }

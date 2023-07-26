@@ -13,7 +13,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
 
         public string DisplayName { get; set; }
 
-        public string? DataType { get; set; }
+        public string DataTypeNodeId { get; set; }
 
         public string? Value { get; set; }
 

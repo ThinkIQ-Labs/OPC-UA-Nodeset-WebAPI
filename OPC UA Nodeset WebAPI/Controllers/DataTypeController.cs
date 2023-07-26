@@ -101,7 +101,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                     {
                         NodeSet = activeNodesetModel,
                         NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
-                        SuperType = activeProjectInstance.GetObjectTypeModelByNodeId(apiDataTypeModel.SuperTypeNodeId),
+                        SuperType = activeProjectInstance.GetNodeModelByNodeId(apiDataTypeModel.SuperTypeNodeId) as DataTypeModel,
                         DisplayName = new List<NodeModel.LocalizedText> { apiDataTypeModel.DisplayName == null ? "" : apiDataTypeModel.DisplayName },
                         BrowseName = apiDataTypeModel.BrowseName,
                         Description = new List<NodeModel.LocalizedText> { apiDataTypeModel.Description == null ? "" : apiDataTypeModel.Description },
@@ -109,8 +109,8 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                         {
                             Name = x.Name,
                             Value = x.Value,
-                            Description = new List<NodeModel.LocalizedText> { x.Description == null ? "" : x.Description },
-                            DisplayName = new List<NodeModel.LocalizedText> { x.DisplayName == null ? "" : x.DisplayName }
+                            Description = x.Description == null ? new List<NodeModel.LocalizedText>() : new List<NodeModel.LocalizedText> { x.Description },
+                            DisplayName = x.DisplayName == null ? new List<NodeModel.LocalizedText>() :new List<NodeModel.LocalizedText> { x.DisplayName }
                         }).ToList()
                     };
 
