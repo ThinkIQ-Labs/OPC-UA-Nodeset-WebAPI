@@ -123,7 +123,9 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                     var parentNode = activeProjectInstance.GetNodeModelByNodeId(apiDataVariableModel.ParentNodeId);
 
                     // look up data type
-                    var aDataType = activeProjectInstance.GetNodeModelByNodeId(apiDataVariableModel.DataTypeNodeId) as DataTypeModel;
+                    DataTypeModel aDataType = apiDataVariableModel.DataTypeNodeId == null ? null : activeProjectInstance.GetNodeModelByNodeId(apiDataVariableModel.DataTypeNodeId) as DataTypeModel;
+
+                    VariableTypeModel aTypeDefinition = apiDataVariableModel.TypeDefinitionNodeId == null ? null : activeProjectInstance.GetNodeModelByNodeId(apiDataVariableModel.TypeDefinitionNodeId) as VariableTypeModel;
 
                     var newDataVariableModel = new DataVariableModel
                     {
@@ -133,8 +135,46 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                         DisplayName = new List<NodeModel.LocalizedText> { apiDataVariableModel.DisplayName },
                         BrowseName = apiDataVariableModel.BrowseName,
                         Description = new List<NodeModel.LocalizedText> { apiDataVariableModel.Description == null ? "" : apiDataVariableModel.Description },
-                        DataType = aDataType as DataTypeModel
+                        DataType = aDataType,
+                        TypeDefinition = aTypeDefinition
                     };
+
+                    if (apiDataVariableModel.GenerateChildren.HasValue)
+                    {
+                        if (apiDataVariableModel.GenerateChildren.Value)
+                        {
+                            aTypeDefinition.Properties.ForEach(aProperty =>
+                            {
+                                newDataVariableModel.Properties.Add(new PropertyModel
+                                {
+                                    NodeSet = activeNodesetModel,
+                                    NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                                    Parent = newDataVariableModel,
+                                    DisplayName = aProperty.DisplayName,
+                                    BrowseName = aProperty.BrowseName,
+                                    Description = aProperty.Description,
+                                    DataType = aProperty.DataType,
+                                    Value = aProperty.Value,
+                                    EngineeringUnit = aProperty.EngineeringUnit,
+                                });
+                            });
+                            aTypeDefinition.DataVariables.ForEach(aDataVariable =>
+                            {
+                                newDataVariableModel.DataVariables.Add(new DataVariableModel
+                                {
+                                    NodeSet = activeNodesetModel,
+                                    NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                                    Parent = newDataVariableModel,
+                                    DisplayName = aDataVariable.DisplayName,
+                                    BrowseName = aDataVariable.BrowseName,
+                                    Description = aDataVariable.Description,
+                                    DataType = aDataVariable.DataType,
+                                    Value = aDataVariable.Value,
+                                    EngineeringUnit = aDataVariable.EngineeringUnit,
+                                });
+                            });
+                        }
+                    }
 
                     // add value
                     if (apiDataVariableModel.Value != null)
@@ -177,7 +217,6 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                                 break;
                         }
                     }
-
 
 
                     parentNode.DataVariables.Add(newDataVariableModel);

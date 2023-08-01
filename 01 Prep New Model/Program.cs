@@ -10,9 +10,9 @@ using System.Xml;
 
 // create client
 HttpClient client = new HttpClient();
-//client.BaseAddress = new Uri("https://localhost:7074/");
+client.BaseAddress = new Uri("https://localhost:7074/");
 //client.BaseAddress = new Uri("https://localhost:5001/");
-client.BaseAddress = new Uri("https://opcuanodesetwebapi.azurewebsites.net/");
+//client.BaseAddress = new Uri("https://opcuanodesetwebapi.azurewebsites.net/");
 HttpResponseMessage response;
 
 // get local nodesets
@@ -150,6 +150,22 @@ response = await client.PutAsJsonAsync<ApiNewObjectTypeModel>(
         SuperTypeNodeId = uaBaseObjectType.NodeId
     });
 var newObjectType = await response.Content.ReadFromJsonAsync<ApiObjectTypeModel>();
+
+// add the variable to the equipment
+// add work status property to new variable type
+response = await client.PutAsJsonAsync<ApiNewDataVariableModel>(
+    $"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/DataVariable",
+    new ApiNewDataVariableModel
+    {
+        ParentNodeId = newObjectType.NodeId,
+        DisplayName = "ThinkIQ MetaData",
+        BrowseName = "ThinkIQ_MetaData",
+        Description = "Variable for ThinkIQ MetaData.",
+        TypeDefinitionNodeId = newVariableType.NodeId,
+        Value = null,
+        GenerateChildren = true
+    });
+var newDataVariable = await response.Content.ReadFromJsonAsync<ApiDataVariableModel>();
 
 
 // get xml

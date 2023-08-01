@@ -10,6 +10,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
     {
         public string ParentNodeId { get; set; }
         public string DataTypeNodeId { get; set; }
+        public string TypeDefinitionNodeId { get; set; }
         public string? Value { get; set; }    
 
         internal NodeModel ParentModel { get; set; }
@@ -26,7 +27,8 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             Description = aVariableModel.Description.Count == 0 ? "" : aVariableModel.Description.First().Text;
             ParentModel = aVariableModel.Parent;
             ParentNodeId = ParentModel.NodeId;
-            DataTypeNodeId = aVariableModel.DataType.NodeId;
+            DataTypeNodeId = aVariableModel.DataType == null ? "" : aVariableModel.DataType.NodeId;
+            TypeDefinitionNodeId = aVariableModel.TypeDefinition == null ? "" : aVariableModel.TypeDefinition.NodeId;
 
             if (aVariableModel.Value != null)
             {

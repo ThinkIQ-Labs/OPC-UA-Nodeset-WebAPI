@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "02 Browse Model", "02 Brows
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "99 Test Properties", "99 Test Properties\99 Test Properties.csproj", "{982E88BE-0CF9-46D8-85A1-FFB44AB1315F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "03 Custom Variable Type with Enum", "03 Custom Variable Type with Enum\03 Custom Variable Type with Enum.csproj", "{81C2FCCD-5E5D-4239-BBD0-6CC78F0DA9FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "03 Custom Variable Type with Enum", "03 Custom Variable Type with Enum\03 Custom Variable Type with Enum.csproj", "{81C2FCCD-5E5D-4239-BBD0-6CC78F0DA9FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{DE87AB18-4199-4163-BE2A-072074D66BDD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,10 @@ Global
 		{81C2FCCD-5E5D-4239-BBD0-6CC78F0DA9FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81C2FCCD-5E5D-4239-BBD0-6CC78F0DA9FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81C2FCCD-5E5D-4239-BBD0-6CC78F0DA9FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE87AB18-4199-4163-BE2A-072074D66BDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE87AB18-4199-4163-BE2A-072074D66BDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE87AB18-4199-4163-BE2A-072074D66BDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE87AB18-4199-4163-BE2A-072074D66BDD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -50,6 +56,7 @@ Global
 		{E1C28677-CD91-467B-ADF6-DF953E3B3B07} = {D54DA77B-5B43-4731-A6A4-2A86670524AC}
 		{982E88BE-0CF9-46D8-85A1-FFB44AB1315F} = {D54DA77B-5B43-4731-A6A4-2A86670524AC}
 		{81C2FCCD-5E5D-4239-BBD0-6CC78F0DA9FE} = {D54DA77B-5B43-4731-A6A4-2A86670524AC}
+		{DE87AB18-4199-4163-BE2A-072074D66BDD} = {D54DA77B-5B43-4731-A6A4-2A86670524AC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E2F16649-A904-4BCC-94B1-C5D0BA8C6CC2}

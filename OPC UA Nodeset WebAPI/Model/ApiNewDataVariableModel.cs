@@ -13,7 +13,9 @@ namespace OPC_UA_Nodeset_WebAPI.Model
 
         public string DisplayName { get; set; }
         
-        public string DataTypeNodeId { get; set; }
+        public string? DataTypeNodeId { get; set; }
+
+        public string? TypeDefinitionNodeId { get; set; }
 
         public string? Value { get; set; }
 
@@ -21,6 +23,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
 
         public string? Description { get; set; }
 
+        public bool? GenerateChildren { get; set; }
 
 
         public ApiNewDataVariableModel() { }
