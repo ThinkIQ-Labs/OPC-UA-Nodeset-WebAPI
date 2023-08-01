@@ -102,8 +102,9 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
 
                     // look up data type
                     //var aDataType = activeProjectInstance.UaBaseModel.AllNodesByNodeId[apiPropertyModel.DataTypeNodeId];
-                    var nodeFromDataTypeNodeId = new ApiUaNodeModel { NodeId = apiPropertyModel.DataTypeNodeId };
-                    var aDataType = activeProjectInstance.NodeSetModels.FirstOrDefault(x=>x.Value.ModelUri== nodeFromDataTypeNodeId.NameSpace).Value.AllNodesByNodeId[apiPropertyModel.DataTypeNodeId];
+                    //var nodeFromDataTypeNodeId = new ApiUaNodeModel { NodeId = apiPropertyModel.DataTypeNodeId };
+                    //var aDataType = activeProjectInstance.NodeSetModels.FirstOrDefault(x=>x.Value.ModelUri== nodeFromDataTypeNodeId.NameSpace).Value.AllNodesByNodeId[apiPropertyModel.DataTypeNodeId];
+                    var aDataType = activeProjectInstance.GetNodeModelByNodeId(apiPropertyModel.DataTypeNodeId);
 
                     // patch datatype and value
                     if (apiPropertyModel.Value != null)
@@ -141,8 +142,11 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                                 }
                                 break;
                             default:
-                                existingProperty.PropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Int32");
-                                existingProperty.PropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(apiPropertyModel.Value);
+                                if (existingProperty.PropertyModel.DataType.SuperType.NodeId == "nsu=http://opcfoundation.org/UA/;i=29")
+                                {
+                                    existingProperty.PropertyModel.DataType = aDataType as DataTypeModel;
+                                    existingProperty.PropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(Int32.Parse(apiPropertyModel.Value));
+                                }
                                 break;
                         }
                     }

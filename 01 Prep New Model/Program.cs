@@ -167,6 +167,16 @@ response = await client.PutAsJsonAsync<ApiNewDataVariableModel>(
     });
 var newDataVariable = await response.Content.ReadFromJsonAsync<ApiDataVariableModel>();
 
+// get the properties of the metadata datavariable
+var newMetadataProperties = await client.GetFromJsonAsync<List<ApiPropertyModel>>($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Property/ByParentNodeId?parentNodeId={newDataVariable.NodeId}");
+
+
+// set value of work status
+var workStatusProp = newMetadataProperties.First();
+workStatusProp.Value = "2";
+response = await client.PatchAsJsonAsync<ApiPropertyModel>($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Property/PatchByNodeId?nodeId={workStatusProp.NodeId}",
+    workStatusProp);
+var workStatusPropAfterPatch = await response.Content.ReadFromJsonAsync<ApiPropertyModel>();
 
 // get xml
 response = await client.GetAsync($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/GenerateXml");
