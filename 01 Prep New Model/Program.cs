@@ -170,13 +170,31 @@ var newDataVariable = await response.Content.ReadFromJsonAsync<ApiDataVariableMo
 // get the properties of the metadata datavariable
 var newMetadataProperties = await client.GetFromJsonAsync<List<ApiPropertyModel>>($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Property/ByParentNodeId?parentNodeId={newDataVariable.NodeId}");
 
-
 // set value of work status
 var workStatusProp = newMetadataProperties.First();
 workStatusProp.Value = "2";
 response = await client.PatchAsJsonAsync<ApiPropertyModel>($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Property/PatchByNodeId?nodeId={workStatusProp.NodeId}",
     workStatusProp);
 var workStatusPropAfterPatch = await response.Content.ReadFromJsonAsync<ApiPropertyModel>();
+
+// get objects collector
+var objectsCollector = await client.GetFromJsonAsync<List<ApiObjectModel>>($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/Object/ByDisplayName/Objects");
+
+// add object to objects
+response = await client.PutAsJsonAsync<ApiNewObjectModel>(
+    $"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Object",
+    new ApiNewObjectModel
+    {
+        ParentNodeId = objectsCollector.First().NodeId,
+        TypeDefinitionNodeId = newObjectType.NodeId,
+        DisplayName = "Equipment 1",
+        BrowseName = "Equipment_1",
+        Description = "new equipment",
+        GenerateChildren = true
+    });
+var newObject = await response.Content.ReadFromJsonAsync<ApiObjectModel>();
+
+var allObjects = await client.GetFromJsonAsync<List<ApiObjectModel>>($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/Object");
 
 // get xml
 response = await client.GetAsync($"NodesetProject/{sessionKey}/NodesetModel/{newModel.Key}/GenerateXml");

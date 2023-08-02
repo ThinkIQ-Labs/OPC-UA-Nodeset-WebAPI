@@ -111,6 +111,10 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                     {
                         switch (aDataType.DisplayName.First().Text)
                         {
+                            case "String":
+                                existingProperty.PropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "String");
+                                existingProperty.PropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(apiPropertyModel.Value.ToString());
+                                break;
                             case "Integer":
                             case "Int16":
                             case "Int32":

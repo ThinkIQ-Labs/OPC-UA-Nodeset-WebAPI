@@ -45,7 +45,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [HttpGet("{nodeId}")]
         [ProducesResponseType(200, Type = typeof(ApiObjectModel))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public IActionResult GetById(string id, string uri, string nodeId)
+        public IActionResult GetByNodeId(string id, string uri, string nodeId)
         {
             var objectsListResult = Get(id, uri) as ObjectResult;
 
@@ -65,6 +65,25 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                 {
                     return NotFound("The node id does not exist.");
                 }
+            }
+        }
+
+        [HttpGet("ByDisplayName/{displayName}")]
+        [ProducesResponseType(200, Type = typeof(List<ApiObjectModel>))]
+        [ProducesResponseType(404, Type = typeof(NotFoundResult))]
+        public IActionResult GetByDisplayName(string id, string uri, string displayName)
+        {
+            var objectsListResult = Get(id, uri) as ObjectResult;
+
+            if (StatusCodes.Status200OK != objectsListResult.StatusCode)
+            {
+                return objectsListResult;
+            }
+            else
+            {
+                var objectsList = objectsListResult.Value as List<ApiObjectModel>;
+                var returnObject = objectsList.Where(x => x.DisplayName == displayName).ToList();
+                return Ok(returnObject);
             }
         }
 
@@ -151,7 +170,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                         }
                     }
 
-                    parentNode.Objects.Add(newObjectModel);
+                    activeNodesetModel.Objects.Add(newObjectModel);
                     activeNodesetModel.UpdateIndices();
                     return Ok(new ApiObjectModel(newObjectModel));
                 }
