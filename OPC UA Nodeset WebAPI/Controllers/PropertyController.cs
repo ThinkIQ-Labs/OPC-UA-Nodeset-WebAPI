@@ -142,11 +142,11 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                                 }
                                 break;
                             default:
-                                if (existingProperty.PropertyModel.DataType.SuperType.NodeId == "nsu=http://opcfoundation.org/UA/;i=29")
-                                {
-                                    existingProperty.PropertyModel.DataType = aDataType as DataTypeModel;
-                                    existingProperty.PropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(Int32.Parse(apiPropertyModel.Value));
-                                }
+if (existingProperty.PropertyModel.DataType.SuperType.NodeId == "nsu=http://opcfoundation.org/UA/;i=29")
+{
+    existingProperty.PropertyModel.DataType = aDataType as DataTypeModel;
+    existingProperty.PropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(Int32.Parse(apiPropertyModel.Value));
+}
                                 break;
                         }
                     }
