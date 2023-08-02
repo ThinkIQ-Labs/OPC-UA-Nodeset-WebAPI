@@ -48,7 +48,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [HttpGet("{nodeId}")]
         [ProducesResponseType(200, Type = typeof(ApiObjectTypeModel))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public IActionResult GetById(string id, string uri, string nodeId)
+        public IActionResult GetByNodeId(string id, string uri, string nodeId)
         {
             var objectTypesListResult = Get(id, uri) as ObjectResult;
 
@@ -71,6 +71,24 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             }
         }
 
+        [HttpGet("ByDisplayName/{displayName}")]
+        [ProducesResponseType(200, Type = typeof(List<ApiObjectTypeModel>))]
+        [ProducesResponseType(404, Type = typeof(NotFoundResult))]
+        public IActionResult GetByDisplayName(string id, string uri, string displayName)
+        {
+            var objectTypesListResult = Get(id, uri) as ObjectResult;
+
+            if (StatusCodes.Status200OK != objectTypesListResult.StatusCode)
+            {
+                return objectTypesListResult;
+            }
+            else
+            {
+                var objectTypes = objectTypesListResult.Value as List<ApiObjectTypeModel>;
+                var returnObject = objectTypes.Where(x => x.DisplayName == displayName).ToList();
+                return Ok(returnObject);
+            }
+        }
 
         [HttpPut]
         [ProducesResponseType(200, Type = typeof(ApiObjectTypeModel))]

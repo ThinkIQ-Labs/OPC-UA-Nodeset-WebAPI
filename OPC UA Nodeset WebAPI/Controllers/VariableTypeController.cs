@@ -48,7 +48,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [HttpGet("{nodeId}")]
         [ProducesResponseType(200, Type = typeof(ApiVariableTypeModel))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public IActionResult GetById(string id, string uri, string nodeId)
+        public IActionResult GetByNodeId(string id, string uri, string nodeId)
         {
             var variableTypesListResult = Get(id, uri) as ObjectResult;
 
@@ -68,6 +68,25 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                 {
                     return NotFound("The node id does not exist.");
                 }
+            }
+        }
+
+        [HttpGet("ByDisplayName/{displayName}")]
+        [ProducesResponseType(200, Type = typeof(List<ApiVariableTypeModel>))]
+        [ProducesResponseType(404, Type = typeof(NotFoundResult))]
+        public IActionResult GetByDisplayName(string id, string uri, string displayName)
+        {
+            var variableTypesListResult = Get(id, uri) as ObjectResult;
+
+            if (StatusCodes.Status200OK != variableTypesListResult.StatusCode)
+            {
+                return variableTypesListResult;
+            }
+            else
+            {
+                var variableTypes = variableTypesListResult.Value as List<ApiVariableTypeModel>;
+                var returnObject = variableTypes.Where(x => x.DisplayName == displayName).ToList();
+                return Ok(returnObject);
             }
         }
 
