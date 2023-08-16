@@ -39,7 +39,6 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             ParentNodeId = aObjectModel.Parent == null ? "" : aObjectModel.Parent.NodeId;
 
             AllReferencedNodes = new List<ApiNodeAndReferenceModel>();
-
             if (aObjectModel.AllReferencedNodes.Count() > 0)
             {
                 foreach (var aReference in aObjectModel.AllReferencedNodes)
