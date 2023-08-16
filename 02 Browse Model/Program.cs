@@ -29,6 +29,10 @@ var uaModelInfo = (await response.Content.ReadFromJsonAsync<Dictionary<string, A
 var uaObjectTypes = await client.GetFromJsonAsync<List<ApiObjectTypeModel>>($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/ObjectType");
 var uaBaseObjectType = uaObjectTypes.First(x => x.DisplayName == "BaseObjectType");
 
+// get ua object types
+var uaObjects = await client.GetFromJsonAsync<List<ApiObjectModel>>($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/Object");
+var uaBaseObject = uaObjects.First(x => x.DisplayName == "Objects");
+
 // get properties
 var uaProperties = await client.GetFromJsonAsync<List<ApiPropertyModel>>($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/Property");
 

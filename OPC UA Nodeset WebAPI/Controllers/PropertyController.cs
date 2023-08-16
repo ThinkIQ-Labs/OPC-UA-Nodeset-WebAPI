@@ -279,7 +279,7 @@ if (existingProperty.PropertyModel.DataType.SuperType.NodeId == "nsu=http://opcf
 
 
 
-                    activeNodesetModel.Properties.Add(newPropertyModel);
+                    parentNode.Properties.Add(newPropertyModel);
                     activeNodesetModel.UpdateIndices();
                     return Ok(new ApiPropertyModel(newPropertyModel));
                 }

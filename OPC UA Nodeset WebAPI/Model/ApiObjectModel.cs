@@ -1,6 +1,7 @@
 ﻿using CESMII.OpcUa.NodeSetModel;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Opc.Ua;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Xml.Linq;
@@ -12,6 +13,10 @@ namespace OPC_UA_Nodeset_WebAPI.Model
         public string ParentNodeId { get; set; }
 
         public string TypeDefinitionNodeId { get; set; }
+
+        public List<ApiNodeAndReferenceModel> AllReferencedNodes { get; set; }
+        public List<ApiNodeAndReferenceModel> OtherReferencedNodes { get; set; }
+        public List<ApiNodeAndReferenceModel> OtherReferencingNodes { get; set; }
 
         internal ObjectModel? ObjectModel { get; set; }
         internal ObjectTypeModel? TypeDefinition { get; set; }
@@ -32,6 +37,28 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             
             ParentNodeModel = aObjectModel.Parent == null ? null : aObjectModel.Parent;
             ParentNodeId = aObjectModel.Parent == null ? "" : aObjectModel.Parent.NodeId;
+
+            AllReferencedNodes = new List<ApiNodeAndReferenceModel>();
+
+            if (aObjectModel.AllReferencedNodes.Count() > 0)
+            {
+                foreach (var aReference in aObjectModel.AllReferencedNodes)
+                {
+                    AllReferencedNodes.Add(new ApiNodeAndReferenceModel(aReference));
+                }
+            }
+
+            OtherReferencedNodes=new List<ApiNodeAndReferenceModel>();
+            foreach (var aReference in aObjectModel.OtherReferencedNodes)
+            {
+                OtherReferencedNodes.Add(new ApiNodeAndReferenceModel(aReference));
+            }
+
+            OtherReferencingNodes=new List<ApiNodeAndReferenceModel>();
+            foreach (var aReference in aObjectModel.OtherReferencingNodes)
+            {
+                OtherReferencingNodes.Add(new ApiNodeAndReferenceModel(aReference));
+            }
         }
 
     }
