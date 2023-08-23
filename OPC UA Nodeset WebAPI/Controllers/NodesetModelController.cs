@@ -149,7 +149,8 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiNodeSetModel>))]
         [ProducesResponseType(400, Type = typeof(BadRequestResult))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-
+        // https://stackoverflow.com/questions/38698350/increase-upload-file-size-in-asp-net-core
+        [DisableRequestSizeLimit, RequestFormLimits(MultipartBodyLengthLimit = Int32.MaxValue, ValueLengthLimit = Int32.MaxValue)]
         public async Task<IActionResult> UploadNodesetXmlFromBase64(string id, [FromBody] UANodeSetBase64Upload data)
         {
 
