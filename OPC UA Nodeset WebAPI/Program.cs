@@ -2,6 +2,8 @@ using OPC_UA_Nodeset_WebAPI.Controllers;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Reflection;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +26,24 @@ builder.Services.AddSwaggerGen(c =>
     c.IncludeXmlComments(xmlPath);
 });
 
+
+//https://stackoverflow.com/questions/38698350/increase-upload-file-size-in-asp-net-core
+builder.Services.Configure<IISServerOptions>(options =>
+{
+    options.MaxRequestBodySize = int.MaxValue;
+});
+builder.Services.Configure<KestrelServerOptions>(options =>
+{
+    options.Limits.MaxRequestBodySize = int.MaxValue; // if don't set default value is: 30 MB
+});
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.ValueLengthLimit = int.MaxValue;
+    options.MultipartBodyLengthLimit = int.MaxValue; // if don't set default value is: 128 MB
+    options.MultipartHeadersLengthLimit = int.MaxValue;
+});
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -40,3 +60,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
