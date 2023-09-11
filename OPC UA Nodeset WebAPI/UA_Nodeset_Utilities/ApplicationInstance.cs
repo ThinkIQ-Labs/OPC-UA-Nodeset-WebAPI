@@ -81,5 +81,64 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
             }
         }
 
+        public IActionResult GetNodeModelByNodeId(string id, string uri, string nodeId, string nodeModelTypeName)
+        {
+
+            var activeNodesetModelResult = GetNodeSetModel(id, uri) as ObjectResult;
+
+            if (Microsoft.AspNetCore.Http.StatusCodes.Status200OK != activeNodesetModelResult.StatusCode)
+            {
+                return activeNodesetModelResult;
+            }
+            else
+            {
+                var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
+                if (activeNodesetModel.AllNodesByNodeId.ContainsKey(nodeId))
+                {
+                    var aNodeModel = activeNodesetModel.AllNodesByNodeId[nodeId];
+
+                    if (aNodeModel.GetType().Name == nodeModelTypeName)
+                    {
+                        ApiUaNodeModel returnObject = null;
+                        switch (aNodeModel)
+                        {
+                            case DataTypeModel aModel:
+                                returnObject = new ApiDataTypeModel(aModel as DataTypeModel);
+                                break;
+                            case DataVariableModel aModel:
+                                returnObject = new ApiDataVariableModel(aModel as DataVariableModel);
+                                break;
+                            case ObjectModel aModel:
+                                returnObject = new ApiObjectModel(aModel as ObjectModel);
+                                break;
+                            case ObjectTypeModel aModel:
+                                returnObject = new ApiObjectTypeModel(aModel as ObjectTypeModel);
+                                break;
+                            case PropertyModel aModel:
+                                returnObject = new ApiPropertyModel(aModel as PropertyModel);
+                                break;
+                            case VariableTypeModel aModel:
+                                returnObject = new ApiVariableTypeModel(aModel as VariableTypeModel);
+                                break;
+                            default:
+                                returnObject = null;
+                                break;
+                        }
+
+                        return returnObject == null ? NotFound("The node type is not implemented.") : Ok(returnObject);
+                    }
+                    else
+                    {
+                        return NotFound($"The node is not a {nodeModelTypeName.Replace("Model", "")}.");
+                    }
+                }
+                else
+                {
+                    return NotFound("The node could not be found.");
+                }
+            }
+        }
+
+
     }
 }

@@ -47,25 +47,28 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetByNodeId(string id, string uri, string nodeId)
         {
-            var objectsListResult = Get(id, uri) as ObjectResult;
 
-            if (StatusCodes.Status200OK != objectsListResult.StatusCode)
-            {
-                return objectsListResult;
-            }
-            else
-            {
-                var objectsList = objectsListResult.Value as List<ApiObjectModel>;
-                var returnObject = objectsList.FirstOrDefault(x => x.NodeId == HttpUtility.UrlDecode(nodeId));
-                if (returnObject != null)
-                {
-                    return Ok(returnObject);
-                }
-                else
-                {
-                    return NotFound("The node id does not exist.");
-                }
-            }
+            return ApplicationInstance.GetNodeModelByNodeId(id, uri, nodeId, "ObjectModel");
+
+            //var objectsListResult = Get(id, uri) as ObjectResult;
+
+            //if (StatusCodes.Status200OK != objectsListResult.StatusCode)
+            //{
+            //    return objectsListResult;
+            //}
+            //else
+            //{
+            //    var objectsList = objectsListResult.Value as List<ApiObjectModel>;
+            //    var returnObject = objectsList.FirstOrDefault(x => x.NodeId == HttpUtility.UrlDecode(nodeId));
+            //    if (returnObject != null)
+            //    {
+            //        return Ok(returnObject);
+            //    }
+            //    else
+            //    {
+            //        return NotFound("The node id does not exist.");
+            //    }
+            //}
         }
 
         [HttpGet("ByDisplayName/{displayName}")]
