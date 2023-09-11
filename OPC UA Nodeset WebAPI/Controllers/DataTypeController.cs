@@ -50,25 +50,28 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetByNodeId(string id, string uri, string nodeId)
         {
-            var dataTypesListResult = Get(id, uri) as ObjectResult;
 
-            if (StatusCodes.Status200OK != dataTypesListResult.StatusCode)
-            {
-                return dataTypesListResult;
-            }
-            else
-            {
-                var dataTypes = dataTypesListResult.Value as List<ApiDataTypeModel>;
-                var returnObject = dataTypes.FirstOrDefault(x => x.NodeId == HttpUtility.UrlDecode(nodeId));
-                if (returnObject != null)
-                {
-                    return Ok(returnObject);
-                }
-                else
-                {
-                    return NotFound("The node id does not exist.");
-                }
-            }
+            return ApplicationInstance.GetNodeModelByNodeId(id, uri, nodeId, "DataTypeModel");
+
+            //var dataTypesListResult = Get(id, uri) as ObjectResult;
+
+            //if (StatusCodes.Status200OK != dataTypesListResult.StatusCode)
+            //{
+            //    return dataTypesListResult;
+            //}
+            //else
+            //{
+            //    var dataTypes = dataTypesListResult.Value as List<ApiDataTypeModel>;
+            //    var returnObject = dataTypes.FirstOrDefault(x => x.NodeId == HttpUtility.UrlDecode(nodeId));
+            //    if (returnObject != null)
+            //    {
+            //        return Ok(returnObject);
+            //    }
+            //    else
+            //    {
+            //        return NotFound("The node id does not exist.");
+            //    }
+            //}
         }
 
         [HttpGet("ByDisplayName/{displayName}")]

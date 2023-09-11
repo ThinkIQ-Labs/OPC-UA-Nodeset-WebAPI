@@ -49,25 +49,28 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetByNodeId(string id, string uri, string nodeId)
         {
-            var propertiesListResult = Get(id, uri) as ObjectResult;
 
-            if (StatusCodes.Status200OK != propertiesListResult.StatusCode)
-            {
-                return propertiesListResult;
-            }
-            else
-            {
-                var propertiesList = propertiesListResult.Value as List<ApiPropertyModel>;
-                var returnObject = propertiesList.FirstOrDefault(x=>x.NodeId== nodeId);
-                if (returnObject != null)
-                {
-                    return Ok(returnObject);
-                }
-                else
-                {
-                    return NotFound("The node id does not exist.");
-                }
-            }
+            return ApplicationInstance.GetNodeModelByNodeId(id, uri, nodeId, "PropertyModel");
+
+            //var propertiesListResult = Get(id, uri) as ObjectResult;
+
+            //if (StatusCodes.Status200OK != propertiesListResult.StatusCode)
+            //{
+            //    return propertiesListResult;
+            //}
+            //else
+            //{
+            //    var propertiesList = propertiesListResult.Value as List<ApiPropertyModel>;
+            //    var returnObject = propertiesList.FirstOrDefault(x=>x.NodeId== nodeId);
+            //    if (returnObject != null)
+            //    {
+            //        return Ok(returnObject);
+            //    }
+            //    else
+            //    {
+            //        return NotFound("The node id does not exist.");
+            //    }
+            //}
         }
 
         [HttpPatch("PatchByNodeId")]

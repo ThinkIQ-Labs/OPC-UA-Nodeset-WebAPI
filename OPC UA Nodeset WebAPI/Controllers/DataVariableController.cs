@@ -47,25 +47,34 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetById(string id, string uri, string nodeId)
         {
-            var dataVariablesListResult = Get(id, uri) as ObjectResult;
+            return ApplicationInstance.GetNodeModelByNodeId(id, uri, nodeId, "DataVariableModel");
 
-            if (StatusCodes.Status200OK != dataVariablesListResult.StatusCode)
-            {
-                return dataVariablesListResult;
-            }
-            else
-            {
-                var dataVariablesList = dataVariablesListResult.Value as List<ApiDataVariableModel>;
-                var returnObject = dataVariablesList.FirstOrDefault(x => x.NodeId == HttpUtility.UrlDecode(nodeId));
-                if (returnObject != null)
-                {
-                    return Ok(returnObject);
-                }
-                else
-                {
-                    return NotFound("The node id does not exist.");
-                }
-            }
+            //var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
+
+            //if (StatusCodes.Status200OK != activeNodesetModelResult.StatusCode)
+            //{
+            //    return activeNodesetModelResult;
+            //}
+            //else
+            //{
+            //    var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
+            //    if (activeNodesetModel.AllNodesByNodeId.ContainsKey(nodeId))
+            //    {
+            //        var aNodeModel = activeNodesetModel.AllNodesByNodeId[nodeId];
+            //        if (aNodeModel.GetType() == typeof(DataVariableModel))
+            //        {
+            //            var returnObject = new ApiDataVariableModel(aNodeModel as DataVariableModel);
+            //            return Ok(returnObject);
+            //        }
+            //        else
+            //        {
+            //            return NotFound("The node is not a DataVariable.");
+            //        }
+            //    } else
+            //    {
+            //        return NotFound("The node could not be found.");
+            //    }
+            //}
         }
 
         [HttpGet("ByParentNodeId")]
