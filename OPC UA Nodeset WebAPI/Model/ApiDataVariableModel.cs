@@ -1,4 +1,6 @@
-﻿using CESMII.OpcUa.NodeSetModel;
+using CESMII.OpcUa.NodeSetModel;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using Opc.Ua;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Xml.Linq;
@@ -9,6 +11,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
     {
         public string ParentNodeId { get; set; }
         public string? DataTypeNodeId { get; set; }
+        public string? Value { get; set; }
 
         public string? TypeDefinitionNodeId { get; set; }
 
@@ -33,6 +36,8 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             DataTypeNodeId = aVariableModel.DataType == null ? "" : aVariableModel.DataType.NodeId;
             TypeDefinitionNodeId = aVariableModel.TypeDefinition == null ? "" : aVariableModel.TypeDefinition.NodeId;
 
+            
+
             AllReferencedNodes = new List<ApiNodeAndReferenceModel>();
             if (aVariableModel.AllReferencedNodes.Count() > 0)
             {
@@ -53,6 +58,29 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             {
                 OtherReferencingNodes.Add(new ApiNodeAndReferenceModel(aReference));
             }
+
+            if (aVariableModel.Value != null)
+            {
+                var aPropertyModelValue = JsonConvert.DeserializeObject<JObject>(aVariableModel.Value);
+                var valueTypeId = aPropertyModelValue["Value"]["Type"].Value<int>();
+
+                //switch (aPropertyModelValue["Value"]["Body"].Type.ToString())
+                //{
+                //    case "Array":
+                //    case "Object":
+                Value = aPropertyModelValue["Value"]["Body"].ToString();
+                //        break;
+                //    default:
+                //        Value = aPropertyModelValue["Value"]["Body"].Value<string>();
+                //        break;
+                //}
+
+            }
+            else
+            {
+                Value = null;
+            }
+
 
         }
 
