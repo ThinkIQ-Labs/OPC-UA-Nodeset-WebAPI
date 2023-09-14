@@ -1,12 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using CESMII.OpcUa.NodeSetModel;
-using Newtonsoft.Json.Linq;
 using Opc.Ua.Export;
 using OPC_UA_Nodeset_WebAPI.Model;
-using System.Collections.Generic;
 using System.Net.Http.Json;
 using System.Text;
-using System.Xml;
 
 // create client
 HttpClient client = new HttpClient();
