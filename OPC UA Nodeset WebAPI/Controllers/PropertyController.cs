@@ -50,7 +50,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         public IActionResult GetByNodeId(string id, string uri, string nodeId)
         {
 
-            return ApplicationInstance.GetNodeModelByNodeId(id, uri, nodeId, "PropertyModel");
+            return ApplicationInstance.GetNodeApiModelByNodeId(id, uri, nodeId, "PropertyModel");
 
             //var propertiesListResult = Get(id, uri) as ObjectResult;
 
@@ -174,24 +174,36 @@ if (existingProperty.PropertyModel.DataType.SuperType.NodeId == "nsu=http://opcf
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetByParentNodeId(string id, string uri, string parentNodeId)
         {
-            var propertiesListResult = Get(id, uri) as ObjectResult;
+            var aParentNodeResult = ApplicationInstance.GetNodeModelByNodeId(id, uri, parentNodeId) as ObjectResult;
 
-            if (StatusCodes.Status200OK != propertiesListResult.StatusCode)
+            if (StatusCodes.Status200OK != aParentNodeResult.StatusCode)
             {
-                return propertiesListResult;
+                return aParentNodeResult;
             }
             else
             {
-                var propertiesList = propertiesListResult.Value as List<ApiPropertyModel>;
-                var returnObject = propertiesList.Where(x=>x.ParentNodeId.Replace("/","") == parentNodeId);
-                if (returnObject != null)
+                NodeModel aNodeModel = aParentNodeResult.Value as NodeModel;
+
+                List<VariableModel> properties = new List<VariableModel>();
+                switch (aNodeModel)
                 {
-                    return Ok(returnObject);
+                    case ObjectTypeModel aObjectTypeModel:
+                        properties = aObjectTypeModel.Properties;
+                        break;
+                    case ObjectModel aObjectModel:
+                        properties = aObjectModel.Properties;
+                        break;
+                    case DataVariableModel aDataVariableModel:
+                        properties = aDataVariableModel.Properties;
+                        break;
+                    default:
+                        break;
                 }
-                else
-                {
-                    return NotFound("The node id does not exist.");
-                }
+
+                var returnObject = properties.Select(x => new ApiPropertyModel(x));
+
+                return Ok(returnObject);
+
             }
         }
 

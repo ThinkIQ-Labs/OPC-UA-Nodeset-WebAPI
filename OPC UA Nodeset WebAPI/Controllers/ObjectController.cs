@@ -48,7 +48,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         public IActionResult GetByNodeId(string id, string uri, string nodeId)
         {
 
-            return ApplicationInstance.GetNodeModelByNodeId(id, uri, nodeId, "ObjectModel");
+            return ApplicationInstance.GetNodeApiModelByNodeId(id, uri, nodeId, "ObjectModel");
 
             //var objectsListResult = Get(id, uri) as ObjectResult;
 

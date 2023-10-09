@@ -50,7 +50,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetByNodeId(string id, string uri, string nodeId)
         {
-            return ApplicationInstance.GetNodeModelByNodeId(id, uri, nodeId, "VariableTypeModel");
+            return ApplicationInstance.GetNodeApiModelByNodeId(id, uri, nodeId, "VariableTypeModel");
 
             //var variableTypesListResult = Get(id, uri) as ObjectResult;
 

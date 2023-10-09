@@ -39,7 +39,14 @@ var uaBaseObject = uaObjects.First(x => x.DisplayName == "Objects");
 // get properties
 var uaProperties = await client.GetFromJsonAsync<List<ApiPropertyModel>>($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/Property");
 
+// get properties by parent nodeid
+var uaPropertiesByParent = await client.GetFromJsonAsync<List<ApiPropertyModel>>($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/Property/ByParentNodeId?parentNodeId={uaObjectTypes[10].NodeId.Replace("/", "")}");
+
 // get datavariables
 var uaDataVariables = await client.GetFromJsonAsync<List<ApiPropertyModel>>($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/DataVariable");
+
+// get datavariables by parent nodeid
+var uaDataVariablesByParent = await client.GetFromJsonAsync<List<ApiPropertyModel>>($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/DataVariable/ByParentNodeId?parentNodeId={uaObjectTypes[10].NodeId.Replace("/", "")}");
+
 
 Console.ReadLine();

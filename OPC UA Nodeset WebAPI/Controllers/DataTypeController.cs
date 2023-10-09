@@ -51,7 +51,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         public IActionResult GetByNodeId(string id, string uri, string nodeId)
         {
 
-            return ApplicationInstance.GetNodeModelByNodeId(id, uri, nodeId, "DataTypeModel");
+            return ApplicationInstance.GetNodeApiModelByNodeId(id, uri, nodeId, "DataTypeModel");
 
             //var dataTypesListResult = Get(id, uri) as ObjectResult;
 

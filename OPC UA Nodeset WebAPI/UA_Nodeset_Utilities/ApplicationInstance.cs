@@ -81,7 +81,7 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
             }
         }
 
-        public IActionResult GetNodeModelByNodeId(string id, string uri, string nodeId, string nodeModelTypeName)
+        public IActionResult GetNodeApiModelByNodeId(string id, string uri, string nodeId, string nodeModelTypeName = "")
         {
 
             var activeNodesetModelResult = GetNodeSetModel(id, uri) as ObjectResult;
@@ -93,53 +93,86 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
             else
             {
                 var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
-                var AllNodesByNodeIdNoSlashes = activeNodesetModel.AllNodesByNodeId.Keys.Select(x => x.Replace("/", ""));
-                if (AllNodesByNodeIdNoSlashes.Contains(nodeId))
+
+                var aNodeModelCandidates = activeNodesetModel.AllNodesByNodeId.Where(x => x.Key.Replace("/", "") == nodeId);
+
+                if(aNodeModelCandidates.Count()==0)
                 {
-                    var aNodeModel = activeNodesetModel.AllNodesByNodeId.FirstOrDefault(x => x.Key.Replace("/", "") == nodeId).Value;
-
-                    if (aNodeModel.GetType().Name == nodeModelTypeName)
+                    return NotFound("The node could not be found.");
+                } 
+                else
+                {
+                    var aNodeModel = aNodeModelCandidates.First().Value;
+                    ApiUaNodeModel returnObject = null;
+                    switch (aNodeModel)
                     {
-                        ApiUaNodeModel returnObject = null;
-                        switch (aNodeModel)
-                        {
-                            case DataTypeModel aModel:
-                                returnObject = new ApiDataTypeModel(aModel as DataTypeModel);
-                                break;
-                            case DataVariableModel aModel:
-                                returnObject = new ApiDataVariableModel(aModel as DataVariableModel);
-                                break;
-                            case ObjectModel aModel:
-                                returnObject = new ApiObjectModel(aModel as ObjectModel);
-                                break;
-                            case ObjectTypeModel aModel:
-                                returnObject = new ApiObjectTypeModel(aModel as ObjectTypeModel);
-                                break;
-                            case PropertyModel aModel:
-                                returnObject = new ApiPropertyModel(aModel as PropertyModel);
-                                break;
-                            case VariableTypeModel aModel:
-                                returnObject = new ApiVariableTypeModel(aModel as VariableTypeModel);
-                                break;
-                            default:
-                                returnObject = null;
-                                break;
-                        }
+                        case DataTypeModel aModel:
+                            returnObject = new ApiDataTypeModel(aModel as DataTypeModel);
+                            break;
+                        case DataVariableModel aModel:
+                            returnObject = new ApiDataVariableModel(aModel as DataVariableModel);
+                            break;
+                        case ObjectModel aModel:
+                            returnObject = new ApiObjectModel(aModel as ObjectModel);
+                            break;
+                        case ObjectTypeModel aModel:
+                            returnObject = new ApiObjectTypeModel(aModel as ObjectTypeModel);
+                            break;
+                        case PropertyModel aModel:
+                            returnObject = new ApiPropertyModel(aModel as PropertyModel);
+                            break;
+                        case VariableTypeModel aModel:
+                            returnObject = new ApiVariableTypeModel(aModel as VariableTypeModel);
+                            break;
+                        default:
+                            returnObject = null;
+                            break;
+                    }
 
-                        return returnObject == null ? NotFound("The node type is not implemented.") : Ok(returnObject);
+                    if (returnObject == null)
+                    {
+                        return NotFound("The node type is not implemented.");
+                    } 
+                    else if(nodeModelTypeName == "" || (aNodeModel.GetType().Name == nodeModelTypeName))
+                    {
+                        return Ok(returnObject);
                     }
                     else
                     {
                         return NotFound($"The node is not a {nodeModelTypeName.Replace("Model", "")}.");
                     }
                 }
-                else
-                {
-                    return NotFound("The node could not be found.");
-                }
             }
         }
 
+        public IActionResult GetNodeModelByNodeId(string id, string uri, string nodeId)
+        {
+
+            var activeNodesetModelResult = GetNodeSetModel(id, uri) as ObjectResult;
+
+            if (Microsoft.AspNetCore.Http.StatusCodes.Status200OK != activeNodesetModelResult.StatusCode)
+            {
+                return activeNodesetModelResult;
+            }
+            else
+            {
+                var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
+
+                var aNodeModelCandidates = activeNodesetModel.AllNodesByNodeId.Where(x => x.Key.Replace("/", "") == nodeId);
+
+                if (aNodeModelCandidates.Count() == 0)
+                {
+                    return NotFound("The node could not be found.");
+                }
+                else
+                {
+                    var aNodeModel = aNodeModelCandidates.First().Value;
+                    
+                    return Ok(aNodeModel);
+                    
+                }
+            }
+        }
 
     }
 }

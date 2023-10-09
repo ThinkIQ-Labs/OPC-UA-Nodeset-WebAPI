@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OPC_UA_Nodeset_WebAPI.Model;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
-using System.Web;
 
 namespace OPC_UA_Nodeset_WebAPI.Controllers
 {
@@ -47,7 +46,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetById(string id, string uri, string nodeId)
         {
-            return ApplicationInstance.GetNodeModelByNodeId(id, uri, nodeId, "DataVariableModel");
+            return ApplicationInstance.GetNodeApiModelByNodeId(id, uri, nodeId, "DataVariableModel");
 
             //var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
 
@@ -82,24 +81,36 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetByParentNodeId(string id, string uri, string parentNodeId)
         {
-            var dataVariablesListResult = Get(id, uri) as ObjectResult;
+            var aParentNodeResult = ApplicationInstance.GetNodeModelByNodeId(id, uri, parentNodeId) as ObjectResult;
 
-            if (StatusCodes.Status200OK != dataVariablesListResult.StatusCode)
+            if (StatusCodes.Status200OK != aParentNodeResult.StatusCode)
             {
-                return dataVariablesListResult;
+                return aParentNodeResult;
             }
             else
             {
-                var dataVariablesList = dataVariablesListResult.Value as List<ApiDataVariableModel>;
-                var returnObject = dataVariablesList.Where(x => x.ParentNodeId.Replace("/", "") == parentNodeId);
-                if (returnObject != null)
+                NodeModel aNodeModel = aParentNodeResult.Value as NodeModel;
+
+                List<DataVariableModel> dataVariables = new List<DataVariableModel>();
+                switch (aNodeModel)
                 {
-                    return Ok(returnObject);
+                    case ObjectTypeModel aObjectTypeModel:
+                        dataVariables = aObjectTypeModel.DataVariables;
+                        break;
+                    case ObjectModel aObjectModel:
+                        dataVariables = aObjectModel.DataVariables;
+                        break;
+                    case DataVariableModel aDataVariableModel:
+                        dataVariables = aDataVariableModel.DataVariables;
+                        break;
+                    default:
+                        break;
                 }
-                else
-                {
-                    return NotFound("The node id does not exist.");
-                }
+
+                var returnObject = dataVariables.Select(x => new ApiDataVariableModel(x));
+                
+                return Ok(returnObject);
+                
             }
         }
 
