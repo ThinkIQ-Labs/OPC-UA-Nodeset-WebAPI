@@ -93,9 +93,10 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
             else
             {
                 var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
-                if (activeNodesetModel.AllNodesByNodeId.ContainsKey(nodeId))
+                var AllNodesByNodeIdNoSlashes = activeNodesetModel.AllNodesByNodeId.Keys.Select(x => x.Replace("/", ""));
+                if (AllNodesByNodeIdNoSlashes.Contains(nodeId))
                 {
-                    var aNodeModel = activeNodesetModel.AllNodesByNodeId[nodeId];
+                    var aNodeModel = activeNodesetModel.AllNodesByNodeId.FirstOrDefault(x => x.Key.Replace("/", "") == nodeId).Value;
 
                     if (aNodeModel.GetType().Name == nodeModelTypeName)
                     {
