@@ -30,7 +30,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             BrowseName = aVariableModel.BrowseName;
             Description = aVariableModel.Description.Count == 0 ? "" : aVariableModel.Description.First().Text;
             ParentModel = aVariableModel.Parent;
-            ParentNodeId = ParentModel.NodeId;
+            ParentNodeId = ParentModel == null ? "" : ParentModel.NodeId;
             DataTypeNodeId = aVariableModel.DataType == null ? "" : aVariableModel.DataType.NodeId;
             TypeDefinitionNodeId = aVariableModel.TypeDefinition == null ? "" : aVariableModel.TypeDefinition.NodeId;
 
