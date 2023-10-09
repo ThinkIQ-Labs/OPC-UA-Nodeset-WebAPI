@@ -183,7 +183,7 @@ if (existingProperty.PropertyModel.DataType.SuperType.NodeId == "nsu=http://opcf
             else
             {
                 var propertiesList = propertiesListResult.Value as List<ApiPropertyModel>;
-                var returnObject = propertiesList.Where(x=>x.ParentNodeId== parentNodeId);
+                var returnObject = propertiesList.Where(x=>x.ParentNodeId.Replace("/","") == parentNodeId);
                 if (returnObject != null)
                 {
                     return Ok(returnObject);

@@ -91,7 +91,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
             else
             {
                 var dataVariablesList = dataVariablesListResult.Value as List<ApiDataVariableModel>;
-                var returnObject = dataVariablesList.Where(x => x.ParentNodeId == parentNodeId);
+                var returnObject = dataVariablesList.Where(x => x.ParentNodeId.Replace("/", "") == parentNodeId);
                 if (returnObject != null)
                 {
                     return Ok(returnObject);
