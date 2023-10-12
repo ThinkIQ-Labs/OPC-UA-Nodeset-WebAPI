@@ -11,9 +11,12 @@ namespace OPC_UA_Nodeset_WebAPI.Model
     {
         public int PropertiesCount { get; set; }
         public int DataVariablesCount { get; set; }
+        public int ObjectsCount { get; set; }
 
         public string SuperTypeNodeId { get; set; }
 
+        public List<string> PropertiesNodeIds { get; set; }
+        public List<string> DataVariablesNodeIds { get; set; }
         public List<string> ObjectsNodeIds { get; set; }
 
         internal ObjectTypeModel? ObjectTypeModel { get; set; }
@@ -27,9 +30,14 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             DisplayName = aOjectTypeModel.DisplayName.First().Text;
             BrowseName = aOjectTypeModel.BrowseName;
             Description = aOjectTypeModel.Description.Count==0 ?  "" : aOjectTypeModel.Description.First().Text;
-            PropertiesCount = aOjectTypeModel.Properties.Count;
-            DataVariablesCount = aOjectTypeModel.DataVariables.Count;
             SuperTypeNodeId = aOjectTypeModel.SuperType == null ? "" : aOjectTypeModel.SuperType.NodeId;
+            
+            PropertiesCount = aOjectTypeModel.Properties == null ? 0 : aOjectTypeModel.Properties.Count;
+            DataVariablesCount = aOjectTypeModel.DataVariables == null ? 0 : aOjectTypeModel.DataVariables.Count;
+            ObjectsCount = aOjectTypeModel.Objects == null ? 0 : aOjectTypeModel.Objects.Count;
+            
+            PropertiesNodeIds = aOjectTypeModel.Properties == null ? new List<string>() : aOjectTypeModel.Properties.Select(x=>x.NodeId).ToList();
+            DataVariablesNodeIds = aOjectTypeModel.DataVariables == null ? new List<string>() : aOjectTypeModel.DataVariables.Select(x=>x.NodeId).ToList();
             ObjectsNodeIds = aOjectTypeModel.Objects == null ? new List<string>() : aOjectTypeModel.Objects.Select(x=>x.NodeId).ToList();
         }
 
