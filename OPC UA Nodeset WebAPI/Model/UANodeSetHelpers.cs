@@ -38,4 +38,13 @@ namespace Opc.Ua.Export
 
         public UAEnumField() { }
     }
+
+    public class UAStructureField
+    {
+        public string Name { get; set; }
+        public string DataTypeName { get; set; }
+        public string DataTypeNodeId { get; set; }
+
+        public UAStructureField() { }
+    }
 }
