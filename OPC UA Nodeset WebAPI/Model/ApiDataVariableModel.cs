@@ -62,13 +62,13 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             if (aVariableModel.Value != null)
             {
                 var aPropertyModelValue = JsonConvert.DeserializeObject<JObject>(aVariableModel.Value);
-                var valueTypeId = aPropertyModelValue["Value"]["Type"].Value<int>();
+                var valueTypeId = aPropertyModelValue["Type"].Value<int>();
 
                 //switch (aPropertyModelValue["Value"]["Body"].Type.ToString())
                 //{
                 //    case "Array":
                 //    case "Object":
-                Value = aPropertyModelValue["Value"]["Body"].ToString();
+                Value = aPropertyModelValue["Body"].ToString();
                 //        break;
                 //    default:
                 //        Value = aPropertyModelValue["Value"]["Body"].Value<string>();

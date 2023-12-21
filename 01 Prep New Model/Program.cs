@@ -35,6 +35,12 @@ var uaBaseObjectType = uaObjectTypes.First(x => x.DisplayName == "BaseObjectType
 var uaDataTypes = await client.GetFromJsonAsync<List<ApiObjectTypeModel>>($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/DataType");
 var uaEnumDataType = uaDataTypes.First(x => x.DisplayName == "Enumeration");
 
+// get ua data types
+var uaDataVariables = await client.GetFromJsonAsync<List<ApiDataVariableModel>>($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/DataVariable");
+
+// get ua properties
+var uaProperties = await client.GetFromJsonAsync<List<ApiPropertyModel>>($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/Property");
+
 // get ua variable types
 var uaVariableTypes = await client.GetFromJsonAsync<List<ApiVariableTypeModel>>($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/VariableType");
 var uaBaseDataVariableType = uaVariableTypes.First(x => x.DisplayName == "BaseDataVariableType");
