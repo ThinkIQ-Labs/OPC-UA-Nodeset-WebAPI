@@ -116,7 +116,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                         {
                             case "String":
                                 existingProperty.PropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "String");
-                                existingProperty.PropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(apiPropertyModel.Value.ToString());
+                                existingProperty.PropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(apiPropertyModel.Value.ToString()).Json;
                                 break;
                             case "Integer":
                             case "Int16":
@@ -127,7 +127,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                                 int aIntValue;
                                 if (Int32.TryParse(apiPropertyModel.Value, out aIntValue))
                                 {
-                                    existingProperty.PropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aIntValue);
+                                    existingProperty.PropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aIntValue).Json;
                                 }
                                 break;
                             case "Boolean":
@@ -136,7 +136,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                                 Boolean aBoolValue;
                                 if (Boolean.TryParse(apiPropertyModel.Value, out aBoolValue))
                                 {
-                                    existingProperty.PropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aBoolValue);
+                                    existingProperty.PropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aBoolValue).Json;
                                 }
                                 break;
                             case "DateTime":
@@ -145,14 +145,14 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                                 DateTime aDateTimeValue;
                                 if (DateTime.TryParse(apiPropertyModel.Value, out aDateTimeValue))
                                 {
-                                    existingProperty.PropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aDateTimeValue);
+                                    existingProperty.PropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aDateTimeValue).Json;
                                 }
                                 break;
                             default:
 if (existingProperty.PropertyModel.DataType.SuperType.NodeId == "nsu=http://opcfoundation.org/UA/;i=29")
 {
     existingProperty.PropertyModel.DataType = aDataType as DataTypeModel;
-    existingProperty.PropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(Int32.Parse(apiPropertyModel.Value));
+    existingProperty.PropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(Int32.Parse(apiPropertyModel.Value)).Json;
 }
                                 break;
                         }
@@ -264,7 +264,7 @@ if (existingProperty.PropertyModel.DataType.SuperType.NodeId == "nsu=http://opcf
                                 int aIntValue;
                                 if (Int32.TryParse(apiPropertyModel.Value, out aIntValue))
                                 {
-                                    newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aIntValue);
+                                    newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aIntValue).Json;
                                 }
                                 break;
                             case "Boolean":
@@ -273,7 +273,7 @@ if (existingProperty.PropertyModel.DataType.SuperType.NodeId == "nsu=http://opcf
                                 Boolean aBoolValue;
                                 if (Boolean.TryParse(apiPropertyModel.Value, out aBoolValue))
                                 {
-                                    newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aBoolValue);
+                                    newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aBoolValue).Json;
                                 }
                                 break;
                             case "DateTime":
@@ -282,12 +282,12 @@ if (existingProperty.PropertyModel.DataType.SuperType.NodeId == "nsu=http://opcf
                                 DateTime aDateTimeValue;
                                 if (DateTime.TryParse(apiPropertyModel.Value, out aDateTimeValue))
                                 {
-                                    newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aDateTimeValue);
+                                    newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aDateTimeValue).Json;
                                 }
                                 break;
                             default:
                                 //newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Int32");
-                                newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(apiPropertyModel.Value);
+                                newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(apiPropertyModel.Value).Json;
                                 break;
                         }
                     }

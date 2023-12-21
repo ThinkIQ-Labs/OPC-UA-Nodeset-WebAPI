@@ -7,7 +7,6 @@ namespace OPC_UA_Nodeset_WebAPI.Model
         public string NodeId { get; set; }
         public string NodeDisplayName { get; set; }
 
-        public string Reference { get; set; }
         public string ReferenceType { get; set; }
         public string ReferenceTypeName { get; set; }
         public ApiNodeAndReferenceModel() { }
@@ -15,7 +14,6 @@ namespace OPC_UA_Nodeset_WebAPI.Model
         {
             NodeId = aNodeAndReference.Node.NodeId;
             NodeDisplayName = aNodeAndReference.Node.DisplayName.First().Text;
-            Reference = aNodeAndReference.Reference;
             ReferenceType = aNodeAndReference.ReferenceType?.NodeId;
             ReferenceTypeName=aNodeAndReference.ReferenceType?.DisplayName.First().Text;
         }

@@ -210,7 +210,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                                 int aIntValue;
                                 if (Int32.TryParse(apiDataVariableModel.Value, out aIntValue))
                                 {
-                                    newDataVariableModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aIntValue);
+                                    newDataVariableModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aIntValue).Json;
                                 }
                                 break;
                             case "Boolean":
@@ -219,7 +219,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                                 Boolean aBoolValue;
                                 if (Boolean.TryParse(apiDataVariableModel.Value, out aBoolValue))
                                 {
-                                    newDataVariableModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aBoolValue);
+                                    newDataVariableModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aBoolValue).Json;
                                 }
                                 break;
                             case "DateTime":
@@ -228,12 +228,12 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                                 DateTime aDateTimeValue;
                                 if (DateTime.TryParse(apiDataVariableModel.Value, out aDateTimeValue))
                                 {
-                                    newDataVariableModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aDateTimeValue);
+                                    newDataVariableModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aDateTimeValue).Json;
                                 }
                                 break;
                             default:
                                 //newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Int32");
-                                newDataVariableModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(apiDataVariableModel.Value);
+                                newDataVariableModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(apiDataVariableModel.Value).Json;
                                 break;
                         }
                     }

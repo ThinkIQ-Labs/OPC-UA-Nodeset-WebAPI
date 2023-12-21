@@ -223,7 +223,7 @@ var2.Properties.Add(new PropertyModel
     BrowseName = "Work_Status",
     Description = new List<NodeModel.LocalizedText> { "Variable for work status." },
     DataType = workStatusEnum,
-    Value = opcContext.JsonEncodeVariant(Int32.Parse("2"))
+    Value = opcContext.JsonEncodeVariant(Int32.Parse("2")).Json
 
 });
 var2.Properties.Add(new PropertyModel
@@ -235,7 +235,7 @@ var2.Properties.Add(new PropertyModel
     BrowseName = "Last_Update",
     Description = new List<NodeModel.LocalizedText> { "Variable last update timestamp." },
     DataType = uaBaseModel.DataTypes.First(x => x.DisplayName.First().Text == "DateTime"),
-    Value = opcContext.JsonEncodeVariant(DateTime.Parse("2023-06-25"))
+    Value = opcContext.JsonEncodeVariant(DateTime.Parse("2023-06-25")).Json
 });
 var2.Properties.Add(new PropertyModel
 {
@@ -246,7 +246,7 @@ var2.Properties.Add(new PropertyModel
     BrowseName = "Hidden",
     Description = new List<NodeModel.LocalizedText> { "Variable is hidden." },
     DataType = uaBaseModel.DataTypes.First(x => x.DisplayName.First().Text == "Boolean"),
-    Value = opcContext.JsonEncodeVariant(Boolean.Parse("True"))
+    Value = opcContext.JsonEncodeVariant(Boolean.Parse("True")).Json
 });
 
 var var1 = new DataVariableModel
@@ -270,7 +270,7 @@ var1.Properties.Add(new PropertyModel
     BrowseName = "Work_Status",
     Description = new List<NodeModel.LocalizedText> { "Variable for work status." },
     DataType = workStatusEnum,
-    Value = opcContext.JsonEncodeVariant(Int32.Parse("2"))
+    Value = opcContext.JsonEncodeVariant(Int32.Parse("2")).Json
 
 });
 var1.Properties.Add(new PropertyModel
@@ -282,7 +282,7 @@ var1.Properties.Add(new PropertyModel
     BrowseName = "Last_Update",
     Description = new List<NodeModel.LocalizedText> { "Variable last update timestamp." },
     DataType = uaBaseModel.DataTypes.First(x => x.DisplayName.First().Text == "DateTime"),
-    Value = opcContext.JsonEncodeVariant(DateTime.Parse("2023-06-25"))
+    Value = opcContext.JsonEncodeVariant(DateTime.Parse("2023-06-25")).Json
 });
 
 motorType.Properties.Add(prop1);
