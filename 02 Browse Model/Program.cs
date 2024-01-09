@@ -16,6 +16,7 @@ HttpResponseMessage response;
 // get local nodesets
 var localNodesets = await client.GetFromJsonAsync<Dictionary<string, ApiNodeSetInfoWithDependencies>>($"LocalNodeset");
 var uaFileName = localNodesets.First(x => x.Value.ModelUri == "http://opcfoundation.org/UA/").Key;
+var isa95FileName = localNodesets.First(x => x.Value.ModelUri == "http://www.OPCFoundation.org/UA/2013/01/ISA95").Key;
 
 // get session
 response = await client.PutAsync($"NodesetProject/a?owner=b", null);
@@ -25,12 +26,20 @@ var sessionKey = (await response.Content.ReadFromJsonAsync<Dictionary<string, Ap
 response = await client.PostAsync($"NodesetProject/{sessionKey}/NodesetModel/LoadNodesetXmlFromServerAsync?uri={uaFileName}", null);
 var uaModelInfo = (await response.Content.ReadFromJsonAsync<Dictionary<string, ApiNodeSetModel>>()).First();
 
+// load ua into session
+response = await client.PostAsync($"NodesetProject/{sessionKey}/NodesetModel/LoadNodesetXmlFromServerAsync?uri={isa95FileName}", null);
+var isa95ModelInfo = (await response.Content.ReadFromJsonAsync<Dictionary<string, ApiNodeSetModel>>()).First();
+
 // get ua object types
 var uaObjectTypes = await client.GetFromJsonAsync<List<ApiObjectTypeModel>>($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/ObjectType");
 var uaBaseObjectType = uaObjectTypes.First(x => x.DisplayName == "BaseObjectType");
+var isa95ObjectTypes = await client.GetFromJsonAsync<List<ApiObjectTypeModel>>($"NodesetProject/{sessionKey}/NodesetModel/{isa95ModelInfo.Key}/ObjectType");
 
 // get ua object type by node id
-var aUaBaseObjectTypeById = await client.GetFromJsonAsync<ApiObjectTypeModel>($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/ObjectType/{uaObjectTypes[10].NodeId.Replace("/","")}");
+var aIsa95TypeByDisplayName = await client.GetFromJsonAsync<ApiObjectTypeModel>($"NodesetProject/{sessionKey}/NodesetModel/{isa95ModelInfo.Key}/ObjectType/ByDisplayName/MaterialDefinitionType");
+
+// get isa95 object type by displayname
+var aIsa95BaseObjectTypeByDisplayName = await client.GetFromJsonAsync<ApiObjectTypeModel>($"NodesetProject/{sessionKey}/NodesetModel/{isa95ModelInfo.Key}/ObjectType/{uaObjectTypes[10].NodeId.Replace("/","")}");
 
 // get ua object types
 var uaObjects = await client.GetFromJsonAsync<List<ApiObjectModel>>($"NodesetProject/{sessionKey}/NodesetModel/{uaModelInfo.Key}/Object");

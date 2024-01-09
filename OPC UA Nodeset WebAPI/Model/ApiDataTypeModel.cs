@@ -35,8 +35,11 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             StructureFields = aDataTypeModel.StructureFields?.Select(x => new UAStructureField()
             {
                 Name = x.Name,
+                Description= x.Description.Count == 0 ? "" : x.Description.First().Text,
+
                 DataTypeNodeId = x.DataType.NodeId,
-                DataTypeName = x.DataType.DisplayName.First().Text
+                DataTypeName = x.DataType.DisplayName.First().Text,
+
             }).ToList();
 
         }

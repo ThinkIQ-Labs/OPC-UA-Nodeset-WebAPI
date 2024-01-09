@@ -42,6 +42,7 @@ namespace Opc.Ua.Export
     public class UAStructureField
     {
         public string Name { get; set; }
+        public string Description { get; set; }
         public string DataTypeName { get; set; }
         public string DataTypeNodeId { get; set; }
 

@@ -8,9 +8,14 @@ namespace OPC_UA_Nodeset_WebAPI.Model
 {
     public class ApiVariableTypeModel : ApiUaNodeModel
     {
+        public int PropertiesCount { get; set; }
+        public int DataVariablesCount { get; set; }
+        public int ObjectsCount { get; set; }
+
         public string SuperTypeNodeId { get; set; }
-        public List<ApiPropertyModel> Properties { get; set; }
-        public List<ApiDataVariableModel> DataVariables { get; set; }
+        public List<string> PropertiesNodeIds { get; set; }
+        public List<string> DataVariablesNodeIds { get; set; }
+        public List<string> ObjectsNodeIds { get; set; }
         internal VariableTypeModel? VariableTypeModel { get; set; }
         public ApiVariableTypeModel() { }
 
@@ -22,8 +27,14 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             BrowseName = aVariableTypeModel.BrowseName;
             Description = aVariableTypeModel.Description.Count == 0 ? "" : aVariableTypeModel.Description.First().Text;
             SuperTypeNodeId = aVariableTypeModel.SuperType == null ? "" : aVariableTypeModel.SuperType.NodeId;
-            Properties = aVariableTypeModel.Properties.Select(x => new ApiPropertyModel(x)).ToList();
-            DataVariables = aVariableTypeModel.DataVariables.Select(x => new ApiDataVariableModel(x)).ToList();
+            
+            PropertiesCount = aVariableTypeModel.Properties == null ? 0 : aVariableTypeModel.Properties.Count;
+            DataVariablesCount = aVariableTypeModel.DataVariables == null ? 0 : aVariableTypeModel.DataVariables.Count;
+            ObjectsCount = aVariableTypeModel.Objects == null ? 0 : aVariableTypeModel.Objects.Count;
+
+            PropertiesNodeIds = aVariableTypeModel.Properties == null ? new List<string>() : aVariableTypeModel.Properties.Select(x => x.NodeId).ToList();
+            DataVariablesNodeIds = aVariableTypeModel.DataVariables == null ? new List<string>() : aVariableTypeModel.DataVariables.Select(x => x.NodeId).ToList();
+            ObjectsNodeIds = aVariableTypeModel.Objects == null ? new List<string>() : aVariableTypeModel.Objects.Select(x => x.NodeId).ToList();
         }
 
     }
