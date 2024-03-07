@@ -2,7 +2,7 @@
 
 ## Summary
 
-This project allows loading, editing, creating and saving of OPC UA NodeSet information models. 
+This project grew out of a collaboration with [CESMII](https://www.cesmii.org/). It allows loading, editing, creating and saving of OPC UA NodeSet information models. 
 The work is targeted specifically for Information Models, as described in 
 [OPC 10000-5: UA Part 5](https://reference.opcfoundation.org/Core/Part5/v104/docs/). It presents
 a wrapper for the [CESMII NodeSet Utilities](https://github.com/cesmii/CESMII-NodeSet-Utilities) 
@@ -14,7 +14,7 @@ manipulating OPC UA NodeSets.
 ## Getting Started
 
 The best way to explore the project is to take a look at the 
-[Swagger](https://opcuanodesetwebapi.azurewebsites.net/swagger/index.html) api documentation.
+[Swagger](https://opcuanodesetwebapi.azurewebsites.net/swagger/index.html) api documentation. This endpoint is sponsored by ThinkIQ and may not always be available. The api is locally available in SMIP (CESMII's smart manufacturing innovation platform) and ThinkIQ instances.
 
 ### Locally Stored UA NodeSets
 
@@ -57,9 +57,7 @@ is important. Nodesets can be loaded from the server, if available, or by upload
 *Note: When nodesets are added to a project we use the namespace uri as a key for further drill down. Because 
 Azure web app's don't do slashes well in url's of resource-style web api's, we remove the slashes.*
 
-> Roadmap: Be able to load a nodeset from a cloud library by namespace
->
-> Roadmap: Be able to automatically resolve namespace dependencies from a cloud library
+> Roadmap: Be able to load a nodeset and its dependencies from a cloud library by namespace name. One could argue this may be outside the scope of this project. SM apps (smart manufacturing apps) already do this using either the OPC UA Foundation's or CESMII's cloud libraries and interface xml source text with this api.
 
 ### Data Types
 
