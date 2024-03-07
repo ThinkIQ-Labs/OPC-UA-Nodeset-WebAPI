@@ -18,7 +18,7 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
         {
             get
             {
-                if(_localNodesets == null)
+                if (_localNodesets == null)
                 {
                     ScanNodesetFiles();
                 }
@@ -96,10 +96,10 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
 
                 var aNodeModelCandidates = activeNodesetModel.AllNodesByNodeId.Where(x => x.Key.Replace("/", "") == nodeId);
 
-                if(aNodeModelCandidates.Count()==0)
+                if (aNodeModelCandidates.Count() == 0)
                 {
                     return NotFound("The node could not be found.");
-                } 
+                }
                 else
                 {
                     var aNodeModel = aNodeModelCandidates.First().Value;
@@ -132,8 +132,8 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
                     if (returnObject == null)
                     {
                         return NotFound("The node type is not implemented.");
-                    } 
-                    else if(nodeModelTypeName == "" || (aNodeModel.GetType().Name == nodeModelTypeName))
+                    }
+                    else if (nodeModelTypeName == "" || (aNodeModel.GetType().Name == nodeModelTypeName))
                     {
                         return Ok(returnObject);
                     }
@@ -167,9 +167,9 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
                 else
                 {
                     var aNodeModel = aNodeModelCandidates.First().Value;
-                    
+
                     return Ok(aNodeModel);
-                    
+
                 }
             }
         }

@@ -2,7 +2,7 @@
 
 ## Summary
 
-This project allows loading, editing, creating and saving of OPC UA NodeSet information models. 
+This project grew out of a collaboration with [CESMII](https://www.cesmii.org/). It allows loading, editing, creating and saving of OPC UA NodeSet information models. 
 The work is targeted specifically for Information Models, as described in 
 [OPC 10000-5: UA Part 5](https://reference.opcfoundation.org/Core/Part5/v104/docs/). It presents
 a wrapper for the [CESMII NodeSet Utilities](https://github.com/cesmii/CESMII-NodeSet-Utilities) 
@@ -14,7 +14,9 @@ manipulating OPC UA NodeSets.
 ## Getting Started
 
 The best way to explore the project is to take a look at the 
-[Swagger](https://opcuanodesetwebapi.azurewebsites.net/swagger/index.html) api documentation.
+Swagger documentation. The api is locally available in SMIP (CESMII's smart manufacturing innovation platform) and ThinkIQ instances.
+
+If you rather use Postman, you can import the collection from the `Postman` file in the root of the project.
 
 ### Locally Stored UA NodeSets
 
@@ -57,43 +59,18 @@ is important. Nodesets can be loaded from the server, if available, or by upload
 *Note: When nodesets are added to a project we use the namespace uri as a key for further drill down. Because 
 Azure web app's don't do slashes well in url's of resource-style web api's, we remove the slashes.*
 
-> ~~Roadmap: Be able to view, add, and remove nodeset files on the server~~
->
-> Roadmap: Be able to load a nodeset from a cloud library by namespace
->
-> Roadmap: Be able to automatically resolve namespace dependencies from a cloud library
->
-> Roadmap: Save out xml for nodeset
+> Roadmap: Be able to load a nodeset and its dependencies from a cloud library by namespace name. One could argue this may be outside the scope of this project. SM apps (smart manufacturing apps) already do this using either the OPC UA Foundation's or CESMII's cloud libraries and interface xml source text with this api.
 
-### Object Types
+### Data Types
 
-We can manage object types in a nodeset.
+We can retrieve and create data types.
 
-- GET /NodesetProject/id/NodesetModel/uri/ObjectType: to obtain all object types in a nodeset
-- GET /NodesetProject/id/NodesetModel/uri/ObjectType/nodeId: to obtain an object type in a nodeset by node id
+### Objects and Object Types
 
-> Roadmap: CRUD object types, more detailed information on object type by nodeId
+We can retrieve and create objects and object types.
 
-### Properties
+### Properties, Data Variables and Data Variable Types
 
-We can manage properties in a nodeset.
+We can retrieve and create properties, data variables, and data variable types.
 
-*Note: Properties are flat-listed for the whole nodeset. To contextualize which node a property
-belongs to, use the parent node id, which could point to a data variable or an object type, for instance.*
 
-- GET /NodesetProject/id/NodesetModel/uri/Property: to obtain all properties in a nodeset
-- GET /NodesetProject/id/NodesetModel/uri/Property/nodeId: to obtain a property in a nodeset by node id
-
-> Roadmap: CRUD properties, more detailed information on property by nodeId
-
-### Data Variables
-
-We can manage data variables in a nodeset.
-
-*Note: Data variables are flat-listed for the whole nodeset. To contextualize which node a data variable
-belongs to, use the parent node id, which could point to an object type, for instance.*
-
-- GET /NodesetProject/id/NodesetModel/uri/DataVariable: to obtain all data variables in a nodeset
-- GET /NodesetProject/id/NodesetModel/uri/DataVariable/nodeId: to obtain a data variable in a nodeset by node id
-
-> Roadmap: CRUD data variables, more detailed information on data variable by nodeId

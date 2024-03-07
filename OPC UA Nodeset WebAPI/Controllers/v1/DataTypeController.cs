@@ -7,23 +7,23 @@ using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Web;
 using StatusCodes = Microsoft.AspNetCore.Http.StatusCodes;
 
-namespace OPC_UA_Nodeset_WebAPI.Controllers
+namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
 {
     [ApiController]
-    [Route("NodesetProject/{id}/NodesetModel/{uri}/[controller]")]
+    [Route("api/v1/Project/data-type")]
     public class DataTypeController : ControllerBase
     {
-        private readonly ILogger<NodesetProjectController> _logger;
+        private readonly ILogger<ProjectController> _logger;
 
         private ApplicationInstance ApplicationInstance { get; set; }
 
-        public DataTypeController(ILogger<NodesetProjectController> logger, ApplicationInstance applicationInstance)
+        public DataTypeController(ILogger<ProjectController> logger, ApplicationInstance applicationInstance)
         {
             _logger = logger;
             ApplicationInstance = applicationInstance;
         }
 
-        [HttpGet]
+        [HttpGet("{id}/{uri}")]
         [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiDataTypeModel>))]
         public IActionResult Get(string id, string uri)
         {
@@ -50,28 +50,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetByNodeId(string id, string uri, string nodeId)
         {
-
             return ApplicationInstance.GetNodeApiModelByNodeId(id, uri, nodeId, "DataTypeModel");
-
-            //var dataTypesListResult = Get(id, uri) as ObjectResult;
-
-            //if (StatusCodes.Status200OK != dataTypesListResult.StatusCode)
-            //{
-            //    return dataTypesListResult;
-            //}
-            //else
-            //{
-            //    var dataTypes = dataTypesListResult.Value as List<ApiDataTypeModel>;
-            //    var returnObject = dataTypes.FirstOrDefault(x => x.NodeId == HttpUtility.UrlDecode(nodeId));
-            //    if (returnObject != null)
-            //    {
-            //        return Ok(returnObject);
-            //    }
-            //    else
-            //    {
-            //        return NotFound("The node id does not exist.");
-            //    }
-            //}
         }
 
         [HttpGet("ByDisplayName/{displayName}")]

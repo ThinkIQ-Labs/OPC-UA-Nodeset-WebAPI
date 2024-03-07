@@ -16,6 +16,7 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
 
         public string Name { get; set; }
         public string Owner { get; set; }
+        public string ProjectId { get; set; }
 
         public Dictionary<string, string> Log { get; set; }
 
@@ -41,8 +42,9 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
 
         UANodeSetModelImporter importer { get; set; }
 
-        public NodeSetProjectInstance(string name, string owner)
+        public NodeSetProjectInstance(string name, string owner, string projectId = "")
         {
+            ProjectId = projectId;
             Name = name;
             Owner = owner;
             importer = new UANodeSetModelImporter(NullLogger.Instance);
@@ -78,7 +80,8 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
                 MemoryStream stream = new MemoryStream(byteArray);
 
                 nodeSet = UANodeSet.Read(stream);
-            } catch(Exception e)
+            }
+            catch (Exception e)
             {
                 return "Error: File did not work.";
             }
@@ -149,9 +152,9 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
             NodeSetModels.Add(newNodeSetModel.ModelUri, newNodeSetModel);
 
             NextNodeIds.Add(newNodeSetModel.ModelUri, 10000);
-            
+
             return newNodeSetModel.ModelUri;
-            
+
         }
 
         public NodeModel GetNodeModelByNodeId(string nodeId)

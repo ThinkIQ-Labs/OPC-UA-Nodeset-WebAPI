@@ -11,9 +11,9 @@
 
         public static string GetIdFromNodeId(string nodeId)
         {
-                if (nodeId == null) return "";
-                if (!nodeId.Contains("=")) return "";
-                return nodeId.Split("=").Last();
+            if (nodeId == null) return "";
+            if (!nodeId.Contains("=")) return "";
+            return nodeId.Split("=").Last();
         }
         public string Id
         {
@@ -25,9 +25,9 @@
 
         public static string GetNameSpaceFromNodeId(string nodeId)
         {
-                if (nodeId == null) return "";
-                if (!nodeId.Contains("=") || !nodeId.Contains(";")) return "";
-                return nodeId.Split("=")[1].Split(";").First();
+            if (nodeId == null) return "";
+            if (!nodeId.Contains("=") || !nodeId.Contains(";")) return "";
+            return nodeId.Split("=")[1].Split(";").First();
 
         }
         public string NameSpace

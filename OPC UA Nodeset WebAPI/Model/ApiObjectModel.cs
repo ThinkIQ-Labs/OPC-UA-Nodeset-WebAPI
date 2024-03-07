@@ -21,7 +21,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
         internal ObjectModel? ObjectModel { get; set; }
         internal ObjectTypeModel? TypeDefinition { get; set; }
         internal NodeModel? ParentNodeModel { get; set; }
-        
+
         public ApiObjectModel() { }
 
         public ApiObjectModel(ObjectModel aObjectModel)
@@ -34,7 +34,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
 
             TypeDefinition = aObjectModel.TypeDefinition == null ? null : aObjectModel.TypeDefinition;
             TypeDefinitionNodeId = aObjectModel.TypeDefinition == null ? "" : aObjectModel.TypeDefinition.NodeId;
-            
+
             ParentNodeModel = aObjectModel.Parent == null ? null : aObjectModel.Parent;
             ParentNodeId = aObjectModel.Parent == null ? "" : aObjectModel.Parent.NodeId;
 
@@ -47,13 +47,13 @@ namespace OPC_UA_Nodeset_WebAPI.Model
                 }
             }
 
-            OtherReferencedNodes=new List<ApiNodeAndReferenceModel>();
+            OtherReferencedNodes = new List<ApiNodeAndReferenceModel>();
             foreach (var aReference in aObjectModel.OtherReferencedNodes)
             {
                 OtherReferencedNodes.Add(new ApiNodeAndReferenceModel(aReference));
             }
 
-            OtherReferencingNodes=new List<ApiNodeAndReferenceModel>();
+            OtherReferencingNodes = new List<ApiNodeAndReferenceModel>();
             foreach (var aReference in aObjectModel.OtherReferencingNodes)
             {
                 OtherReferencingNodes.Add(new ApiNodeAndReferenceModel(aReference));
