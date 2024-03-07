@@ -14,7 +14,7 @@ manipulating OPC UA NodeSets.
 ## Getting Started
 
 The best way to explore the project is to take a look at the 
-[Swagger](https://opcuanodesetwebapi.azurewebsites.net/swagger/index.html) api documentation. This endpoint is sponsored by ThinkIQ and may not always be available. The api is locally available in SMIP (CESMII's smart manufacturing innovation platform) and ThinkIQ instances.
+Swagger documentation. The api is locally available in SMIP (CESMII's smart manufacturing innovation platform) and ThinkIQ instances.
 
 ### Locally Stored UA NodeSets
 
