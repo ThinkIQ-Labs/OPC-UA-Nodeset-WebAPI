@@ -15,7 +15,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             NodeId = aNodeAndReference.Node.NodeId;
             NodeDisplayName = aNodeAndReference.Node.DisplayName.First().Text;
             ReferenceType = aNodeAndReference.ReferenceType?.NodeId;
-            ReferenceTypeName=aNodeAndReference.ReferenceType?.DisplayName.First().Text;
+            ReferenceTypeName = aNodeAndReference.ReferenceType?.DisplayName.First().Text;
         }
     }
 }

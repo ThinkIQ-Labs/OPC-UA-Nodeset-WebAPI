@@ -36,7 +36,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             DataTypeNodeId = aVariableModel.DataType == null ? "" : aVariableModel.DataType.NodeId;
             TypeDefinitionNodeId = aVariableModel.TypeDefinition == null ? "" : aVariableModel.TypeDefinition.NodeId;
 
-            
+
 
             AllReferencedNodes = new List<ApiNodeAndReferenceModel>();
             if (aVariableModel.AllReferencedNodes.Count() > 0)

@@ -108,9 +108,9 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                 }
 
                 var returnObject = dataVariables.Select(x => new ApiDataVariableModel(x));
-                
+
                 return Ok(returnObject);
-                
+
             }
         }
 

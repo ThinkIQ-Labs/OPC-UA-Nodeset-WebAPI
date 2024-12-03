@@ -1,6 +1,7 @@
 ﻿using System.Xml.Serialization;
 using System.Xml;
 using System.Reflection.PortableExecutable;
+using OPC_UA_Nodeset_WebAPI.Model;
 
 namespace Opc.Ua.Export
 {
@@ -15,7 +16,7 @@ namespace Opc.Ua.Export
         {
             XmlSerializer serializer = new XmlSerializer(typeof(UANodeSet));
             using (TextReader reader = new StringReader(istr))
-            { 
+            {
                 return serializer.Deserialize(reader) as UANodeSet;
             }
         }
@@ -47,5 +48,34 @@ namespace Opc.Ua.Export
         public string DataTypeNodeId { get; set; }
 
         public UAStructureField() { }
+    }
+
+    /**
+     * Request object for creating a new nodeset project.
+     */
+    public class NodesetRequest
+    {
+        public string name { get; set; }
+        public string owner { get; set; }
+    }
+
+    public class NodesetFile
+    {
+        public string ProjectId { get; set; }
+        public string? Uri { get; set; } = "";
+        public IFormFile? File { get; set; }
+        public string? FileName { get; set; }
+        public string? XmlBase64 { get; set; }
+        public ApiNodeSetInfo? apiNodeSetInfo { get; set; }
+    }
+
+    public class ApiCombinedResponse
+    {
+        public List<ApiObjectTypeModel> ObjectTypes { get; set; }
+        public List<ApiDataVariableModel> DataVariables { get; set; }
+        public List<ApiPropertyModel> Properties { get; set; }
+        public List<ApiVariableTypeModel> VariableTypes { get; set; }
+        public List<ApiDataTypeModel> DataTypes { get; set; }
+        public List<ApiObjectModel> Objects { get; set; }
     }
 }

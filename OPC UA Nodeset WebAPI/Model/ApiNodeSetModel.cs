@@ -7,7 +7,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
     public class ApiNodeSetModel
     {
         public string? ModelUri { get; set; }
-        
+
         public string? Version { get; set; }
         public DateTime? PublicationDate { get; set; }
 
@@ -25,22 +25,22 @@ namespace OPC_UA_Nodeset_WebAPI.Model
         internal NodeSetModel? NodeSetModel { get; set; }
 
         public ApiNodeSetModel() { }
-        public ApiNodeSetModel(NodeSetModel aNodeSetModel) 
+        public ApiNodeSetModel(NodeSetModel aNodeSetModel)
         {
             NodeSetModel = aNodeSetModel;
-            ModelUri= aNodeSetModel.ModelUri;
-            Version= aNodeSetModel.Version;
+            ModelUri = aNodeSetModel.ModelUri;
+            Version = aNodeSetModel.Version;
             PublicationDate = aNodeSetModel.PublicationDate;
             DataTypesCount = aNodeSetModel.DataTypes.Count;
-            DataVariablesCount=aNodeSetModel.GetDataVariables().Count();
-            InterfacesCount= aNodeSetModel.Interfaces.Count;
-            ObjectTypesCount= aNodeSetModel.ObjectTypes.Count;
-            ObjectsCount= aNodeSetModel.GetObjects().Count();
-            PropertiesCount= aNodeSetModel.GetProperties().Count();
-            ReferenceTypesCount=aNodeSetModel.ReferenceTypes.Count;
-            RequiredModelsCount=aNodeSetModel.RequiredModels.Count;
-            UnknownNodesCount=aNodeSetModel.UnknownNodes.Count;
-            VariableTypesCount=aNodeSetModel.VariableTypes.Count;
+            DataVariablesCount = aNodeSetModel.GetDataVariables().Count();
+            InterfacesCount = aNodeSetModel.Interfaces.Count;
+            ObjectTypesCount = aNodeSetModel.ObjectTypes.Count;
+            ObjectsCount = aNodeSetModel.GetObjects().Count();
+            PropertiesCount = aNodeSetModel.GetProperties().Count();
+            ReferenceTypesCount = aNodeSetModel.ReferenceTypes.Count;
+            RequiredModelsCount = aNodeSetModel.RequiredModels.Count;
+            UnknownNodesCount = aNodeSetModel.UnknownNodes.Count;
+            VariableTypesCount = aNodeSetModel.VariableTypes.Count;
         }
     }
 }

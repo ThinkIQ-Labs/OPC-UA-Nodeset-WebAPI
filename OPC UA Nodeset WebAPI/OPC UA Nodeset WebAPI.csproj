@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>OPC_UA_Nodeset_WebAPI</RootNamespace>
@@ -17,10 +17,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CESMII.OpcUa.NodeSetImporter" Version="2.0.3" />
-    <PackageReference Include="CESMII.OpcUa.NodeSetModel" Version="2.0.3" />
-    <PackageReference Include="CESMII.OpcUa.NodeSetModel.Factory.Opc" Version="2.0.3" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="CESMII.OpcUa.NodeSetImporter" Version="2.1.2" />
+    <PackageReference Include="CESMII.OpcUa.NodeSetModel" Version="2.1.2" />
+    <PackageReference Include="CESMII.OpcUa.NodeSetModel.Factory.Opc" Version="2.1.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>

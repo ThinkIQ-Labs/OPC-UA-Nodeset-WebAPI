@@ -20,7 +20,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         public NodesetProjectController(ILogger<NodesetProjectController> logger, ApplicationInstance applicationInstance)
         {
             _logger = logger;
-            ApplicationInstance= applicationInstance;
+            ApplicationInstance = applicationInstance;
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         public IActionResult Get()
         {
             var returnObject = new Dictionary<string, ApiNodeSetProject>();
-            foreach(var aKeyValue in ApplicationInstance.NodeSetProjectInstances)
+            foreach (var aKeyValue in ApplicationInstance.NodeSetProjectInstances)
             {
                 returnObject.Add(aKeyValue.Key, new ApiNodeSetProject(aKeyValue.Value));
             }
@@ -48,7 +48,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         /// <response code="200">The nodeset project was successfully retrieved.</response>
         /// <response code="404">The project id was not valid.</response>
         [HttpGet("{id}")]
-        [ProducesResponseType(200, Type = typeof(Dictionary<string,ApiNodeSetProject>))]
+        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiNodeSetProject>))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetById(string id)
         {
@@ -134,11 +134,12 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                     }
                     return BadRequest($"{id} - removal was unsuccessful {maxAttempts}x.");
                 }
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest($"{id} - {ex.Message}");
             }
-            
+
 
 
 

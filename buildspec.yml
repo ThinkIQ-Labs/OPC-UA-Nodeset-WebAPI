@@ -1,0 +1,31 @@
+version: 0.2
+
+env:
+  parameter-store:
+    TIQ_GIT_TOKEN: "git-token"
+
+  shell: bash
+
+phases:
+  pre_build:
+    commands:
+      - echo "no pre_build commands"
+
+  build:
+    commands:
+      - pwd
+      - ls -l
+      - echo "verify dotnet"
+      - dotnet --list-sdks
+      - echo "dotnet info"
+      - dotnet --info
+      - git status
+      - echo "update version from trigger tag for file suffix"
+      - ./update-version.sh $TIQ_GIT_TOKEN
+      - echo "source env vars for build"
+      - cat build-artifacts.sh
+      - . build-artifacts.sh
+      - echo "start project build"
+      - ./build.sh $BUILD_CONFIG_TYPE $TAG_NAME
+      - echo "upload release"
+      - ./upload-release.sh $TIQ_GIT_TOKEN

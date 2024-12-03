@@ -65,7 +65,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
                 //{
                 //    case "Array":
                 //    case "Object":
-                        Value = aPropertyModelValue["Body"].ToString();
+                Value = aPropertyModelValue["Body"].ToString();
                 //        break;
                 //    default:
                 //        Value = aPropertyModelValue["Value"]["Body"].Value<string>();

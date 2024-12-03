@@ -16,6 +16,8 @@ manipulating OPC UA NodeSets.
 The best way to explore the project is to take a look at the 
 Swagger documentation. The api is locally available in SMIP (CESMII's smart manufacturing innovation platform) and ThinkIQ instances.
 
+If you rather use Postman, you can import the collection from the `Postman` file in the root of the project.
+
 ### Locally Stored UA NodeSets
 
 Depending on the use case, some NodeSets are standard dependencies. The system can store, retrieve, 
@@ -70,5 +72,3 @@ We can retrieve and create objects and object types.
 ### Properties, Data Variables and Data Variable Types
 
 We can retrieve and create properties, data variables, and data variable types.
-
-

@@ -12,7 +12,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
         public string ParentNodeId { get; set; }
 
         public string DisplayName { get; set; }
-        
+
         public string? DataTypeNodeId { get; set; }
 
         public string? TypeDefinitionNodeId { get; set; }

@@ -8,10 +8,11 @@ using System.Collections.Concurrent;
 using System.Text;
 using System.Xml;
 
-namespace OPC_UA_Nodeset_WebAPI.Controllers
+// @TODO: extract some of the repeated logic into a helper method
+namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/v1/local-nodeset")]
     public class LocalNodesetController : ControllerBase
     {
         private readonly ILogger<NodesetModelController> _logger;
@@ -45,7 +46,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [HttpGet("{fileName}")]
         [Produces("application/xml")]
         [ProducesResponseType(200, Type = typeof(ConcurrentDictionary<string, ApiNodeSetInfoWithDependencies>))]
-        public IActionResult DownloadNodesetFromServer(string fileName)
+        public IActionResult LocalNodesetXML(string fileName)
         {
             var filePath = $"{AppContext.BaseDirectory}/NodeSets/{fileName}";
             if (System.IO.File.Exists(filePath))
@@ -54,10 +55,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                 xmlDoc.Load(filePath);
                 return Ok(xmlDoc);
             }
-            else
-            {
-                return NotFound($"{fileName} was not found on the server.");
-            }
+            return NotFound($"{fileName} was not found on the server.");
         }
 
         /// <summary>
@@ -69,7 +67,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         [HttpDelete("{fileName}")]
         [ProducesResponseType(200, Type = typeof(ConcurrentDictionary<string, ApiNodeSetInfoWithDependencies>))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public IActionResult DeleteNodesetFromServer(string fileName)
+        public IActionResult Destroy(string fileName)
         {
             var uri = $"{AppContext.BaseDirectory}/NodeSets/{fileName}";
             if (System.IO.File.Exists(uri))
@@ -78,10 +76,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                 ApplicationInstance.ScanNodesetFiles();
                 return Ok(ApplicationInstance.LocalNodesets);
             }
-            else
-            {
-                return NotFound($"{fileName} was not found on the server.");
-            }
+            return NotFound($"{fileName} was not found on the server.");
         }
 
         /// <summary>
@@ -92,17 +87,15 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         /// <response code="200">The nodeset was successfully loaded and parsed as a nodeset model.</response>
         /// <response code="400">The nodeset could not be loaded.</response>
         //https://medium.com/@niteshsinghal85/testing-file-upload-with-swagger-in-asp-net-core-90269bc24fe8
-        [HttpPut]
+        [HttpPut("upload-xml-from-file-async")]
         [ProducesResponseType(200, Type = typeof(ApiNodeSetInfoWithDependencies))]
         [ProducesResponseType(400, Type = typeof(BadRequestResult))]
-
         public async Task<IActionResult> UploadNodesetXmlFromFileAsync(IFormFile file)
         {
             var filePath = $"{AppContext.BaseDirectory}/NodeSets/{file.FileName}";
 
             try
             {
-
                 // save the file from a stream
                 using (var stream = System.IO.File.Create(filePath))
                 {
@@ -118,11 +111,9 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                 ApplicationInstance.ScanNodesetFiles();
 
                 return Ok(returnObject);
-
             }
             catch (Exception ex)
             {
-
                 // if we're here something went wrong and we need to delete the file
                 if (System.IO.File.Exists(filePath))
                 {
@@ -130,7 +121,6 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                 }
 
                 return BadRequest($"{file.FileName} could not be added to the server. Is it a valid nodeset xml file?");
-
             }
         }
 
@@ -141,18 +131,18 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         /// <response code="200">The nodeset was successfully loaded and parsed as a nodeset model.</response>
         /// <response code="400">The nodeset could not be loaded.</response>
         //https://medium.com/@niteshsinghal85/testing-file-upload-with-swagger-in-asp-net-core-90269bc24fe8
-        [HttpPost]
+        [HttpPost("upload-xml-from-base-64")]
         [ProducesResponseType(200, Type = typeof(ApiNodeSetInfoWithDependencies))]
         [ProducesResponseType(400, Type = typeof(BadRequestResult))]
-
-        public async Task<IActionResult> UploadNodesetXmlFromBase64([FromBody] UANodeSetBase64Upload data)
+        public async Task<IActionResult> UploadNodesetXmlFromBase64([FromBody] UANodeSetBase64Upload request)
         {
-
-            var filePath = $"{AppContext.BaseDirectory}/NodeSets/{data.FileName}";
+            var fileName = request.FileName;
+            var xmlContent = request.XmlBase64;
+            var filePath = $"{AppContext.BaseDirectory}/NodeSets/{fileName}";
 
             try
             {
-                var valueBytes = Convert.FromBase64String(data.XmlBase64);
+                var valueBytes = Convert.FromBase64String(xmlContent);
                 var xml = Encoding.UTF8.GetString(valueBytes);
 
                 System.IO.File.WriteAllText(filePath, xml);
@@ -166,18 +156,16 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                 ApplicationInstance.ScanNodesetFiles();
 
                 return Ok(returnObject);
-
             }
             catch (Exception ex)
             {
-
                 // if we're here something went wrong and we need to delete the file
                 if (System.IO.File.Exists(filePath))
                 {
                     System.IO.File.Delete(filePath);
                 }
 
-                return BadRequest($"{data.FileName} could not be added to the server. Is it a valid nodeset xml file?");
+                return BadRequest($"{fileName} could not be added to the server. Is it a valid nodeset xml file?");
 
             }
         }
@@ -189,18 +177,18 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
         /// <response code="200">The nodeset was successfully loaded and parsed as a nodeset model.</response>
         /// <response code="400">The nodeset could not be loaded.</response>
         //https://medium.com/@niteshsinghal85/testing-file-upload-with-swagger-in-asp-net-core-90269bc24fe8
-        [HttpPost("GetInfoNodesetXmlFromBase64")]
+        [HttpPost("get-info-xml-from-base-64")]
         [ProducesResponseType(200, Type = typeof(ApiNodeSetInfoWithDependencies))]
         [ProducesResponseType(400, Type = typeof(BadRequestResult))]
-
-        public async Task<IActionResult> GetInfoNodesetXmlFromBase64([FromBody] UANodeSetBase64Upload data)
+        public async Task<IActionResult> GetInfoNodesetXmlFromBase64([FromBody] UANodeSetBase64Upload request)
         {
-
+            var fileName = request.FileName;
+            var xmlContent = request.XmlBase64;
             var filePath = Path.GetTempFileName();
 
             try
             {
-                var valueBytes = Convert.FromBase64String(data.XmlBase64);
+                var valueBytes = Convert.FromBase64String(xmlContent);
                 var xml = Encoding.UTF8.GetString(valueBytes);
 
                 System.IO.File.WriteAllText(filePath, xml);
@@ -213,21 +201,17 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers
                 System.IO.File.Delete(filePath);
 
                 return Ok(returnObject);
-
             }
             catch (Exception ex)
             {
-
                 // if we're here something went wrong and we need to delete the file
                 if (System.IO.File.Exists(filePath))
                 {
                     System.IO.File.Delete(filePath);
                 }
 
-                return BadRequest($"{data.FileName} could not be parsed. Is it a valid nodeset xml file?");
-
+                return BadRequest($"{fileName} could not be parsed. Is it a valid nodeset xml file?");
             }
         }
-
     }
 }

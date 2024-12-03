@@ -22,7 +22,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             BrowseName = aDataTypeModel.BrowseName;
             Description = aDataTypeModel.Description.Count == 0 ? "" : aDataTypeModel.Description.First().Text;
             SuperTypeNodeId = aDataTypeModel.SuperType == null ? "" : aDataTypeModel.SuperType.NodeId;
-            
+
             EnumFields = aDataTypeModel.EnumFields?.Select(x => new UAEnumField()
             {
                 Description = x.Description.Count == 0 ? "" : x.Description.First().Text,
@@ -35,7 +35,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             StructureFields = aDataTypeModel.StructureFields?.Select(x => new UAStructureField()
             {
                 Name = x.Name,
-                Description= x.Description.Count == 0 ? "" : x.Description.First().Text,
+                Description = x.Description.Count == 0 ? "" : x.Description.First().Text,
 
                 DataTypeNodeId = x.DataType.NodeId,
                 DataTypeName = x.DataType.DisplayName.First().Text,

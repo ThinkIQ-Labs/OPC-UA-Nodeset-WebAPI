@@ -10,6 +10,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model
 {
     public class ApiNodeSetProject
     {
+        public string ProjectId { get; set; }
         public string Name { get; set; }
         public string Owner { get; set; }
         public Dictionary<string, string> Log { get; set; }
@@ -24,9 +25,10 @@ namespace OPC_UA_Nodeset_WebAPI.Model
         public ApiNodeSetProject() { }
         public ApiNodeSetProject(NodeSetProjectInstance aNodesetProjectInstance)
         {
-            Name= aNodesetProjectInstance.Name;
-            Owner= aNodesetProjectInstance.Owner;
-            NodeSetModelCount=aNodesetProjectInstance.NodeSetModels.Count;
+            ProjectId = aNodesetProjectInstance.ProjectId;
+            Name = aNodesetProjectInstance.Name;
+            Owner = aNodesetProjectInstance.Owner;
+            NodeSetModelCount = aNodesetProjectInstance.NodeSetModels.Count;
             Log = aNodesetProjectInstance.Log;
         }
     }
