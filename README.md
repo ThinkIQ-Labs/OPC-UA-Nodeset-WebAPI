@@ -72,5 +72,3 @@ We can retrieve and create objects and object types.
 ### Properties, Data Variables and Data Variable Types
 
 We can retrieve and create properties, data variables, and data variable types.
-
-
