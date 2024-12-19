@@ -7,12 +7,6 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-#GIT_REL_API="https://api.github.com/repos/ThinkIQ/opc-ua-nodeset-webapi/releases"
-#GIT_TAG_API="https://api.github.com/repos/ThinkIQ/opc-ua-nodeset-webapi/releases/tags"
-#GIT_UPLOAD_API="https://uploads.github.com/repos/ThinkIQ/opc-ua-nodeset-webapi/releases"
-#S3_DEV_PATH="s3://tiq.builds/opc-ua-nodeset-webapi/DEVELOPMENT"
-#S3_REL_PATH="s3://tiq.builds/opc-ua-nodeset-webapi/RELEASED"
-
 BuildNumber=""
 GitReleaseId=""
 IsReleaseBuild="false"
@@ -26,9 +20,6 @@ else
     file_suffix=${TAG_NAME}
     server_zip_name="${server_zip_prefix}_${file_suffix}.zip"
 fi
-
-#server_zip_name="opcuaserver_${file_suffix}.zip"
-#server_build_dir="BuildOutput/"
 
 cp version-info.sh $server_build_dir
 cd $server_build_dir

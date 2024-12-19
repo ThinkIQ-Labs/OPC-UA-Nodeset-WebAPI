@@ -42,7 +42,6 @@ echo "export TAG_NAME=${tag_name}" >> build-artifacts.sh
 # header build for github api
 echo building headers for github api
 authentication="Authorization: Bearer ${1}"
-#githubapi_all_tags="https://api.github.com/repos/ThinkIQ/opc-ua-nodeset-webapi/tags"
 accept="Accept: application/vnd.github+json"
 githubapiversion="X-GitHub-Api-Version: 2022-11-28"
 
