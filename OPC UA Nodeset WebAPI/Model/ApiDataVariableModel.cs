@@ -13,8 +13,8 @@ namespace OPC_UA_Nodeset_WebAPI.Model
         public string? DataTypeNodeId { get; set; }
         public string? Value { get; set; }
         public string? TypeDefinitionNodeId { get; set; }
-        public object MinValues { get; set; }
-        public object MaxValues { get; set; }
+        public object MinValue { get; set; }
+        public object MaxValue { get; set; }
         public Dictionary<string, object> EngineeringUnit { get; set; } = new Dictionary<string, object>();
         public List<ApiNodeAndReferenceModel> AllReferencedNodes { get; set; }
         public List<ApiNodeAndReferenceModel> OtherReferencedNodes { get; set; }
@@ -35,8 +35,8 @@ namespace OPC_UA_Nodeset_WebAPI.Model
             ParentNodeId = ParentModel == null ? "" : ParentModel.NodeId;
             DataTypeNodeId = aVariableModel.DataType == null ? "" : aVariableModel.DataType.NodeId;
             TypeDefinitionNodeId = aVariableModel.TypeDefinition == null ? "" : aVariableModel.TypeDefinition.NodeId;
-            MinValues = aVariableModel.MinValue;
-            MaxValues = aVariableModel.MaxValue;
+            MinValue = aVariableModel.MinValue;
+            MaxValue = aVariableModel.MaxValue;
             var engineeringUnit = aVariableModel.EngineeringUnit;
 
             var engineeringUnitProperties = new Dictionary<string, object>();
