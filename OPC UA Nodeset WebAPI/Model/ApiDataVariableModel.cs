@@ -45,6 +45,11 @@ namespace OPC_UA_Nodeset_WebAPI.Model
                 foreach (var prop in engineeringUnit.GetType().GetProperties())
                 {
                     var value = prop.GetValue(engineeringUnit, null);
+                    var textProperty = value?.GetType().GetProperty("Text");
+                    if (textProperty != null)
+                    {
+                        value = textProperty.GetValue(value, null);
+                    }
                     engineeringUnitProperties.Add(prop.Name, value ?? "Unknown");
                 }
             }
