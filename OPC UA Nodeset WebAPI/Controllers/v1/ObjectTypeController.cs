@@ -25,7 +25,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
 
         [HttpGet("{id}/{uri}")]
         [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiObjectTypeModel>))]
-        public IActionResult Get(string id, string uri)
+        public IActionResult Get(string id, string uri, [FromQuery] Dictionary<string, string> filters = null)
         {
             var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
 
@@ -41,6 +41,20 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                 {
                     returnObject.Add(new ApiObjectTypeModel(aObjectType));
                 }
+
+                returnObject = returnObject.Where(x =>
+                    (!filters.ContainsKey("displayName") || x.DisplayName == filters["displayName"]) &&
+                    (!filters.ContainsKey("browseName") || x.BrowseName == filters["browseName"]) &&
+                    (!filters.ContainsKey("description") || x.Description == filters["description"]) &&
+                    (!filters.ContainsKey("superTypeNodeId") || x.SuperTypeNodeId == filters["superTypeNodeId"]) &&
+                    (!filters.ContainsKey("propertiesCount") || x.PropertiesCount.ToString() == filters["propertiesCount"]) &&
+                    (!filters.ContainsKey("dataVariablesCount") || x.DataVariablesCount.ToString() == filters["dataVariablesCount"]) &&
+                    (!filters.ContainsKey("objectsCount") || x.ObjectsCount.ToString() == filters["objectsCount"]) &&
+                    (!filters.ContainsKey("propertiesNodeIds") || x.PropertiesNodeIds.Contains(filters["propertiesNodeIds"])) &&
+                    (!filters.ContainsKey("dataVariablesNodeIds") || x.DataVariablesNodeIds.Contains(filters["dataVariablesNodeIds"])) &&
+                    (!filters.ContainsKey("objectsNodeIds") || x.ObjectsNodeIds.Contains(filters["objectsNodeIds"]))
+                ).ToList();
+
                 return Ok(returnObject);
             }
         }
