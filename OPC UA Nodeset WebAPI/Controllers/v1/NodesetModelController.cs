@@ -150,11 +150,11 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         /// <response code="200">The nodeset was successfully loaded and parsed as a nodeset model.</response>
         /// <response code="400">The nodeset could not be loaded.</response>
         /// <response code="404">The project id was not valid.</response>
-        [HttpPut]
+        [HttpPost]
         [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiNodeSetModel>))]
         [ProducesResponseType(400, Type = typeof(BadRequestResult))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public async Task<IActionResult> PutAsync([FromBody] NodesetFile request)
+        public async Task<IActionResult> HttpPost([FromBody] NodesetFile request)
         {
             if (request.apiNodeSetInfo == null)
             {
