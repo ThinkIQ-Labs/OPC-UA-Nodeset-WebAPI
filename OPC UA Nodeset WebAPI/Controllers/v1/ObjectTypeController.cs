@@ -42,6 +42,11 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                     returnObject.Add(new ApiObjectTypeModel(aObjectType));
                 }
 
+                if (filters == null)
+                {
+                    return Ok(returnObject);
+                }
+
                 returnObject = returnObject.Where(x =>
                     (!filters.ContainsKey("displayName") || x.DisplayName == filters["displayName"]) &&
                     (!filters.ContainsKey("browseName") || x.BrowseName == filters["browseName"]) &&
