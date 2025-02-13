@@ -10,7 +10,7 @@ using StatusCodes = Microsoft.AspNetCore.Http.StatusCodes;
 namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
 {
     [ApiController]
-    [Route("api/v1/Project/data-type")]
+    [Route("api/v1/data-type")]
     public class DataTypeController : ControllerBase
     {
         private readonly ILogger<ProjectController> _logger;
@@ -25,7 +25,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
 
         [HttpGet("{id}/{uri}")]
         [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiDataTypeModel>))]
-        public IActionResult Get(string id, string uri)
+        public IActionResult Get(string id, string uri, [FromQuery] Dictionary<string, string> filters = null)
         {
             var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
 
@@ -41,6 +41,19 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                 {
                     returnObject.Add(new ApiDataTypeModel(aDataType));
                 }
+
+                if (filters == null)
+                {
+                    return Ok(returnObject);
+                }
+
+                returnObject = returnObject.Where(x =>
+                    (!filters.ContainsKey("displayName") || x.DisplayName == filters["displayName"]) &&
+                    (!filters.ContainsKey("browseName") || x.BrowseName == filters["browseName"]) &&
+                    (!filters.ContainsKey("description") || x.Description == filters["description"]) &&
+                    (!filters.ContainsKey("superTypeNodeId") || x.SuperTypeNodeId == filters["superTypeNodeId"])
+                ).ToList();
+
                 return Ok(returnObject);
             }
         }
