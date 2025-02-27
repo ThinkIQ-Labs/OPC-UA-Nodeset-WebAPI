@@ -1,6 +1,6 @@
 ﻿using CESMII.OpcUa.NodeSetModel;
 using Microsoft.AspNetCore.Mvc;
-using OPC_UA_Nodeset_WebAPI.Model;
+using OPC_UA_Nodeset_WebAPI.Model.v1;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 
 namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
@@ -80,11 +80,13 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             return Ok(returnObject);
         }
 
-        [HttpPut]
+        [HttpPost]
         [ProducesResponseType(200, Type = typeof(ApiDataVariableModel))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public IActionResult PutAsync(string id, string uri, [FromBody] ApiNewDataVariableModel apiDataVariableModel)
+        public IActionResult Post([FromBody] ApiNewDataVariableModel request)
         {
+            var id = request.ProjectId;
+            var uri = request.Uri;
             var dataVariablesListResult = Get(id, uri) as ObjectResult;
 
             if (StatusCodes.Status200OK != dataVariablesListResult.StatusCode)
@@ -92,7 +94,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                 return dataVariablesListResult;
             }
             var dataVariablesList = dataVariablesListResult.Value as List<ApiDataVariableModel>;
-            var existingDataVariable = dataVariablesList.Where(x => x.ParentNodeId == apiDataVariableModel.ParentNodeId).FirstOrDefault(x => x.DisplayName == apiDataVariableModel.DisplayName);
+            var existingDataVariable = dataVariablesList.Where(x => x.ParentNodeId == request.ParentNodeId).FirstOrDefault(x => x.DisplayName == request.DisplayName);
             if (existingDataVariable == null)
             {
                 // add new dataVariable
@@ -103,28 +105,28 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                 var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
 
                 // look up parent object
-                var parentNode = activeProjectInstance.GetNodeModelByNodeId(apiDataVariableModel.ParentNodeId);
+                var parentNode = activeProjectInstance.GetNodeModelByNodeId(request.ParentNodeId);
 
                 // look up data type
-                DataTypeModel aDataType = apiDataVariableModel.DataTypeNodeId == null ? null : activeProjectInstance.GetNodeModelByNodeId(apiDataVariableModel.DataTypeNodeId) as DataTypeModel;
+                DataTypeModel aDataType = request.DataTypeNodeId == null ? null : activeProjectInstance.GetNodeModelByNodeId(request.DataTypeNodeId) as DataTypeModel;
 
-                VariableTypeModel aTypeDefinition = apiDataVariableModel.TypeDefinitionNodeId == null ? null : activeProjectInstance.GetNodeModelByNodeId(apiDataVariableModel.TypeDefinitionNodeId) as VariableTypeModel;
+                VariableTypeModel aTypeDefinition = request.TypeDefinitionNodeId == null ? null : activeProjectInstance.GetNodeModelByNodeId(request.TypeDefinitionNodeId) as VariableTypeModel;
 
                 var newDataVariableModel = new DataVariableModel
                 {
                     NodeSet = activeNodesetModel,
                     NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
                     Parent = parentNode,
-                    DisplayName = new List<NodeModel.LocalizedText> { apiDataVariableModel.DisplayName },
-                    BrowseName = apiDataVariableModel.BrowseName,
-                    Description = new List<NodeModel.LocalizedText> { apiDataVariableModel.Description == null ? "" : apiDataVariableModel.Description },
+                    DisplayName = new List<NodeModel.LocalizedText> { request.DisplayName },
+                    BrowseName = request.BrowseName,
+                    Description = new List<NodeModel.LocalizedText> { request.Description == null ? "" : request.Description },
                     DataType = aDataType,
                     TypeDefinition = aTypeDefinition
                 };
 
-                if (apiDataVariableModel.GenerateChildren.HasValue)
+                if (request.GenerateChildren.HasValue)
                 {
-                    if (apiDataVariableModel.GenerateChildren.Value)
+                    if (request.GenerateChildren.Value)
                     {
                         aTypeDefinition.Properties.ForEach(aProperty =>
                         {
@@ -160,7 +162,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                 }
 
                 // add value
-                if (apiDataVariableModel.Value != null)
+                if (request.Value != null)
                 {
                     switch (aDataType.DisplayName.First().Text)
                     {
@@ -171,7 +173,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                         case "SByte":
                             //newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Int32");
                             int aIntValue;
-                            if (Int32.TryParse(apiDataVariableModel.Value, out aIntValue))
+                            if (Int32.TryParse(request.Value, out aIntValue))
                             {
                                 newDataVariableModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aIntValue).Json;
                             }
@@ -180,7 +182,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                         case "Bool":
                             //newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Boolean");
                             Boolean aBoolValue;
-                            if (Boolean.TryParse(apiDataVariableModel.Value, out aBoolValue))
+                            if (Boolean.TryParse(request.Value, out aBoolValue))
                             {
                                 newDataVariableModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aBoolValue).Json;
                             }
@@ -189,14 +191,14 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                         case "UtcTime":
                             //newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "DateTime");
                             DateTime aDateTimeValue;
-                            if (DateTime.TryParse(apiDataVariableModel.Value, out aDateTimeValue))
+                            if (DateTime.TryParse(request.Value, out aDateTimeValue))
                             {
                                 newDataVariableModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aDateTimeValue).Json;
                             }
                             break;
                         default:
                             //newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Int32");
-                            newDataVariableModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(apiDataVariableModel.Value).Json;
+                            newDataVariableModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(request.Value).Json;
                             break;
                     }
                 }

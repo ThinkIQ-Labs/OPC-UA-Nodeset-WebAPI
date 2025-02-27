@@ -6,10 +6,14 @@ using Opc.Ua.Export;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Xml.Linq;
 
-namespace OPC_UA_Nodeset_WebAPI.Model
+namespace OPC_UA_Nodeset_WebAPI.Model.v1
 {
     public class ApiNewDataTypeModel
     {
+        public string ProjectId { get; set; }
+
+        public string Uri { get; set; }
+
         public string SuperTypeNodeId { get; set; }
 
         public string DisplayName { get; set; }

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Opc.Ua;
-using OPC_UA_Nodeset_WebAPI.Model;
+using OPC_UA_Nodeset_WebAPI.Model.v1;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Web;
 using StatusCodes = Microsoft.AspNetCore.Http.StatusCodes;
@@ -92,52 +92,50 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPost]
         [ProducesResponseType(200, Type = typeof(ApiObjectTypeModel))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public IActionResult PutAsync(string id, string uri, [FromBody] ApiNewObjectTypeModel apiObjectTypeModel)
+        public async Task<IActionResult> HttpPost([FromBody] ApiNewObjectTypeModel request)
         {
-
+            var id = request.ProjectId;
+            var uri = request.Uri;
             var objectTypesListResult = Get(id, uri) as ObjectResult;
 
             if (StatusCodes.Status200OK != objectTypesListResult.StatusCode)
             {
                 return objectTypesListResult;
             }
-            else
+
+            var objectTypes = objectTypesListResult.Value as List<ApiObjectTypeModel>;
+            var existingObjectType = objectTypes.FirstOrDefault(x => x.DisplayName == request.DisplayName);
+
+            if (existingObjectType != null)
             {
-                var objectTypes = objectTypesListResult.Value as List<ApiObjectTypeModel>;
-                var existingObjectType = objectTypes.FirstOrDefault(x => x.DisplayName == apiObjectTypeModel.DisplayName);
-                if (existingObjectType == null)
-                {
-                    // add new object type
-                    var projectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
-                    var activeProjectInstance = projectInstanceResult.Value as NodeSetProjectInstance;
-
-                    var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
-                    var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
-
-                    var newObjectTypeModel = new ObjectTypeModel
-                    {
-                        NodeSet = activeNodesetModel,
-                        NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
-                        SuperType = activeProjectInstance.GetNodeModelByNodeId(apiObjectTypeModel.SuperTypeNodeId) as ObjectTypeModel,
-                        DisplayName = new List<NodeModel.LocalizedText> { apiObjectTypeModel.DisplayName },
-                        BrowseName = apiObjectTypeModel.BrowseName,
-                        Description = new List<NodeModel.LocalizedText> { apiObjectTypeModel.Description == null ? "" : apiObjectTypeModel.Description },
-                        Properties = new List<VariableModel>(),
-                        DataVariables = new List<DataVariableModel>(),
-                    };
-
-                    activeNodesetModel.ObjectTypes.Add(newObjectTypeModel);
-                    activeNodesetModel.UpdateIndices();
-                    return Ok(new ApiObjectTypeModel(newObjectTypeModel));
-                }
-                else
-                {
-                    return BadRequest("An object type with this name exists.");
-                }
+                return BadRequest("An object type with this name exists.");
             }
+
+            // add new object type
+            var projectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
+            var activeProjectInstance = projectInstanceResult.Value as NodeSetProjectInstance;
+
+            var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
+            var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
+
+            var newObjectTypeModel = new ObjectTypeModel
+            {
+                NodeSet = activeNodesetModel,
+                NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                SuperType = activeProjectInstance.GetNodeModelByNodeId(request.SuperTypeNodeId) as ObjectTypeModel,
+                DisplayName = new List<NodeModel.LocalizedText> { request.DisplayName },
+                BrowseName = request.BrowseName,
+                Description = new List<NodeModel.LocalizedText> { request.Description == null ? "" : request.Description },
+                Properties = new List<VariableModel>(),
+                DataVariables = new List<DataVariableModel>(),
+            };
+
+            activeNodesetModel.ObjectTypes.Add(newObjectTypeModel);
+            activeNodesetModel.UpdateIndices();
+            return Ok(new ApiObjectTypeModel(newObjectTypeModel));
         }
 
 

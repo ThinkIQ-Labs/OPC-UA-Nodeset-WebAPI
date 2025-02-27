@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Opc.Ua;
 using Opc.Ua.Export;
-using OPC_UA_Nodeset_WebAPI.Model;
+using OPC_UA_Nodeset_WebAPI.Model.v1;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System;
 using System.Collections.Concurrent;
@@ -188,7 +188,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         /// </summary>
         /// <returns>Returns a nodeset xml file.</returns>
         /// <response code="200">The nodeset was successfully delivered.</response>
-        [HttpGet("generate-xml")]
+        [HttpPost("generate-xml")]
         [Produces("application/xml")]
         [ProducesResponseType(200, Type = typeof(ConcurrentDictionary<string, ApiNodeSetInfoWithDependencies>))]
         public IActionResult GenerateXml([FromBody] NodesetFile request)
@@ -197,9 +197,12 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             {
                 return BadRequest("Invalid request: Uri is required.");
             }
+
             var id = request.ProjectId;
             var uri = request.Uri;
+
             var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
+
             if (StatusCodes.Status200OK != activeNodesetModelResult.StatusCode)
             {
                 return activeNodesetModelResult;

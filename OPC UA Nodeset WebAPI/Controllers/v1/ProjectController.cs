@@ -1,7 +1,7 @@
 using CESMII.OpcUa.NodeSetModel;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Mvc;
-using OPC_UA_Nodeset_WebAPI.Model;
+using OPC_UA_Nodeset_WebAPI.Model.v1;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Collections.Concurrent;
 using System.Linq;

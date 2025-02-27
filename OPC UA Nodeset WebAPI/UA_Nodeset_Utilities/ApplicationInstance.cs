@@ -70,15 +70,9 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
                     //return Ok(aNodesetProjectInstance.NodeSetModels.First(x => x.Value.ModelUri == uriNoSlashes).Value);
                     return Ok(aNodesetProjectInstance.NodeSetModels.First(x => x.Value.ModelUri.Replace("/", "") == uriNoSlashes).Value);
                 }
-                else
-                {
-                    return NotFound("The model does not exist.");
-                }
+                return NotFound("The model does not exist.");
             }
-            else
-            {
-                return NotFound("The project does not exist.");
-            }
+            return NotFound("The project does not exist.");
         }
 
         public IActionResult GetNodeApiModelByNodeId(string id, string uri, string nodeId, string nodeModelTypeName = "")
