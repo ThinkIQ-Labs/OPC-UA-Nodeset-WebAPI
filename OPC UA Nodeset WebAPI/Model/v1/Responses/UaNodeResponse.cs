@@ -1,6 +1,6 @@
-﻿namespace OPC_UA_Nodeset_WebAPI.Model.v1
+﻿namespace OPC_UA_Nodeset_WebAPI.Model.v1.Responses
 {
-    public class ApiUaNodeModel
+    public class UaNodeResponse
     {
         public static string GetNodeIdFromIdAndNameSpace(string id, string ns)
         {

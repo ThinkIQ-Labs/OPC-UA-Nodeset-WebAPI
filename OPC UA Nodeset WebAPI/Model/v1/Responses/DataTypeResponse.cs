@@ -5,13 +5,13 @@ using System.Xml.Linq;
 
 namespace OPC_UA_Nodeset_WebAPI.Model.v1.Responses
 {
-    public class DataTypeResponse : ApiUaNodeModel
+    public class DataTypeResponse : UaNodeResponse
     {
         public string SuperTypeNodeId { get; set; }
         public List<UAEnumField> EnumFields { get; set; }
         public List<UAStructureField> StructureFields { get; set; }
         internal DataTypeModel? DataTypeModel { get; set; }
-        public ApiDataTypeModel() { }
+        public DataTypeResponse() { }
 
         public DataTypeResponse(DataTypeModel aDataTypeModel)
         {

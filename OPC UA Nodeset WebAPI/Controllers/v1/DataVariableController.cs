@@ -116,7 +116,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                 var newDataVariableModel = new DataVariableModel
                 {
                     NodeSet = activeNodesetModel,
-                    NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                    NodeId = UaNodeResponse.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
                     Parent = parentNode,
                     DisplayName = new List<NodeModel.LocalizedText> { request.DisplayName },
                     BrowseName = request.BrowseName,
@@ -134,7 +134,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                             newDataVariableModel.Properties.Add(new PropertyModel
                             {
                                 NodeSet = activeNodesetModel,
-                                NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                                NodeId = UaNodeResponse.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
                                 Parent = newDataVariableModel,
                                 DisplayName = aProperty.DisplayName,
                                 BrowseName = aProperty.BrowseName,
@@ -149,7 +149,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                             newDataVariableModel.DataVariables.Add(new DataVariableModel
                             {
                                 NodeSet = activeNodesetModel,
-                                NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                                NodeId = UaNodeResponse.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
                                 Parent = newDataVariableModel,
                                 DisplayName = aDataVariable.DisplayName,
                                 BrowseName = aDataVariable.BrowseName,
@@ -205,7 +205,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                 }
                 parentNode.DataVariables.Add(newDataVariableModel);
                 activeNodesetModel.UpdateIndices();
-                return Ok(new ApiPropertyModel(newDataVariableModel));
+                return Ok(new PropertyResponse(newDataVariableModel));
             }
             return BadRequest("A dataVariable with this name exists.");
         }

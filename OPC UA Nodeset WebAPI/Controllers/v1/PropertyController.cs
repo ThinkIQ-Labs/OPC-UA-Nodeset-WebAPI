@@ -1,6 +1,7 @@
 ﻿using CESMII.OpcUa.NodeSetModel;
 using Microsoft.AspNetCore.Mvc;
-using OPC_UA_Nodeset_WebAPI.Model.v1;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Requests;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System;
 using System.Web;
@@ -22,7 +23,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         }
 
         [HttpGet("{id}/{uri}")]
-        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiPropertyModel>))]
+        [ProducesResponseType(200, Type = typeof(Dictionary<string, PropertyResponse>))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult Get(string id, string uri)
         {
@@ -35,17 +36,17 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             else
             {
                 var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
-                var returnObject = new List<ApiPropertyModel>();
+                var returnObject = new List<PropertyResponse>();
                 foreach (var aProperty in activeNodesetModel.GetProperties())
                 {
-                    returnObject.Add(new ApiPropertyModel(aProperty));
+                    returnObject.Add(new PropertyResponse(aProperty));
                 }
                 return Ok(returnObject);
             }
         }
 
         [HttpGet("GetByNodeId")]
-        [ProducesResponseType(200, Type = typeof(ApiPropertyModel))]
+        [ProducesResponseType(200, Type = typeof(PropertyResponse))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetByNodeId(string id, string uri, string nodeId)
         {
@@ -53,9 +54,9 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         }
 
         [HttpPatch]
-        [ProducesResponseType(200, Type = typeof(ApiPropertyModel))]
+        [ProducesResponseType(200, Type = typeof(PropertyResponse))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public IActionResult PatchByNodeId([FromBody] ApiNewPropertyModel request)
+        public IActionResult PatchByNodeId([FromBody] PropertyRequest request)
         {
             var id = request.ProjectId;
             var uri = request.Uri;
@@ -67,7 +68,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                 return propertiesListResult;
             }
 
-            var propertiesList = propertiesListResult.Value as List<ApiPropertyModel>;
+            var propertiesList = propertiesListResult.Value as List<PropertyResponse>;
             var existingProperty = propertiesList.FirstOrDefault(x => x.NodeId == nodeId);
 
             if (existingProperty == null)
@@ -88,7 +89,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
 
             // look up data type
             //var aDataType = activeProjectInstance.UaBaseModel.AllNodesByNodeId[request.DataTypeNodeId];
-            //var nodeFromDataTypeNodeId = new ApiUaNodeModel { NodeId = request.DataTypeNodeId };
+            //var nodeFromDataTypeNodeId = new UaNodeResponse { NodeId = request.DataTypeNodeId };
             //var aDataType = activeProjectInstance.NodeSetModels.FirstOrDefault(x=>x.Value.ModelUri== nodeFromDataTypeNodeId.NameSpace).Value.AllNodesByNodeId[request.DataTypeNodeId];
             var aDataType = activeProjectInstance.GetNodeModelByNodeId(request.DataTypeNodeId);
 
@@ -142,12 +143,12 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             }
 
             activeNodesetModel.UpdateIndices();
-            return Ok(new ApiPropertyModel(existingProperty.PropertyModel));
+            return Ok(new PropertyResponse(existingProperty.PropertyModel));
         }
 
 
         [HttpGet("ByParentNodeId")]
-        [ProducesResponseType(200, Type = typeof(List<ApiPropertyModel>))]
+        [ProducesResponseType(200, Type = typeof(List<PropertyResponse>))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetByParentNodeId(string id, string uri, string parentNodeId)
         {
@@ -177,7 +178,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                         break;
                 }
 
-                var returnObject = properties.Select(x => new ApiPropertyModel(x));
+                var returnObject = properties.Select(x => new PropertyResponse(x));
 
                 return Ok(returnObject);
 
@@ -186,9 +187,9 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
 
 
         [HttpPost]
-        [ProducesResponseType(200, Type = typeof(ApiPropertyModel))]
+        [ProducesResponseType(200, Type = typeof(PropertyResponse))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public async Task<IActionResult> HttpPost([FromBody] ApiNewPropertyModel apiPropertyModel)
+        public async Task<IActionResult> HttpPost([FromBody] PropertyRequest apiPropertyModel)
         {
             var id = apiPropertyModel.ProjectId;
             var uri = apiPropertyModel.Uri;
@@ -198,7 +199,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             {
                 return propertiesListResult;
             }
-            var propertiesList = propertiesListResult.Value as List<ApiPropertyModel>;
+            var propertiesList = propertiesListResult.Value as List<PropertyResponse>;
             var existingProperty = propertiesList.Where(x => x.ParentNodeId == apiPropertyModel.ParentNodeId).FirstOrDefault(x => x.DisplayName == apiPropertyModel.DisplayName);
 
             if (existingProperty == null)
@@ -219,7 +220,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                 var newPropertyModel = new PropertyModel
                 {
                     NodeSet = activeNodesetModel,
-                    NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                    NodeId = UaNodeResponse.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
                     Parent = parentNode,
                     DisplayName = new List<NodeModel.LocalizedText> { apiPropertyModel.DisplayName },
                     BrowseName = apiPropertyModel.BrowseName,
@@ -273,7 +274,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
 
                 parentNode.Properties.Add(newPropertyModel);
                 activeNodesetModel.UpdateIndices();
-                return Ok(new ApiPropertyModel(newPropertyModel));
+                return Ok(new PropertyResponse(newPropertyModel));
             }
             return BadRequest("A property with this name exists.");
         }

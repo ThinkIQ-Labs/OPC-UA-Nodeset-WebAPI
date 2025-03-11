@@ -2,7 +2,7 @@
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.ComponentModel.DataAnnotations;
 
-namespace OPC_UA_Nodeset_WebAPI.Model.v1
+namespace OPC_UA_Nodeset_WebAPI.Model.v1.Responses
 {
     public class NodeSetModelResponse
     {

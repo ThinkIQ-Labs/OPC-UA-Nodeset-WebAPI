@@ -117,7 +117,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             var newDataTypeModel = new DataTypeModel
             {
                 NodeSet = activeNodesetModel,
-                NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                NodeId = UaNodeResponse.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
                 SuperType = activeProjectInstance.GetNodeModelByNodeId(request.SuperTypeNodeId) as DataTypeModel,
                 DisplayName = new List<NodeModel.LocalizedText> { request.DisplayName == null ? "" : request.DisplayName },
                 BrowseName = request.BrowseName,

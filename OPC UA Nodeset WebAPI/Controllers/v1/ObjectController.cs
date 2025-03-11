@@ -1,6 +1,7 @@
 ﻿using CESMII.OpcUa.NodeSetModel;
 using Microsoft.AspNetCore.Mvc;
 using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Requests;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Web;
 
@@ -73,7 +74,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         [HttpPost]
         [ProducesResponseType(200, Type = typeof(ObjectModelResponse))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public async Task<IActionResult> HttpPost([FromBody] ApiNewObjectModel request)
+        public async Task<IActionResult> HttpPost([FromBody] ObjectRequest request)
         {
             var id = request.ProjectId;
             var uri = request.Uri;
@@ -100,17 +101,17 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
 
             // look up parent object
-            var aParentModel = activeProjectInstance.NodeSetModels.FirstOrDefault(x => x.Value.ModelUri == ApiUaNodeModel.GetNameSpaceFromNodeId(request.ParentNodeId)).Value;
+            var aParentModel = activeProjectInstance.NodeSetModels.FirstOrDefault(x => x.Value.ModelUri == UaNodeResponse.GetNameSpaceFromNodeId(request.ParentNodeId)).Value;
             var parentNode = aParentModel.AllNodesByNodeId[request.ParentNodeId];
 
             // look up type definition
-            var aObjectTypeModel = activeProjectInstance.NodeSetModels.FirstOrDefault(x => x.Value.ModelUri == ApiUaNodeModel.GetNameSpaceFromNodeId(request.TypeDefinitionNodeId)).Value;
+            var aObjectTypeModel = activeProjectInstance.NodeSetModels.FirstOrDefault(x => x.Value.ModelUri == UaNodeResponse.GetNameSpaceFromNodeId(request.TypeDefinitionNodeId)).Value;
             var aObjectTypeDefinition = aObjectTypeModel.ObjectTypes.FirstOrDefault(ot => ot.NodeId == request.TypeDefinitionNodeId);
 
             var newObjectModel = new ObjectModel
             {
                 NodeSet = activeNodesetModel,
-                NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                NodeId = UaNodeResponse.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
                 Parent = parentNode,
                 TypeDefinition = aObjectTypeDefinition,
                 DisplayName = new List<NodeModel.LocalizedText> { request.DisplayName },
@@ -129,7 +130,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                         newObjectModel.Properties.Add(new PropertyModel
                         {
                             NodeSet = activeNodesetModel,
-                            NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                            NodeId = UaNodeResponse.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
                             Parent = newObjectModel,
                             DisplayName = aProperty.DisplayName,
                             BrowseName = aProperty.BrowseName,
@@ -144,7 +145,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                         newObjectModel.DataVariables.Add(new DataVariableModel
                         {
                             NodeSet = activeNodesetModel,
-                            NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                            NodeId = UaNodeResponse.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
                             Parent = newObjectModel,
                             DisplayName = aDataVariable.DisplayName,
                             BrowseName = aDataVariable.BrowseName,

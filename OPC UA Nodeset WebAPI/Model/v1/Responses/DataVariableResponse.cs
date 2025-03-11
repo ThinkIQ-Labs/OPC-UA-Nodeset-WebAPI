@@ -7,7 +7,7 @@ using System.Xml.Linq;
 
 namespace OPC_UA_Nodeset_WebAPI.Model.v1.Responses
 {
-    public class DataVariableResponse : ApiUaNodeModel
+    public class DataVariableResponse : UaNodeResponse
     {
         public string ParentNodeId { get; set; }
         public string? DataTypeNodeId { get; set; }

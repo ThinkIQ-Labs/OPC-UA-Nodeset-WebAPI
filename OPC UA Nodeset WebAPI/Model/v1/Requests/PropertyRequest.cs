@@ -5,9 +5,9 @@ using Opc.Ua;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Xml.Linq;
 
-namespace OPC_UA_Nodeset_WebAPI.Model.v1
+namespace OPC_UA_Nodeset_WebAPI.Model.v1.Requests
 {
-    public class ApiNewPropertyModel
+    public class PropertyRequest
     {
         public string ProjectId { get; set; }
 
@@ -25,6 +25,6 @@ namespace OPC_UA_Nodeset_WebAPI.Model.v1
 
         public string? Description { get; set; }
 
-        public ApiNewPropertyModel() { }
+        public PropertyRequest() { }
     }
 }

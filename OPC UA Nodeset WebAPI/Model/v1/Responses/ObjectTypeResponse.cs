@@ -5,9 +5,9 @@ using Opc.Ua;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Xml.Linq;
 
-namespace OPC_UA_Nodeset_WebAPI.Model.v1
+namespace OPC_UA_Nodeset_WebAPI.Model.v1.Responses
 {
-    public class ApiObjectTypeModel : ApiUaNodeModel
+    public class ObjectTypeResponse : UaNodeResponse
     {
         public int PropertiesCount { get; set; }
         public int DataVariablesCount { get; set; }
@@ -21,9 +21,9 @@ namespace OPC_UA_Nodeset_WebAPI.Model.v1
 
         internal ObjectTypeModel? ObjectTypeModel { get; set; }
 
-        public ApiObjectTypeModel() { }
+        public ObjectTypeResponse() { }
 
-        public ApiObjectTypeModel(ObjectTypeModel aOjectTypeModel)
+        public ObjectTypeResponse(ObjectTypeModel aOjectTypeModel)
         {
             ObjectTypeModel = aOjectTypeModel;
             NodeId = aOjectTypeModel.NodeId;

@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Opc.Ua;
-using OPC_UA_Nodeset_WebAPI.Model.v1;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Requests;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Web;
 using StatusCodes = Microsoft.AspNetCore.Http.StatusCodes;
@@ -24,7 +25,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         }
 
         [HttpGet("{id}/{uri}")]
-        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiVariableTypeModel>))]
+        [ProducesResponseType(200, Type = typeof(Dictionary<string, VariableTypeResponse>))]
         public IActionResult Get(string id, string uri, [FromQuery] Dictionary<string, string> filters = null)
         {
             var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
@@ -36,10 +37,10 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             else
             {
                 var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
-                var returnObject = new List<ApiVariableTypeModel>();
+                var returnObject = new List<VariableTypeResponse>();
                 foreach (var aVariableType in activeNodesetModel.VariableTypes)
                 {
-                    returnObject.Add(new ApiVariableTypeModel(aVariableType));
+                    returnObject.Add(new VariableTypeResponse(aVariableType));
                 }
 
                 if (filters == null)
@@ -59,7 +60,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         }
 
         [HttpGet("{nodeId}")]
-        [ProducesResponseType(200, Type = typeof(ApiVariableTypeModel))]
+        [ProducesResponseType(200, Type = typeof(VariableTypeResponse))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetByNodeId(string id, string uri, string nodeId)
         {
@@ -67,7 +68,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         }
 
         [HttpGet("ByDisplayName/{displayName}")]
-        [ProducesResponseType(200, Type = typeof(List<ApiVariableTypeModel>))]
+        [ProducesResponseType(200, Type = typeof(List<VariableTypeResponse>))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetByDisplayName(string id, string uri, string displayName)
         {
@@ -79,7 +80,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             }
             else
             {
-                var variableTypes = variableTypesListResult.Value as List<ApiVariableTypeModel>;
+                var variableTypes = variableTypesListResult.Value as List<VariableTypeResponse>;
                 var returnObject = variableTypes.Where(x => x.DisplayName == displayName).ToList();
                 return Ok(returnObject);
             }
@@ -87,9 +88,9 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
 
 
         [HttpPost]
-        [ProducesResponseType(200, Type = typeof(ApiVariableTypeModel))]
+        [ProducesResponseType(200, Type = typeof(VariableTypeResponse))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public async Task<IActionResult> HttpPost([FromBody] ApiNewVariableTypeModel request)
+        public async Task<IActionResult> HttpPost([FromBody] VariableTypeRequest request)
         {
             var id = request.ProjectId;
             var uri = request.Uri;
@@ -99,7 +100,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             {
                 return variableTypesListResult;
             }
-            var variableTypes = variableTypesListResult.Value as List<ApiVariableTypeModel>;
+            var variableTypes = variableTypesListResult.Value as List<VariableTypeResponse>;
             var existingVariableType = variableTypes.FirstOrDefault(x => x.DisplayName == request.DisplayName);
 
             if (existingVariableType != null)
@@ -116,7 +117,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             var newVariableTypeModel = new VariableTypeModel
             {
                 NodeSet = activeNodesetModel,
-                NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                NodeId = UaNodeResponse.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
                 SuperType = activeProjectInstance.GetNodeModelByNodeId(request.SuperTypeNodeId) as VariableTypeModel,
                 DisplayName = new List<NodeModel.LocalizedText> { request.DisplayName == null ? "" : request.DisplayName },
                 BrowseName = request.BrowseName,
@@ -125,7 +126,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
 
             activeNodesetModel.VariableTypes.Add(newVariableTypeModel);
             activeNodesetModel.UpdateIndices();
-            return Ok(new ApiVariableTypeModel(newVariableTypeModel));
+            return Ok(new VariableTypeResponse(newVariableTypeModel));
         }
     }
 }

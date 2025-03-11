@@ -2,19 +2,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Opc.Ua;
-using Opc.Ua.Export;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Xml.Linq;
 
-namespace OPC_UA_Nodeset_WebAPI.Model.v1
+namespace OPC_UA_Nodeset_WebAPI.Model.v1.Requests
 {
-    public class ApiNewVariableTypeModel
+    public class ObjectRequest
     {
         public string ProjectId { get; set; }
 
         public string Uri { get; set; }
 
-        public string SuperTypeNodeId { get; set; }
+        public string ParentNodeId { get; set; }
+
+        public string TypeDefinitionNodeId { get; set; }
 
         public string DisplayName { get; set; }
 
@@ -22,8 +23,10 @@ namespace OPC_UA_Nodeset_WebAPI.Model.v1
 
         public string? Description { get; set; }
 
+        public bool? GenerateChildren { get; set; }
 
-        public ApiNewVariableTypeModel() { }
+
+        public ObjectRequest() { }
 
 
     }

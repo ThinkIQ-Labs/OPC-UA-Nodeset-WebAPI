@@ -1,7 +1,7 @@
 ﻿using System.Xml.Serialization;
 using System.Xml;
 using System.Reflection.PortableExecutable;
-using OPC_UA_Nodeset_WebAPI.Model.v1;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
 
 namespace Opc.Ua.Export.v1.Responses
 {
@@ -66,16 +66,16 @@ namespace Opc.Ua.Export.v1.Responses
         public IFormFile? File { get; set; }
         public string? FileName { get; set; }
         public string? XmlBase64 { get; set; }
-        public ApiNodeSetInfo? apiNodeSetInfo { get; set; }
+        public NodeSetInfoResponse? apiNodeSetInfo { get; set; }
     }
 
     public class ApiCombinedResponse
     {
-        public List<ApiObjectTypeModel> ObjectTypes { get; set; }
-        public List<ApiDataVariableModel> DataVariables { get; set; }
-        public List<ApiPropertyModel> Properties { get; set; }
-        public List<ApiVariableTypeModel> VariableTypes { get; set; }
-        public List<ApiDataTypeModel> DataTypes { get; set; }
+        public List<ObjectTypeResponse> ObjectTypes { get; set; }
+        public List<DataVariableResponse> DataVariables { get; set; }
+        public List<PropertyResponse> Properties { get; set; }
+        public List<VariableTypeResponse> VariableTypes { get; set; }
+        public List<DataTypeResponse> DataTypes { get; set; }
         public List<ObjectModelResponse> Objects { get; set; }
     }
 }

@@ -2,10 +2,11 @@ using CESMII.OpcUa.NodeSetModel;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Mvc;
 using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Requests;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Collections.Concurrent;
 using System.Linq;
-using Opc.Ua.Export.v1;
+using Opc.Ua.Export.v1.Responses;
 
 namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
 {
@@ -44,11 +45,11 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
 
             var combinedResponse = new ApiCombinedResponse
             {
-                ObjectTypes = PopulateList(activeNodesetModel.ObjectTypes, objectType => new ApiObjectTypeModel(objectType)),
-                DataVariables = PopulateList(activeNodesetModel.GetDataVariables(), dataVariable => new ApiDataVariableModel(dataVariable)),
-                Properties = PopulateList(activeNodesetModel.GetProperties(), property => new ApiPropertyModel(property)),
-                VariableTypes = PopulateList(activeNodesetModel.VariableTypes, variableType => new ApiVariableTypeModel(variableType)),
-                DataTypes = PopulateList(activeNodesetModel.DataTypes, dataType => new ApiDataTypeModel(dataType)),
+                ObjectTypes = PopulateList(activeNodesetModel.ObjectTypes, objectType => new ObjectTypeResponse(objectType)),
+                DataVariables = PopulateList(activeNodesetModel.GetDataVariables(), dataVariable => new DataVariableResponse(dataVariable)),
+                Properties = PopulateList(activeNodesetModel.GetProperties(), property => new PropertyResponse(property)),
+                VariableTypes = PopulateList(activeNodesetModel.VariableTypes, variableType => new VariableTypeResponse(variableType)),
+                DataTypes = PopulateList(activeNodesetModel.DataTypes, dataType => new DataTypeResponse(dataType)),
                 Objects = PopulateList(activeNodesetModel.GetObjects(), objectModel => new ObjectModelResponse(objectModel))
             };
 

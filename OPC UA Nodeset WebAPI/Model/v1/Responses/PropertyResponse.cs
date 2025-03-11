@@ -6,7 +6,7 @@ using System.Xml.Linq;
 
 namespace OPC_UA_Nodeset_WebAPI.Model.v1.Responses
 {
-    public class ApiPropertyModel : ApiUaNodeModel
+    public class PropertyResponse : UaNodeResponse
     {
         public string ParentNodeId { get; set; }
         public string DataTypeNodeId { get; set; }
@@ -19,10 +19,10 @@ namespace OPC_UA_Nodeset_WebAPI.Model.v1.Responses
 
         internal NodeModel ParentModel { get; set; }
         internal PropertyModel PropertyModel { get; set; }
-        public ApiPropertyModel() { }
+        public PropertyResponse() { }
 
 
-        public ApiPropertyModel(VariableModel aVariableModel)
+        public PropertyResponse(VariableModel aVariableModel)
         {
             PropertyModel = aVariableModel as PropertyModel;
             NodeId = aVariableModel.NodeId;

@@ -4,9 +4,9 @@ using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Reflection.Metadata.Ecma335;
 using System.Xml.Linq;
 
-namespace OPC_UA_Nodeset_WebAPI.Model.v1
+namespace OPC_UA_Nodeset_WebAPI.Model.v1.Responses
 {
-    public class ApiVariableTypeModel : ApiUaNodeModel
+    public class VariableTypeResponse : UaNodeResponse
     {
         public int PropertiesCount { get; set; }
         public int DataVariablesCount { get; set; }
@@ -17,9 +17,9 @@ namespace OPC_UA_Nodeset_WebAPI.Model.v1
         public List<string> DataVariablesNodeIds { get; set; }
         public List<string> ObjectsNodeIds { get; set; }
         internal VariableTypeModel? VariableTypeModel { get; set; }
-        public ApiVariableTypeModel() { }
+        public VariableTypeResponse() { }
 
-        public ApiVariableTypeModel(VariableTypeModel aVariableTypeModel)
+        public VariableTypeResponse(VariableTypeModel aVariableTypeModel)
         {
             VariableTypeModel = aVariableTypeModel;
             NodeId = aVariableTypeModel.NodeId;

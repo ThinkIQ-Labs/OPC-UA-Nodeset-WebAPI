@@ -13,8 +13,8 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
     public class ApplicationInstance : ControllerBase
     {
         public ConcurrentDictionary<string, NodeSetProjectInstance> NodeSetProjectInstances { get; } = new ConcurrentDictionary<string, NodeSetProjectInstance>();
-        private ConcurrentDictionary<string, ApiNodeSetInfoWithDependencies> _localNodesets { get; set; }
-        public ConcurrentDictionary<string, ApiNodeSetInfoWithDependencies> LocalNodesets
+        private ConcurrentDictionary<string, NodeSetInfoWithDependenciesResponse> _localNodesets { get; set; }
+        public ConcurrentDictionary<string, NodeSetInfoWithDependenciesResponse> LocalNodesets
         {
             get
             {
@@ -32,14 +32,14 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
 
         public void ScanNodesetFiles()
         {
-            _localNodesets = new ConcurrentDictionary<string, ApiNodeSetInfoWithDependencies>();
+            _localNodesets = new ConcurrentDictionary<string, NodeSetInfoWithDependenciesResponse>();
             var allLocalNodesetFiles = Directory.GetFiles($"{AppContext.BaseDirectory}/NodeSets");
             foreach (var aFile in allLocalNodesetFiles)
             {
                 //_localNodesets.Add(file, new List<string>());
                 string aXmlString = System.IO.File.ReadAllText(aFile);
                 var aNodeSet = UANodeSetFromString.Read(aXmlString);
-                _localNodesets.TryAdd(Path.GetFileName(aFile), new ApiNodeSetInfoWithDependencies(aNodeSet));
+                _localNodesets.TryAdd(Path.GetFileName(aFile), new NodeSetInfoWithDependenciesResponse(aNodeSet));
             }
         }
 
@@ -97,7 +97,7 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
                 else
                 {
                     var aNodeModel = aNodeModelCandidates.First().Value;
-                    ApiUaNodeModel returnObject = null;
+                    UaNodeResponse returnObject = null;
                     switch (aNodeModel)
                     {
                         case DataTypeModel aModel:
@@ -113,7 +113,7 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
                             returnObject = new ObjectTypeResponse(aModel as ObjectTypeModel);
                             break;
                         case PropertyModel aModel:
-                            returnObject = new ApiPropertyModel(aModel as PropertyModel);
+                            returnObject = new PropertyResponse(aModel as PropertyModel);
                             break;
                         case VariableTypeModel aModel:
                             returnObject = new VariableTypeResponse(aModel as VariableTypeModel);
