@@ -6,21 +6,21 @@ using Opc.Ua.Export;
 using System.Reflection;
 using System.Text.Json.Serialization;
 
-namespace OPC_UA_Nodeset_WebAPI.Model.v1
+namespace OPC_UA_Nodeset_WebAPI.Model.v1.Responses
 {
-    public class ApiNodeSetInfo
+    public class NodeSetInfoResponse
     {
         public string? ModelUri { get; set; }
 
         public string? Version { get; set; }
         public DateTime? PublicationDate { get; set; }
 
-        public ApiNodeSetInfo()
+        public NodeSetInfoResponse()
         {
 
         }
 
-        public ApiNodeSetInfo(UANodeSet aNodeSet)
+        public NodeSetInfoResponse(UANodeSet aNodeSet)
         {
             ModelUri = aNodeSet.Models.First().ModelUri;
             Version = aNodeSet.Models.First().Version;

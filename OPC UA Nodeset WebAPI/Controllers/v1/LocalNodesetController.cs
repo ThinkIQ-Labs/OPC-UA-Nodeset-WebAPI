@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Opc.Ua.Export;
-using OPC_UA_Nodeset_WebAPI.Model.v1;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System;
 using System.Collections.Concurrent;
@@ -32,7 +32,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         /// <returns>Returns a dictionary with nodeset metadata where the file name is used as key.</returns>
         /// <response code="200">The nodesets locally available were successfully listed.</response>
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(ConcurrentDictionary<string, ApiNodeSetInfoWithDependencies>))]
+        [ProducesResponseType(200, Type = typeof(ConcurrentDictionary<string, NodeSetInfoWithDependenciesResponse>))]
         public IActionResult ListNodesetsOnServer()
         {
             return Ok(ApplicationInstance.LocalNodesets);
@@ -45,7 +45,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         /// <response code="200">The nodesets locally available were successfully delivered.</response>
         [HttpGet("{fileName}")]
         [Produces("application/xml")]
-        [ProducesResponseType(200, Type = typeof(ConcurrentDictionary<string, ApiNodeSetInfoWithDependencies>))]
+        [ProducesResponseType(200, Type = typeof(ConcurrentDictionary<string, NodeSetInfoWithDependenciesResponse>))]
         public IActionResult LocalNodesetXML(string fileName)
         {
             var filePath = $"{AppContext.BaseDirectory}/NodeSets/{fileName}";
@@ -65,7 +65,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         /// <response code="200">The nodeset was successfully deleted from the server.</response>
         /// <response code="404">The nodeset was not found on the server.</response>
         [HttpDelete("{fileName}")]
-        [ProducesResponseType(200, Type = typeof(ConcurrentDictionary<string, ApiNodeSetInfoWithDependencies>))]
+        [ProducesResponseType(200, Type = typeof(ConcurrentDictionary<string, NodeSetInfoWithDependenciesResponse>))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult Destroy(string fileName)
         {
@@ -88,7 +88,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         /// <response code="400">The nodeset could not be loaded.</response>
         //https://medium.com/@niteshsinghal85/testing-file-upload-with-swagger-in-asp-net-core-90269bc24fe8
         [HttpPut("upload-xml-from-file-async")]
-        [ProducesResponseType(200, Type = typeof(ApiNodeSetInfoWithDependencies))]
+        [ProducesResponseType(200, Type = typeof(NodeSetInfoWithDependenciesResponse))]
         [ProducesResponseType(400, Type = typeof(BadRequestResult))]
         public async Task<IActionResult> UploadNodesetXmlFromFileAsync(IFormFile file)
         {
@@ -105,7 +105,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                 // we saved a file. now we need to verify it's a legit nodeset
                 string aXmlString = System.IO.File.ReadAllText(filePath);
                 var aNodeSet = UANodeSetFromString.Read(aXmlString);
-                var returnObject = new ApiNodeSetInfoWithDependencies(aNodeSet);
+                var returnObject = new NodeSetInfoWithDependenciesResponse(aNodeSet);
 
                 // since we added a nodeset we have to update the listing of all available nodesets
                 ApplicationInstance.ScanNodesetFiles();
@@ -132,7 +132,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         /// <response code="400">The nodeset could not be loaded.</response>
         //https://medium.com/@niteshsinghal85/testing-file-upload-with-swagger-in-asp-net-core-90269bc24fe8
         [HttpPost("upload-xml-from-base-64")]
-        [ProducesResponseType(200, Type = typeof(ApiNodeSetInfoWithDependencies))]
+        [ProducesResponseType(200, Type = typeof(NodeSetInfoWithDependenciesResponse))]
         [ProducesResponseType(400, Type = typeof(BadRequestResult))]
         public async Task<IActionResult> UploadNodesetXmlFromBase64([FromBody] UANodeSetBase64Upload request)
         {
@@ -150,7 +150,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                 // we saved a file. now we need to verify it's a legit nodeset
                 string aXmlString = System.IO.File.ReadAllText(filePath);
                 var aNodeSet = UANodeSetFromString.Read(aXmlString);
-                var returnObject = new ApiNodeSetInfoWithDependencies(aNodeSet);
+                var returnObject = new NodeSetInfoWithDependenciesResponse(aNodeSet);
 
                 // since we added a nodeset we have to update the listing of all available nodesets
                 ApplicationInstance.ScanNodesetFiles();
@@ -178,7 +178,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         /// <response code="400">The nodeset could not be loaded.</response>
         //https://medium.com/@niteshsinghal85/testing-file-upload-with-swagger-in-asp-net-core-90269bc24fe8
         [HttpPost("get-info-xml-from-base-64")]
-        [ProducesResponseType(200, Type = typeof(ApiNodeSetInfoWithDependencies))]
+        [ProducesResponseType(200, Type = typeof(NodeSetInfoWithDependenciesResponse))]
         [ProducesResponseType(400, Type = typeof(BadRequestResult))]
         public async Task<IActionResult> GetInfoNodesetXmlFromBase64([FromBody] UANodeSetBase64Upload request)
         {
@@ -196,7 +196,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                 // we saved a file. now we need to verify it's a legit nodeset
                 string aXmlString = System.IO.File.ReadAllText(filePath);
                 var aNodeSet = UANodeSetFromString.Read(aXmlString);
-                var returnObject = new ApiNodeSetInfoWithDependencies(aNodeSet);
+                var returnObject = new NodeSetInfoWithDependenciesResponse(aNodeSet);
 
                 System.IO.File.Delete(filePath);
 

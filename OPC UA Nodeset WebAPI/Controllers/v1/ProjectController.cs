@@ -1,7 +1,7 @@
 using CESMII.OpcUa.NodeSetModel;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Mvc;
-using OPC_UA_Nodeset_WebAPI.Model.v1;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Collections.Concurrent;
 using System.Linq;
@@ -30,13 +30,13 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         /// <returns>Returns a dictionary of current projects.</returns>
         /// <response code="200">All nodeset projects were successfully retrieved.</response>
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiNodeSetProject>))]
+        [ProducesResponseType(200, Type = typeof(Dictionary<string, NodeSetProjectResponse>))]
         public IActionResult Index()
         {
-            var returnObject = new Dictionary<string, ApiNodeSetProject>();
+            var returnObject = new Dictionary<string, NodeSetProjectResponse>();
             foreach (var aKeyValue in ApplicationInstance.NodeSetProjectInstances)
             {
-                returnObject.Add(aKeyValue.Key, new ApiNodeSetProject(aKeyValue.Value));
+                returnObject.Add(aKeyValue.Key, new NodeSetProjectResponse(aKeyValue.Value));
             }
             return Ok(returnObject);
         }
@@ -49,7 +49,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         /// <response code="200">Project was successfully created.</response>
         /// <response code="400">The project was not created.</response>
         [HttpPost]
-        [ProducesResponseType(200, Type = typeof(List<ApiNodeSetProject>))]
+        [ProducesResponseType(200, Type = typeof(List<NodeSetProjectResponse>))]
         [ProducesResponseType(400, Type = typeof(BadRequestResult))]
         public IActionResult Store([FromBody] NodesetRequest request)
         {
@@ -67,7 +67,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             if (result)
             {
                 var getByIdResult = GetById(key) as OkObjectResult;
-                var aNodesetProject = getByIdResult.Value as Dictionary<string, ApiNodeSetProject>;
+                var aNodesetProject = getByIdResult.Value as Dictionary<string, NodeSetProjectResponse>;
                 aNodesetProject.First().Value.AddToLog($"Project '{name}'({aNodesetProject.First().Key}) created successfully.");
 
                 return Ok(aNodesetProject.First().Value);
@@ -84,7 +84,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         /// <response code="200">The nodeset project was successfully retrieved.</response>
         /// <response code="404">The project id was not valid.</response>
         [HttpGet("{id}")]
-        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiNodeSetProject>))]
+        [ProducesResponseType(200, Type = typeof(Dictionary<string, NodeSetProjectResponse>))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetById(string id)
         {
@@ -92,7 +92,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             var projectExists = ApplicationInstance.NodeSetProjectInstances.TryGetValue(id, out aNodesetProjectInstance);
             if (projectExists)
             {
-                return Ok(new Dictionary<string, ApiNodeSetProject> { { id, new ApiNodeSetProject(aNodesetProjectInstance) } });
+                return Ok(new Dictionary<string, NodeSetProjectResponse> { { id, new NodeSetProjectResponse(aNodesetProjectInstance) } });
             }
             return NotFound($"{id} - not a valid project id.");
         }
@@ -128,7 +128,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                     result = ApplicationInstance.NodeSetProjectInstances.TryRemove(id, out aNodesetProjectInstance);
                     if (result)
                     {
-                        var aNodesetProject = new Dictionary<string, ApiNodeSetProject> { { id, new ApiNodeSetProject(aNodesetProjectInstance) } };
+                        var aNodesetProject = new Dictionary<string, NodeSetProjectResponse> { { id, new NodeSetProjectResponse(aNodesetProjectInstance) } };
                         aNodesetProject.First().Value.AddToLog($"Project '{aNodesetProject.First().Value.Name}'({id}) deleted successfully.");
                         return Ok($"{id} - project was successfully deleted.");
                     }

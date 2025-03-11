@@ -6,25 +6,25 @@ using Opc.Ua;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Xml.Linq;
 
-namespace OPC_UA_Nodeset_WebAPI.Model.v1
+namespace OPC_UA_Nodeset_WebAPI.Model.v1.Responses
 {
-    public class ApiObjectModel : ApiUaNodeModel
+    public class ObjectModelResponse : ApiUaNodeModel
     {
         public string ParentNodeId { get; set; }
 
         public string TypeDefinitionNodeId { get; set; }
 
-        public List<ApiNodeAndReferenceModel> AllReferencedNodes { get; set; }
-        public List<ApiNodeAndReferenceModel> OtherReferencedNodes { get; set; }
-        public List<ApiNodeAndReferenceModel> OtherReferencingNodes { get; set; }
+        public List<NodeAndReferenceResponse> AllReferencedNodes { get; set; }
+        public List<NodeAndReferenceResponse> OtherReferencedNodes { get; set; }
+        public List<NodeAndReferenceResponse> OtherReferencingNodes { get; set; }
 
         internal ObjectModel? ObjectModel { get; set; }
         internal ObjectTypeModel? TypeDefinition { get; set; }
         internal NodeModel? ParentNodeModel { get; set; }
 
-        public ApiObjectModel() { }
+        public ObjectModelResponse() { }
 
-        public ApiObjectModel(ObjectModel aObjectModel)
+        public ObjectModelResponse(ObjectModel aObjectModel)
         {
             ObjectModel = aObjectModel;
             NodeId = aObjectModel.NodeId;
@@ -38,25 +38,25 @@ namespace OPC_UA_Nodeset_WebAPI.Model.v1
             ParentNodeModel = aObjectModel.Parent == null ? null : aObjectModel.Parent;
             ParentNodeId = aObjectModel.Parent == null ? "" : aObjectModel.Parent.NodeId;
 
-            AllReferencedNodes = new List<ApiNodeAndReferenceModel>();
+            AllReferencedNodes = new List<NodeAndReferenceResponse>();
             if (aObjectModel.AllReferencedNodes.Count() > 0)
             {
                 foreach (var aReference in aObjectModel.AllReferencedNodes)
                 {
-                    AllReferencedNodes.Add(new ApiNodeAndReferenceModel(aReference));
+                    AllReferencedNodes.Add(new NodeAndReferenceResponse(aReference));
                 }
             }
 
-            OtherReferencedNodes = new List<ApiNodeAndReferenceModel>();
+            OtherReferencedNodes = new List<NodeAndReferenceResponse>();
             foreach (var aReference in aObjectModel.OtherReferencedNodes)
             {
-                OtherReferencedNodes.Add(new ApiNodeAndReferenceModel(aReference));
+                OtherReferencedNodes.Add(new NodeAndReferenceResponse(aReference));
             }
 
-            OtherReferencingNodes = new List<ApiNodeAndReferenceModel>();
+            OtherReferencingNodes = new List<NodeAndReferenceResponse>();
             foreach (var aReference in aObjectModel.OtherReferencingNodes)
             {
-                OtherReferencingNodes.Add(new ApiNodeAndReferenceModel(aReference));
+                OtherReferencingNodes.Add(new NodeAndReferenceResponse(aReference));
             }
         }
 

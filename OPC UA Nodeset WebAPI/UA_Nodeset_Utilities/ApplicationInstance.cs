@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Opc.Ua.Export;
 using Opc.Ua;
-using OPC_UA_Nodeset_WebAPI.Model;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
 using System.Collections.Concurrent;
 using System.Reflection.PortableExecutable;
 using System.Web;
@@ -101,22 +101,22 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
                     switch (aNodeModel)
                     {
                         case DataTypeModel aModel:
-                            returnObject = new ApiDataTypeModel(aModel as DataTypeModel);
+                            returnObject = new DataTypeResponse(aModel as DataTypeModel);
                             break;
                         case DataVariableModel aModel:
-                            returnObject = new ApiDataVariableModel(aModel as DataVariableModel);
+                            returnObject = new DataVariableResponse(aModel as DataVariableModel);
                             break;
                         case ObjectModel aModel:
-                            returnObject = new ApiObjectModel(aModel as ObjectModel);
+                            returnObject = new ObjectModelResponse(aModel as ObjectModel);
                             break;
                         case ObjectTypeModel aModel:
-                            returnObject = new ApiObjectTypeModel(aModel as ObjectTypeModel);
+                            returnObject = new ObjectTypeResponse(aModel as ObjectTypeModel);
                             break;
                         case PropertyModel aModel:
                             returnObject = new ApiPropertyModel(aModel as PropertyModel);
                             break;
                         case VariableTypeModel aModel:
-                            returnObject = new ApiVariableTypeModel(aModel as VariableTypeModel);
+                            returnObject = new VariableTypeResponse(aModel as VariableTypeModel);
                             break;
                         default:
                             returnObject = null;

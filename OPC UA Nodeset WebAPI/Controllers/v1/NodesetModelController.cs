@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Opc.Ua;
 using Opc.Ua.Export;
-using OPC_UA_Nodeset_WebAPI.Model.v1;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System;
 using System.Collections.Concurrent;
@@ -40,7 +40,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         /// <response code="200">All nodeset models were successfully retrieved for a nodeset project.</response>
         /// <response code="404">The project id was not valid.</response>
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiNodeSetModel>))]
+        [ProducesResponseType(200, Type = typeof(Dictionary<string, NodeSetModelResponse>))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetById(string id)
         {
@@ -51,10 +51,10 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                 return activeNodesetProjectInstanceResult;
             }
             var activeNodeSetProjectInstance = activeNodesetProjectInstanceResult.Value as NodeSetProjectInstance;
-            var returnObject = new Dictionary<string, ApiNodeSetModel>();
+            var returnObject = new Dictionary<string, NodeSetModelResponse>();
             foreach (var aNodeSetKeyValue in activeNodeSetProjectInstance.NodeSetModels)
             {
-                returnObject.Add(aNodeSetKeyValue.Key.Replace("/", ""), new ApiNodeSetModel(aNodeSetKeyValue.Value));
+                returnObject.Add(aNodeSetKeyValue.Key.Replace("/", ""), new NodeSetModelResponse(aNodeSetKeyValue.Value));
             }
             return Ok(returnObject);
         }
@@ -68,7 +68,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         /// <response code="400">The nodeset could not be loaded.</response>
         /// <response code="404">The project id was not valid.</response>
         [HttpPost("load-xml-from-server-async")]
-        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiNodeSetModel>))]
+        [ProducesResponseType(200, Type = typeof(Dictionary<string, NodeSetModelResponse>))]
         [ProducesResponseType(400, Type = typeof(BadRequestResult))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public async Task<IActionResult> LoadNodesetXmlFromServerAsync([FromBody] NodesetFile request)
@@ -87,7 +87,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         /// <response code="404">The project id was not valid.</response>
         //https://medium.com/@niteshsinghal85/testing-file-upload-with-swagger-in-asp-net-core-90269bc24fe8
         [HttpPost("upload-xml-from-file-async")]
-        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiNodeSetModel>))]
+        [ProducesResponseType(200, Type = typeof(Dictionary<string, NodeSetModelResponse>))]
         [ProducesResponseType(400, Type = typeof(BadRequestResult))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         // https://stackoverflow.com/questions/38698350/increase-upload-file-size-in-asp-net-core
@@ -119,7 +119,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         /// <response code="404">The project id was not valid.</response>
         //https://medium.com/@niteshsinghal85/testing-file-upload-with-swagger-in-asp-net-core-90269bc24fe8
         [HttpPost("upload-xml-from-base-64")]
-        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiNodeSetModel>))]
+        [ProducesResponseType(200, Type = typeof(Dictionary<string, NodeSetModelResponse>))]
         [ProducesResponseType(400, Type = typeof(BadRequestResult))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         // https://stackoverflow.com/questions/38698350/increase-upload-file-size-in-asp-net-core
@@ -151,7 +151,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         /// <response code="400">The nodeset could not be loaded.</response>
         /// <response code="404">The project id was not valid.</response>
         [HttpPost]
-        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiNodeSetModel>))]
+        [ProducesResponseType(200, Type = typeof(Dictionary<string, NodeSetModelResponse>))]
         [ProducesResponseType(400, Type = typeof(BadRequestResult))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public async Task<IActionResult> HttpPost([FromBody] NodesetFile request)
@@ -178,9 +178,9 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             activeNodeSetProjectInstance.NodeSetModels[modelUriResultString].PublicationDate = apiNodeSetInfo.PublicationDate;
             activeNodeSetProjectInstance.NodeSetModels[modelUriResultString].Version = apiNodeSetInfo.Version;
 
-            var aNodesetModel = new ApiNodeSetModel(activeNodeSetProjectInstance.NodeSetModels[modelUriResultString]);
+            var aNodesetModel = new NodeSetModelResponse(activeNodeSetProjectInstance.NodeSetModels[modelUriResultString]);
             activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Success: Add new NodeSetModel '{apiNodeSetInfo.ModelUri}'.");
-            return Ok(new Dictionary<string, ApiNodeSetModel> { { modelUriResultString.Replace("/", ""), aNodesetModel } });
+            return Ok(new Dictionary<string, NodeSetModelResponse> { { modelUriResultString.Replace("/", ""), aNodesetModel } });
         }
 
         /// <summary>
@@ -190,7 +190,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         /// <response code="200">The nodeset was successfully delivered.</response>
         [HttpPost("generate-xml")]
         [Produces("application/xml")]
-        [ProducesResponseType(200, Type = typeof(ConcurrentDictionary<string, ApiNodeSetInfoWithDependencies>))]
+        [ProducesResponseType(200, Type = typeof(ConcurrentDictionary<string, NodeSetInfoWithDependenciesResponse>))]
         public IActionResult GenerateXml([FromBody] NodesetFile request)
         {
             if (request.Uri == null)
@@ -246,9 +246,9 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                 return BadRequest($"{uri} - {modelUriResultString}");
             }
 
-            var aNodesetModel = new ApiNodeSetModel(activeNodeSetProjectInstance.NodeSetModels[modelUriResultString]);
+            var aNodesetModel = new NodeSetModelResponse(activeNodeSetProjectInstance.NodeSetModels[modelUriResultString]);
             activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Success: Add NodeSetModel from file '{uri}'.");
-            return Ok(new Dictionary<string, ApiNodeSetModel> { { modelUriResultString.Replace("/", ""), aNodesetModel } });
+            return Ok(new Dictionary<string, NodeSetModelResponse> { { modelUriResultString.Replace("/", ""), aNodesetModel } });
         }
     }
 }

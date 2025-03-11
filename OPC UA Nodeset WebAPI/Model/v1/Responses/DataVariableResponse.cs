@@ -5,9 +5,9 @@ using Opc.Ua;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Xml.Linq;
 
-namespace OPC_UA_Nodeset_WebAPI.Model.v1
+namespace OPC_UA_Nodeset_WebAPI.Model.v1.Responses
 {
-    public class ApiDataVariableModel : ApiUaNodeModel
+    public class DataVariableResponse : ApiUaNodeModel
     {
         public string ParentNodeId { get; set; }
         public string? DataTypeNodeId { get; set; }
@@ -16,15 +16,15 @@ namespace OPC_UA_Nodeset_WebAPI.Model.v1
         public object MinValue { get; set; }
         public object MaxValue { get; set; }
         public Dictionary<string, object> EngineeringUnit { get; set; } = new Dictionary<string, object>();
-        public List<ApiNodeAndReferenceModel> AllReferencedNodes { get; set; }
-        public List<ApiNodeAndReferenceModel> OtherReferencedNodes { get; set; }
-        public List<ApiNodeAndReferenceModel> OtherReferencingNodes { get; set; }
+        public List<NodeAndReferenceResponse> AllReferencedNodes { get; set; }
+        public List<NodeAndReferenceResponse> OtherReferencedNodes { get; set; }
+        public List<NodeAndReferenceResponse> OtherReferencingNodes { get; set; }
 
         internal NodeModel? ParentModel { get; set; }
         internal DataVariableModel? DataVariableModel { get; set; }
-        public ApiDataVariableModel() { }
+        public DataVariableResponse() { }
 
-        public ApiDataVariableModel(VariableModel aVariableModel)
+        public DataVariableResponse(VariableModel aVariableModel)
         {
             DataVariableModel = aVariableModel as DataVariableModel;
             NodeId = aVariableModel.NodeId;
@@ -55,25 +55,25 @@ namespace OPC_UA_Nodeset_WebAPI.Model.v1
             }
             EngineeringUnit = engineeringUnitProperties;
 
-            AllReferencedNodes = new List<ApiNodeAndReferenceModel>();
+            AllReferencedNodes = new List<NodeAndReferenceResponse>();
             if (aVariableModel.AllReferencedNodes.Count() > 0)
             {
                 foreach (var aReference in aVariableModel.AllReferencedNodes)
                 {
-                    AllReferencedNodes.Add(new ApiNodeAndReferenceModel(aReference));
+                    AllReferencedNodes.Add(new NodeAndReferenceResponse(aReference));
                 }
             }
 
-            OtherReferencedNodes = new List<ApiNodeAndReferenceModel>();
+            OtherReferencedNodes = new List<NodeAndReferenceResponse>();
             foreach (var aReference in aVariableModel.OtherReferencedNodes)
             {
-                OtherReferencedNodes.Add(new ApiNodeAndReferenceModel(aReference));
+                OtherReferencedNodes.Add(new NodeAndReferenceResponse(aReference));
             }
 
-            OtherReferencingNodes = new List<ApiNodeAndReferenceModel>();
+            OtherReferencingNodes = new List<NodeAndReferenceResponse>();
             foreach (var aReference in aVariableModel.OtherReferencingNodes)
             {
-                OtherReferencingNodes.Add(new ApiNodeAndReferenceModel(aReference));
+                OtherReferencingNodes.Add(new NodeAndReferenceResponse(aReference));
             }
 
             if (aVariableModel.Value != null)

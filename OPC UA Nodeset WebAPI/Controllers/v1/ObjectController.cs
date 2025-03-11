@@ -1,6 +1,6 @@
 ﻿using CESMII.OpcUa.NodeSetModel;
 using Microsoft.AspNetCore.Mvc;
-using OPC_UA_Nodeset_WebAPI.Model.v1;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Web;
 
@@ -21,7 +21,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         }
 
         [HttpGet("{id}/{uri}")]
-        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiObjectModel>))]
+        [ProducesResponseType(200, Type = typeof(Dictionary<string, ObjectModelResponse>))]
         public IActionResult Get(string id, string uri)
         {
             var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
@@ -33,17 +33,17 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             else
             {
                 var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
-                var returnObject = new List<ApiObjectModel>();
+                var returnObject = new List<ObjectModelResponse>();
                 foreach (var aObject in activeNodesetModel.GetObjects())
                 {
-                    returnObject.Add(new ApiObjectModel(aObject));
+                    returnObject.Add(new ObjectModelResponse(aObject));
                 }
                 return Ok(returnObject);
             }
         }
 
         [HttpGet("{nodeId}")]
-        [ProducesResponseType(200, Type = typeof(ApiObjectModel))]
+        [ProducesResponseType(200, Type = typeof(ObjectModelResponse))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetByNodeId(string id, string uri, string nodeId)
         {
@@ -52,7 +52,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         }
 
         [HttpGet("ByDisplayName/{displayName}")]
-        [ProducesResponseType(200, Type = typeof(List<ApiObjectModel>))]
+        [ProducesResponseType(200, Type = typeof(List<ObjectModelResponse>))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetByDisplayName(string id, string uri, string displayName)
         {
@@ -64,14 +64,14 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             }
             else
             {
-                var objectsList = objectsListResult.Value as List<ApiObjectModel>;
+                var objectsList = objectsListResult.Value as List<ObjectModelResponse>;
                 var returnObject = objectsList.Where(x => x.DisplayName == displayName).ToList();
                 return Ok(returnObject);
             }
         }
 
         [HttpPost]
-        [ProducesResponseType(200, Type = typeof(ApiObjectModel))]
+        [ProducesResponseType(200, Type = typeof(ObjectModelResponse))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public async Task<IActionResult> HttpPost([FromBody] ApiNewObjectModel request)
         {
@@ -84,7 +84,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                 return objectsListResult;
             }
 
-            var objects = objectsListResult.Value as List<ApiObjectModel>;
+            var objects = objectsListResult.Value as List<ObjectModelResponse>;
             var existingObject = objects.Where(x => x.ParentNodeId == request.ParentNodeId).FirstOrDefault(x => x.DisplayName == request.DisplayName);
 
             if (existingObject != null)
@@ -159,7 +159,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
 
             activeNodesetModel.Objects.Add(newObjectModel);
             activeNodesetModel.UpdateIndices();
-            return Ok(new ApiObjectModel(newObjectModel));
+            return Ok(new ObjectModelResponse(newObjectModel));
         }
     }
 }

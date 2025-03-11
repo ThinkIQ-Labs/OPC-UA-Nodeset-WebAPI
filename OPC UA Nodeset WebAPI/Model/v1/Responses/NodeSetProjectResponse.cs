@@ -6,9 +6,9 @@ using Opc.Ua.Export;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System;
 
-namespace OPC_UA_Nodeset_WebAPI.Model.v1
+namespace OPC_UA_Nodeset_WebAPI.Model.v1.Responses
 {
-    public class ApiNodeSetProject
+    public class NodeSetProjectResponse
     {
         public string ProjectId { get; set; }
         public string Name { get; set; }
@@ -22,8 +22,8 @@ namespace OPC_UA_Nodeset_WebAPI.Model.v1
 
         public int NodeSetModelCount { get; set; }
 
-        public ApiNodeSetProject() { }
-        public ApiNodeSetProject(NodeSetProjectInstance aNodesetProjectInstance)
+        public NodeSetProjectResponse() { }
+        public NodeSetProjectResponse(NodeSetProjectInstance aNodesetProjectInstance)
         {
             ProjectId = aNodesetProjectInstance.ProjectId;
             Name = aNodesetProjectInstance.Name;

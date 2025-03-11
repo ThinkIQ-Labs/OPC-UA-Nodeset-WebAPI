@@ -2,6 +2,7 @@
 
 namespace OPC_UA_Nodeset_WebAPI.Model
 {
+
     public class ApiNodeAndReferenceModel
     {
         public string NodeId { get; set; }

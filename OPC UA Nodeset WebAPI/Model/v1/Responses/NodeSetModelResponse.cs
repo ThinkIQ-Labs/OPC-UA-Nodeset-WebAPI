@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OPC_UA_Nodeset_WebAPI.Model.v1
 {
-    public class ApiNodeSetModel
+    public class NodeSetModelResponse
     {
         public string? ModelUri { get; set; }
 
@@ -24,8 +24,8 @@ namespace OPC_UA_Nodeset_WebAPI.Model.v1
 
         internal NodeSetModel? NodeSetModel { get; set; }
 
-        public ApiNodeSetModel() { }
-        public ApiNodeSetModel(NodeSetModel aNodeSetModel)
+        public NodeSetModelResponse() { }
+        public NodeSetModelResponse(NodeSetModel aNodeSetModel)
         {
             NodeSetModel = aNodeSetModel;
             ModelUri = aNodeSetModel.ModelUri;

@@ -1,7 +1,7 @@
 using CESMII.OpcUa.NodeSetModel;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Mvc;
-using OPC_UA_Nodeset_WebAPI.Model.v1;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Collections.Concurrent;
 using System.Linq;
@@ -49,7 +49,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                 Properties = PopulateList(activeNodesetModel.GetProperties(), property => new ApiPropertyModel(property)),
                 VariableTypes = PopulateList(activeNodesetModel.VariableTypes, variableType => new ApiVariableTypeModel(variableType)),
                 DataTypes = PopulateList(activeNodesetModel.DataTypes, dataType => new ApiDataTypeModel(dataType)),
-                Objects = PopulateList(activeNodesetModel.GetObjects(), objectModel => new ApiObjectModel(objectModel))
+                Objects = PopulateList(activeNodesetModel.GetObjects(), objectModel => new ObjectModelResponse(objectModel))
             };
 
             return Ok(combinedResponse);

@@ -3,9 +3,9 @@ using Opc.Ua.Export;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Xml.Linq;
 
-namespace OPC_UA_Nodeset_WebAPI.Model.v1
+namespace OPC_UA_Nodeset_WebAPI.Model.v1.Responses
 {
-    public class ApiDataTypeModel : ApiUaNodeModel
+    public class DataTypeResponse : ApiUaNodeModel
     {
         public string SuperTypeNodeId { get; set; }
         public List<UAEnumField> EnumFields { get; set; }
@@ -13,7 +13,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model.v1
         internal DataTypeModel? DataTypeModel { get; set; }
         public ApiDataTypeModel() { }
 
-        public ApiDataTypeModel(DataTypeModel aDataTypeModel)
+        public DataTypeResponse(DataTypeModel aDataTypeModel)
         {
 
             DataTypeModel = aDataTypeModel;

@@ -1,6 +1,7 @@
 ﻿using CESMII.OpcUa.NodeSetModel;
 using Microsoft.AspNetCore.Mvc;
-using OPC_UA_Nodeset_WebAPI.Model.v1;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Requests;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 
 namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
@@ -20,7 +21,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         }
 
         [HttpGet("{id}/{uri}")]
-        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiDataVariableModel>))]
+        [ProducesResponseType(200, Type = typeof(Dictionary<string, DataVariableResponse>))]
         public IActionResult Get(string id, string uri)
         {
             var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
@@ -30,16 +31,16 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                 return activeNodesetModelResult;
             }
             var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
-            var returnObject = new List<ApiDataVariableModel>();
+            var returnObject = new List<DataVariableResponse>();
             foreach (var aDataVariable in activeNodesetModel.GetDataVariables())
             {
-                returnObject.Add(new ApiDataVariableModel(aDataVariable));
+                returnObject.Add(new DataVariableResponse(aDataVariable));
             }
             return Ok(returnObject);
         }
 
         [HttpGet("{nodeId}")]
-        [ProducesResponseType(200, Type = typeof(ApiDataVariableModel))]
+        [ProducesResponseType(200, Type = typeof(DataVariableResponse))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetById(string id, string uri, string nodeId)
         {
@@ -47,7 +48,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         }
 
         [HttpGet("ByParentNodeId")]
-        [ProducesResponseType(200, Type = typeof(List<ApiDataVariableModel>))]
+        [ProducesResponseType(200, Type = typeof(List<DataVariableResponse>))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetByParentNodeId(string id, string uri, string parentNodeId)
         {
@@ -75,15 +76,15 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
                     break;
             }
 
-            var returnObject = dataVariables.Select(x => new ApiDataVariableModel(x));
+            var returnObject = dataVariables.Select(x => new DataVariableResponse(x));
 
             return Ok(returnObject);
         }
 
         [HttpPost]
-        [ProducesResponseType(200, Type = typeof(ApiDataVariableModel))]
+        [ProducesResponseType(200, Type = typeof(DataVariableResponse))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public IActionResult Post([FromBody] ApiNewDataVariableModel request)
+        public IActionResult Post([FromBody] DataVariableRequest request)
         {
             var id = request.ProjectId;
             var uri = request.Uri;
@@ -93,7 +94,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             {
                 return dataVariablesListResult;
             }
-            var dataVariablesList = dataVariablesListResult.Value as List<ApiDataVariableModel>;
+            var dataVariablesList = dataVariablesListResult.Value as List<DataVariableResponse>;
             var existingDataVariable = dataVariablesList.Where(x => x.ParentNodeId == request.ParentNodeId).FirstOrDefault(x => x.DisplayName == request.DisplayName);
             if (existingDataVariable == null)
             {

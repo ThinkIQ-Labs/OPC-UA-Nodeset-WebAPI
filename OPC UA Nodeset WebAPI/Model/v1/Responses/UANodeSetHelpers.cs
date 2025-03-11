@@ -3,7 +3,7 @@ using System.Xml;
 using System.Reflection.PortableExecutable;
 using OPC_UA_Nodeset_WebAPI.Model.v1;
 
-namespace Opc.Ua.Export.v1
+namespace Opc.Ua.Export.v1.Responses
 {
     public static class UANodeSetFromString
     {
@@ -76,6 +76,6 @@ namespace Opc.Ua.Export.v1
         public List<ApiPropertyModel> Properties { get; set; }
         public List<ApiVariableTypeModel> VariableTypes { get; set; }
         public List<ApiDataTypeModel> DataTypes { get; set; }
-        public List<ApiObjectModel> Objects { get; set; }
+        public List<ObjectModelResponse> Objects { get; set; }
     }
 }
