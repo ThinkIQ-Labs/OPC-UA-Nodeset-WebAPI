@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Opc.Ua;
-using OPC_UA_Nodeset_WebAPI.Model;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Requests;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Web;
 using StatusCodes = Microsoft.AspNetCore.Http.StatusCodes;
@@ -24,7 +25,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         }
 
         [HttpGet("{id}/{uri}")]
-        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiDataTypeModel>))]
+        [ProducesResponseType(200, Type = typeof(Dictionary<string, DataTypeResponse>))]
         public IActionResult Get(string id, string uri, [FromQuery] Dictionary<string, string> filters = null)
         {
             var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
@@ -36,10 +37,10 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             else
             {
                 var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
-                var returnObject = new List<ApiDataTypeModel>();
+                var returnObject = new List<DataTypeResponse>();
                 foreach (var aDataType in activeNodesetModel.DataTypes)
                 {
-                    returnObject.Add(new ApiDataTypeModel(aDataType));
+                    returnObject.Add(new DataTypeResponse(aDataType));
                 }
 
                 if (filters == null)
@@ -59,7 +60,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         }
 
         [HttpGet("{nodeId}")]
-        [ProducesResponseType(200, Type = typeof(ApiDataTypeModel))]
+        [ProducesResponseType(200, Type = typeof(DataTypeResponse))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetByNodeId(string id, string uri, string nodeId)
         {
@@ -67,7 +68,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         }
 
         [HttpGet("ByDisplayName/{displayName}")]
-        [ProducesResponseType(200, Type = typeof(List<ApiDataTypeModel>))]
+        [ProducesResponseType(200, Type = typeof(List<DataTypeResponse>))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetByDisplayName(string id, string uri, string displayName)
         {
@@ -79,65 +80,60 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             }
             else
             {
-                var dataTypes = dataTypesListResult.Value as List<ApiDataTypeModel>;
+                var dataTypes = dataTypesListResult.Value as List<DataTypeResponse>;
                 var returnObject = dataTypes.Where(x => x.DisplayName == displayName).ToList();
                 return Ok(returnObject);
             }
         }
 
-        [HttpPut]
-        [ProducesResponseType(200, Type = typeof(ApiDataTypeModel))]
+        [HttpPost]
+        [ProducesResponseType(200, Type = typeof(DataTypeResponse))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public IActionResult PutAsync(string id, string uri, [FromBody] ApiNewDataTypeModel apiDataTypeModel)
+        public IActionResult HttpPost([FromBody] DataTypeRequest request)
         {
-
+            var id = request.ProjectId;
+            var uri = request.Uri;
             var dataTypesListResult = Get(id, uri) as ObjectResult;
 
             if (StatusCodes.Status200OK != dataTypesListResult.StatusCode)
             {
                 return dataTypesListResult;
             }
-            else
+
+            var dataTypes = dataTypesListResult.Value as List<DataTypeResponse>;
+            var existingDataType = dataTypes.FirstOrDefault(x => x.DisplayName == request.DisplayName);
+
+            if (existingDataType != null)
             {
-                var dataTypes = dataTypesListResult.Value as List<ApiDataTypeModel>;
-                var existingDataType = dataTypes.FirstOrDefault(x => x.DisplayName == apiDataTypeModel.DisplayName);
-                if (existingDataType == null)
-                {
-                    // add new data type
-                    var projectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
-                    var activeProjectInstance = projectInstanceResult.Value as NodeSetProjectInstance;
-
-                    var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
-                    var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
-
-                    var newDataTypeModel = new DataTypeModel
-                    {
-                        NodeSet = activeNodesetModel,
-                        NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
-                        SuperType = activeProjectInstance.GetNodeModelByNodeId(apiDataTypeModel.SuperTypeNodeId) as DataTypeModel,
-                        DisplayName = new List<NodeModel.LocalizedText> { apiDataTypeModel.DisplayName == null ? "" : apiDataTypeModel.DisplayName },
-                        BrowseName = apiDataTypeModel.BrowseName,
-                        Description = new List<NodeModel.LocalizedText> { apiDataTypeModel.Description == null ? "" : apiDataTypeModel.Description },
-                        EnumFields = apiDataTypeModel.EnumFields.Select(x => new DataTypeModel.UaEnumField
-                        {
-                            Name = x.Name,
-                            Value = x.Value,
-                            Description = x.Description == null ? new List<NodeModel.LocalizedText>() : new List<NodeModel.LocalizedText> { x.Description },
-                            DisplayName = x.DisplayName == null ? new List<NodeModel.LocalizedText>() : new List<NodeModel.LocalizedText> { x.DisplayName }
-                        }).ToList()
-                    };
-
-                    activeNodesetModel.DataTypes.Add(newDataTypeModel);
-                    activeNodesetModel.UpdateIndices();
-                    return Ok(new ApiDataTypeModel(newDataTypeModel));
-                }
-                else
-                {
-                    return BadRequest("An data type with this name exists.");
-                }
+                return BadRequest("An data type with this name exists.");
             }
+
+            // add new data type
+            var projectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
+            var activeProjectInstance = projectInstanceResult.Value as NodeSetProjectInstance;
+            var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
+            var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
+
+            var newDataTypeModel = new DataTypeModel
+            {
+                NodeSet = activeNodesetModel,
+                NodeId = UaNodeResponse.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                SuperType = activeProjectInstance.GetNodeModelByNodeId(request.SuperTypeNodeId) as DataTypeModel,
+                DisplayName = new List<NodeModel.LocalizedText> { request.DisplayName == null ? "" : request.DisplayName },
+                BrowseName = request.BrowseName,
+                Description = new List<NodeModel.LocalizedText> { request.Description == null ? "" : request.Description },
+                EnumFields = request.EnumFields.Select(x => new DataTypeModel.UaEnumField
+                {
+                    Name = x.Name,
+                    Value = x.Value,
+                    Description = x.Description == null ? new List<NodeModel.LocalizedText>() : new List<NodeModel.LocalizedText> { x.Description },
+                    DisplayName = x.DisplayName == null ? new List<NodeModel.LocalizedText>() : new List<NodeModel.LocalizedText> { x.DisplayName }
+                }).ToList()
+            };
+
+            activeNodesetModel.DataTypes.Add(newDataTypeModel);
+            activeNodesetModel.UpdateIndices();
+            return Ok(new DataTypeResponse(newDataTypeModel));
         }
-
-
     }
 }

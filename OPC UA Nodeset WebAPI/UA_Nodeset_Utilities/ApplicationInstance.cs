@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Opc.Ua.Export;
 using Opc.Ua;
-using OPC_UA_Nodeset_WebAPI.Model;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
 using System.Collections.Concurrent;
 using System.Reflection.PortableExecutable;
 using System.Web;
@@ -13,8 +13,8 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
     public class ApplicationInstance : ControllerBase
     {
         public ConcurrentDictionary<string, NodeSetProjectInstance> NodeSetProjectInstances { get; } = new ConcurrentDictionary<string, NodeSetProjectInstance>();
-        private ConcurrentDictionary<string, ApiNodeSetInfoWithDependencies> _localNodesets { get; set; }
-        public ConcurrentDictionary<string, ApiNodeSetInfoWithDependencies> LocalNodesets
+        private ConcurrentDictionary<string, NodeSetInfoWithDependenciesResponse> _localNodesets { get; set; }
+        public ConcurrentDictionary<string, NodeSetInfoWithDependenciesResponse> LocalNodesets
         {
             get
             {
@@ -32,14 +32,14 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
 
         public void ScanNodesetFiles()
         {
-            _localNodesets = new ConcurrentDictionary<string, ApiNodeSetInfoWithDependencies>();
+            _localNodesets = new ConcurrentDictionary<string, NodeSetInfoWithDependenciesResponse>();
             var allLocalNodesetFiles = Directory.GetFiles($"{AppContext.BaseDirectory}/NodeSets");
             foreach (var aFile in allLocalNodesetFiles)
             {
                 //_localNodesets.Add(file, new List<string>());
                 string aXmlString = System.IO.File.ReadAllText(aFile);
                 var aNodeSet = UANodeSetFromString.Read(aXmlString);
-                _localNodesets.TryAdd(Path.GetFileName(aFile), new ApiNodeSetInfoWithDependencies(aNodeSet));
+                _localNodesets.TryAdd(Path.GetFileName(aFile), new NodeSetInfoWithDependenciesResponse(aNodeSet));
             }
         }
 
@@ -70,15 +70,9 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
                     //return Ok(aNodesetProjectInstance.NodeSetModels.First(x => x.Value.ModelUri == uriNoSlashes).Value);
                     return Ok(aNodesetProjectInstance.NodeSetModels.First(x => x.Value.ModelUri.Replace("/", "") == uriNoSlashes).Value);
                 }
-                else
-                {
-                    return NotFound("The model does not exist.");
-                }
+                return NotFound("The model does not exist.");
             }
-            else
-            {
-                return NotFound("The project does not exist.");
-            }
+            return NotFound("The project does not exist.");
         }
 
         public IActionResult GetNodeApiModelByNodeId(string id, string uri, string nodeId, string nodeModelTypeName = "")
@@ -103,26 +97,26 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
                 else
                 {
                     var aNodeModel = aNodeModelCandidates.First().Value;
-                    ApiUaNodeModel returnObject = null;
+                    UaNodeResponse returnObject = null;
                     switch (aNodeModel)
                     {
                         case DataTypeModel aModel:
-                            returnObject = new ApiDataTypeModel(aModel as DataTypeModel);
+                            returnObject = new DataTypeResponse(aModel as DataTypeModel);
                             break;
                         case DataVariableModel aModel:
-                            returnObject = new ApiDataVariableModel(aModel as DataVariableModel);
+                            returnObject = new DataVariableResponse(aModel as DataVariableModel);
                             break;
                         case ObjectModel aModel:
-                            returnObject = new ApiObjectModel(aModel as ObjectModel);
+                            returnObject = new ObjectModelResponse(aModel as ObjectModel);
                             break;
                         case ObjectTypeModel aModel:
-                            returnObject = new ApiObjectTypeModel(aModel as ObjectTypeModel);
+                            returnObject = new ObjectTypeResponse(aModel as ObjectTypeModel);
                             break;
                         case PropertyModel aModel:
-                            returnObject = new ApiPropertyModel(aModel as PropertyModel);
+                            returnObject = new PropertyResponse(aModel as PropertyModel);
                             break;
                         case VariableTypeModel aModel:
-                            returnObject = new ApiVariableTypeModel(aModel as VariableTypeModel);
+                            returnObject = new VariableTypeResponse(aModel as VariableTypeModel);
                             break;
                         default:
                             returnObject = null;

@@ -1,6 +1,7 @@
 ﻿using CESMII.OpcUa.NodeSetModel;
 using Microsoft.AspNetCore.Mvc;
-using OPC_UA_Nodeset_WebAPI.Model;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Requests;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Web;
 
@@ -21,7 +22,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         }
 
         [HttpGet("{id}/{uri}")]
-        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiObjectModel>))]
+        [ProducesResponseType(200, Type = typeof(Dictionary<string, ObjectModelResponse>))]
         public IActionResult Get(string id, string uri)
         {
             var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
@@ -33,17 +34,17 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             else
             {
                 var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
-                var returnObject = new List<ApiObjectModel>();
+                var returnObject = new List<ObjectModelResponse>();
                 foreach (var aObject in activeNodesetModel.GetObjects())
                 {
-                    returnObject.Add(new ApiObjectModel(aObject));
+                    returnObject.Add(new ObjectModelResponse(aObject));
                 }
                 return Ok(returnObject);
             }
         }
 
         [HttpGet("{nodeId}")]
-        [ProducesResponseType(200, Type = typeof(ApiObjectModel))]
+        [ProducesResponseType(200, Type = typeof(ObjectModelResponse))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetByNodeId(string id, string uri, string nodeId)
         {
@@ -52,7 +53,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         }
 
         [HttpGet("ByDisplayName/{displayName}")]
-        [ProducesResponseType(200, Type = typeof(List<ApiObjectModel>))]
+        [ProducesResponseType(200, Type = typeof(List<ObjectModelResponse>))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetByDisplayName(string id, string uri, string displayName)
         {
@@ -64,106 +65,102 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             }
             else
             {
-                var objectsList = objectsListResult.Value as List<ApiObjectModel>;
+                var objectsList = objectsListResult.Value as List<ObjectModelResponse>;
                 var returnObject = objectsList.Where(x => x.DisplayName == displayName).ToList();
                 return Ok(returnObject);
             }
         }
 
-        [HttpPut]
-        [ProducesResponseType(200, Type = typeof(ApiObjectModel))]
+        [HttpPost]
+        [ProducesResponseType(200, Type = typeof(ObjectModelResponse))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public IActionResult PutAsync(string id, string uri, [FromBody] ApiNewObjectModel apiObjectModel)
+        public async Task<IActionResult> HttpPost([FromBody] ObjectRequest request)
         {
-
+            var id = request.ProjectId;
+            var uri = request.Uri;
             var objectsListResult = Get(id, uri) as ObjectResult;
 
             if (StatusCodes.Status200OK != objectsListResult.StatusCode)
             {
                 return objectsListResult;
             }
-            else
+
+            var objects = objectsListResult.Value as List<ObjectModelResponse>;
+            var existingObject = objects.Where(x => x.ParentNodeId == request.ParentNodeId).FirstOrDefault(x => x.DisplayName == request.DisplayName);
+
+            if (existingObject != null)
             {
-                var objects = objectsListResult.Value as List<ApiObjectModel>;
-                var existingObject = objects.Where(x => x.ParentNodeId == apiObjectModel.ParentNodeId).FirstOrDefault(x => x.DisplayName == apiObjectModel.DisplayName);
-                if (existingObject == null)
+                return BadRequest("A object with this name exists.");
+            }
+
+            // add new object
+            var projectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
+            var activeProjectInstance = projectInstanceResult.Value as NodeSetProjectInstance;
+
+            var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
+            var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
+
+            // look up parent object
+            var aParentModel = activeProjectInstance.NodeSetModels.FirstOrDefault(x => x.Value.ModelUri == UaNodeResponse.GetNameSpaceFromNodeId(request.ParentNodeId)).Value;
+            var parentNode = aParentModel.AllNodesByNodeId[request.ParentNodeId];
+
+            // look up type definition
+            var aObjectTypeModel = activeProjectInstance.NodeSetModels.FirstOrDefault(x => x.Value.ModelUri == UaNodeResponse.GetNameSpaceFromNodeId(request.TypeDefinitionNodeId)).Value;
+            var aObjectTypeDefinition = aObjectTypeModel.ObjectTypes.FirstOrDefault(ot => ot.NodeId == request.TypeDefinitionNodeId);
+
+            var newObjectModel = new ObjectModel
+            {
+                NodeSet = activeNodesetModel,
+                NodeId = UaNodeResponse.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                Parent = parentNode,
+                TypeDefinition = aObjectTypeDefinition,
+                DisplayName = new List<NodeModel.LocalizedText> { request.DisplayName },
+                BrowseName = request.BrowseName,
+                Description = new List<NodeModel.LocalizedText> { request.Description == null ? "" : request.Description },
+                Properties = new List<VariableModel>(),
+                DataVariables = new List<DataVariableModel>()
+            };
+
+            if (request.GenerateChildren.HasValue)
+            {
+                if (request.GenerateChildren.Value)
                 {
-                    // add new object
-                    var projectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
-                    var activeProjectInstance = projectInstanceResult.Value as NodeSetProjectInstance;
-
-                    var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
-                    var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
-
-                    // look up parent object
-                    var aParentModel = activeProjectInstance.NodeSetModels.FirstOrDefault(x => x.Value.ModelUri == ApiUaNodeModel.GetNameSpaceFromNodeId(apiObjectModel.ParentNodeId)).Value;
-                    var parentNode = aParentModel.AllNodesByNodeId[apiObjectModel.ParentNodeId];
-
-                    // look up type definition
-                    var aObjectTypeModel = activeProjectInstance.NodeSetModels.FirstOrDefault(x => x.Value.ModelUri == ApiUaNodeModel.GetNameSpaceFromNodeId(apiObjectModel.TypeDefinitionNodeId)).Value;
-                    var aObjectTypeDefinition = aObjectTypeModel.ObjectTypes.FirstOrDefault(ot => ot.NodeId == apiObjectModel.TypeDefinitionNodeId);
-
-                    var newObjectModel = new ObjectModel
+                    aObjectTypeDefinition.Properties.ForEach(aProperty =>
                     {
-                        NodeSet = activeNodesetModel,
-                        NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
-                        Parent = parentNode,
-                        TypeDefinition = aObjectTypeDefinition,
-                        DisplayName = new List<NodeModel.LocalizedText> { apiObjectModel.DisplayName },
-                        BrowseName = apiObjectModel.BrowseName,
-                        Description = new List<NodeModel.LocalizedText> { apiObjectModel.Description == null ? "" : apiObjectModel.Description },
-                        Properties = new List<VariableModel>(),
-                        DataVariables = new List<DataVariableModel>()
-                    };
-
-                    if (apiObjectModel.GenerateChildren.HasValue)
-                    {
-                        if (apiObjectModel.GenerateChildren.Value)
+                        newObjectModel.Properties.Add(new PropertyModel
                         {
-                            aObjectTypeDefinition.Properties.ForEach(aProperty =>
-                            {
-                                newObjectModel.Properties.Add(new PropertyModel
-                                {
-                                    NodeSet = activeNodesetModel,
-                                    NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
-                                    Parent = newObjectModel,
-                                    DisplayName = aProperty.DisplayName,
-                                    BrowseName = aProperty.BrowseName,
-                                    Description = aProperty.Description,
-                                    DataType = aProperty.DataType,
-                                    Value = aProperty.Value,
-                                    EngineeringUnit = aProperty.EngineeringUnit,
-                                });
-                            });
-                            aObjectTypeDefinition.DataVariables.ForEach(aDataVariable =>
-                            {
-                                newObjectModel.DataVariables.Add(new DataVariableModel
-                                {
-                                    NodeSet = activeNodesetModel,
-                                    NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
-                                    Parent = newObjectModel,
-                                    DisplayName = aDataVariable.DisplayName,
-                                    BrowseName = aDataVariable.BrowseName,
-                                    Description = aDataVariable.Description,
-                                    DataType = aDataVariable.DataType,
-                                    Value = aDataVariable.Value,
-                                    EngineeringUnit = aDataVariable.EngineeringUnit,
-                                });
-                            });
-                        }
-                    }
-
-                    activeNodesetModel.Objects.Add(newObjectModel);
-                    activeNodesetModel.UpdateIndices();
-                    return Ok(new ApiObjectModel(newObjectModel));
-                }
-                else
-                {
-                    return BadRequest("A object with this name exists.");
+                            NodeSet = activeNodesetModel,
+                            NodeId = UaNodeResponse.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                            Parent = newObjectModel,
+                            DisplayName = aProperty.DisplayName,
+                            BrowseName = aProperty.BrowseName,
+                            Description = aProperty.Description,
+                            DataType = aProperty.DataType,
+                            Value = aProperty.Value,
+                            EngineeringUnit = aProperty.EngineeringUnit,
+                        });
+                    });
+                    aObjectTypeDefinition.DataVariables.ForEach(aDataVariable =>
+                    {
+                        newObjectModel.DataVariables.Add(new DataVariableModel
+                        {
+                            NodeSet = activeNodesetModel,
+                            NodeId = UaNodeResponse.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                            Parent = newObjectModel,
+                            DisplayName = aDataVariable.DisplayName,
+                            BrowseName = aDataVariable.BrowseName,
+                            Description = aDataVariable.Description,
+                            DataType = aDataVariable.DataType,
+                            Value = aDataVariable.Value,
+                            EngineeringUnit = aDataVariable.EngineeringUnit,
+                        });
+                    });
                 }
             }
+
+            activeNodesetModel.Objects.Add(newObjectModel);
+            activeNodesetModel.UpdateIndices();
+            return Ok(new ObjectModelResponse(newObjectModel));
         }
-
-
     }
 }

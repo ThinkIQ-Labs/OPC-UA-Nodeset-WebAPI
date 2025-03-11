@@ -6,10 +6,14 @@ using Opc.Ua.Export;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Xml.Linq;
 
-namespace OPC_UA_Nodeset_WebAPI.Model
+namespace OPC_UA_Nodeset_WebAPI.Model.v1.Requests
 {
-    public class ApiNewDataTypeModel
+    public class VariableTypeRequest
     {
+        public string ProjectId { get; set; }
+
+        public string Uri { get; set; }
+
         public string SuperTypeNodeId { get; set; }
 
         public string DisplayName { get; set; }
@@ -18,8 +22,9 @@ namespace OPC_UA_Nodeset_WebAPI.Model
 
         public string? Description { get; set; }
 
-        public List<UAEnumField> EnumFields { get; set; }
 
-        public ApiNewDataTypeModel() { }
+        public VariableTypeRequest() { }
+
+
     }
 }

@@ -2,7 +2,7 @@
 using CESMII.OpcUa.NodeSetModel;
 using Microsoft.Extensions.Logging.Abstractions;
 using Opc.Ua.Export;
-using OPC_UA_Nodeset_WebAPI.Model;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
 using Opc.Ua;
 using static System.Net.Mime.MediaTypeNames;
 using System.Text;
@@ -159,7 +159,7 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
 
         public NodeModel GetNodeModelByNodeId(string nodeId)
         {
-            var nodeFromNodeId = new ApiUaNodeModel { NodeId = nodeId };
+            var nodeFromNodeId = new UaNodeResponse { NodeId = nodeId };
             var aNode = NodeSetModels.FirstOrDefault(x => x.Value.ModelUri == nodeFromNodeId.NameSpace).Value.AllNodesByNodeId[nodeId];
             return aNode;
         }
