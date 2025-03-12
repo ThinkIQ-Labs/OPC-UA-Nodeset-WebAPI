@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Opc.Ua;
-using Opc.Ua.Export;
+using Opc.Ua.Export.v1.Responses;
 using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
 using OPC_UA_Nodeset_WebAPI.Model.v1.Requests;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
@@ -16,7 +16,7 @@ using System.Xml;
 using System.Xml.Linq;
 using StatusCodes = Microsoft.AspNetCore.Http.StatusCodes;
 
-namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
+namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
 {
     [ApiController]
     [Route("api/v1/nodeset-model")]
