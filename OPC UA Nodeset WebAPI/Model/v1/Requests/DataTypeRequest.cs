@@ -5,6 +5,7 @@ using Opc.Ua;
 using Opc.Ua.Export;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Xml.Linq;
+using Opc.Ua.Export.v1.Responses;
 
 namespace OPC_UA_Nodeset_WebAPI.Model.v1.Requests
 {

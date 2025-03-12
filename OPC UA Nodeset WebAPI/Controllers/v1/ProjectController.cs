@@ -2,12 +2,14 @@ using CESMII.OpcUa.NodeSetModel;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Mvc;
 using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Requests;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Collections.Concurrent;
 using System.Linq;
 using Opc.Ua.Export;
+using Opc.Ua.Export.v1.Responses;
 
-namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
+namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
 {
     [ApiController]
     [Route("api/v1/[controller]")]

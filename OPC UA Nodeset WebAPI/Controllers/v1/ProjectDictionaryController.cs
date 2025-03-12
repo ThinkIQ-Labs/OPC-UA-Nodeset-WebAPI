@@ -8,7 +8,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using Opc.Ua.Export.v1.Responses;
 
-namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
+namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
 {
     [ApiController]
     [Route("api/v1/project-dictionary")]

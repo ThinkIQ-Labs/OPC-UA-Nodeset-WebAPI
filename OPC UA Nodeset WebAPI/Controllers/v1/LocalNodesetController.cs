@@ -1,15 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using Opc.Ua.Export;
+using Opc.Ua.Export.v1.Responses;
 using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System;
 using System.Collections.Concurrent;
 using System.Text;
 using System.Xml;
+using OPC_UA_Nodeset_WebAPI.Controllers.v1;
 
 // @TODO: extract some of the repeated logic into a helper method
-namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
+namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
 {
     [ApiController]
     [Route("api/v1/local-nodeset")]

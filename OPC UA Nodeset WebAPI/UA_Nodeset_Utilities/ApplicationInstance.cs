@@ -1,6 +1,6 @@
 ﻿using CESMII.OpcUa.NodeSetModel;
 using Microsoft.AspNetCore.Mvc;
-using Opc.Ua.Export;
+using Opc.Ua.Export.v1.Responses;
 using Opc.Ua;
 using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
 using System.Collections.Concurrent;

@@ -8,7 +8,7 @@ using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Web;
 using StatusCodes = Microsoft.AspNetCore.Http.StatusCodes;
 
-namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
+namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
 {
     [ApiController]
     [Route("api/v1/object-type")]
