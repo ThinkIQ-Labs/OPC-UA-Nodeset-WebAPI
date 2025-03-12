@@ -60,7 +60,8 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
             UANodeSet nodeSet;
             try
             {
-                nodeSet = UANodeSet.Read(new FileStream(file, FileMode.Open));
+                var fileStream = new FileStream(file, FileMode.Open);
+                nodeSet = UANodeSet.Read(fileStream);
             }
             catch (Exception e)
             {
