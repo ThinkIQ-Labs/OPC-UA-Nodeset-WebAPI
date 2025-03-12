@@ -64,7 +64,7 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
             }
             catch (Exception e)
             {
-                return "Error: File not found.";
+                throw new InvalidOperationException("Error: " + e.Message);
             }
             ModelTableEntry modelEntry = nodeSet.Models.FirstOrDefault();
 
