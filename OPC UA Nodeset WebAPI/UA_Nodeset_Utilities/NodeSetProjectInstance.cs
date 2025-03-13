@@ -65,7 +65,7 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
             }
             catch (Exception e)
             {
-                throw new InvalidOperationException("Error: " + e.Message);
+                throw new InvalidOperationException(e.Message);
             }
             ModelTableEntry modelEntry = nodeSet.Models.FirstOrDefault();
 
@@ -97,25 +97,23 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
             // check if namespace is already present
             if (NodeSetModels.Where(x => x.Value.ModelUri == modelEntry.ModelUri).Count() > 0)
             {
-                return $"Error: NodeSet {modelEntry.ModelUri} already exists.";
+                throw new InvalidOperationException($"Error: NodeSet {modelEntry.ModelUri} already exists.");
             }
 
             // check if all requirements are in place
-            bool allowImport = true;
             if (modelEntry.RequiredModel != null)
             {
                 foreach (var aRequiredModelUri in modelEntry.RequiredModel.Select(x => x.ModelUri))
                 {
                     if (!NodeSetModels.ContainsKey(aRequiredModelUri))
                     {
-                        allowImport = false;
-                        return $"Error: NodeSet can not be imported. {aRequiredModelUri} required.";
+                        throw new InvalidOperationException($"Error: NodeSet can not be imported: {aRequiredModelUri} required.");
                     }
                 }
             }
 
             // attempt import of nodeset
-            if (allowImport)
+            try
             {
                 await importer.LoadNodeSetModelAsync(opcContext, nodeSet);
 
@@ -123,9 +121,10 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
 
                 return modelEntry.ModelUri;
             }
-            else
+            catch (Exception e)
             {
-                return "Error: NodeSet can not be imported.";
+                Log.Add(modelEntry.ModelUri, e.Message);
+                throw new InvalidOperationException($"Error: NodeSet can not be imported: {e.Message}");
             }
         }
 
