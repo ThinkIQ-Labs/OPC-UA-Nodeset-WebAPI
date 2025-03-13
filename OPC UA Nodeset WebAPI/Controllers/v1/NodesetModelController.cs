@@ -129,7 +129,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
         {
             if (request.XmlBase64 == null)
             {
-                return BadRequest("Invalid request: XmlBase64 is required.");
+                return BadRequest("Invalid request: parameter XmlBase64 is required.");
             }
             var id = request.ProjectId;
             var xmlBase64 = request.XmlBase64;
@@ -137,9 +137,18 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
             var valueBytes = Convert.FromBase64String(xmlBase64);
             var xml = Encoding.UTF8.GetString(valueBytes);
             System.IO.File.WriteAllText(filePath, xml);
-            var response = await TryLoadNodesetXmlFromServerAsync(id, filePath);
-            System.IO.File.Delete(filePath);
-            return response;
+
+            try
+            {
+                var response = await TryLoadNodesetXmlFromServerAsync(id, filePath);
+                System.IO.File.Delete(filePath);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                System.IO.File.Delete(filePath);
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -240,15 +249,9 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
 
             var activeNodeSetProjectInstance = activeNodesetProjectInstanceResult.Value as NodeSetProjectInstance;
             var modelUriResultString = await activeNodeSetProjectInstance.LoadNodeSetFromFileOnServerAsync(uri);
-
-            if (modelUriResultString.StartsWith("Error"))
-            {
-                activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Fail: Add NodeSetModel from file '{uri}'. {modelUriResultString}");
-                return BadRequest($"{uri} - {modelUriResultString}");
-            }
-
             var aNodesetModel = new NodeSetModelResponse(activeNodeSetProjectInstance.NodeSetModels[modelUriResultString]);
             activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Success: Add NodeSetModel from file '{uri}'.");
+
             return Ok(new Dictionary<string, NodeSetModelResponse> { { modelUriResultString.Replace("/", ""), aNodesetModel } });
         }
     }
