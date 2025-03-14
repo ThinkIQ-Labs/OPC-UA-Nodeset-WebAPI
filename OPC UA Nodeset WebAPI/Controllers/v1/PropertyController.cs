@@ -247,11 +247,18 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
                         case "Int32":
                         case "Int64":
                         case "SByte":
-                            //newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Int32");
                             int aIntValue;
                             if (Int32.TryParse(apiPropertyModel.Value, out aIntValue))
                             {
                                 newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aIntValue).Json;
+                            }
+                            break;
+                        case "Float":
+                        case "Double":
+                            double aDoubleValue;
+                            if (double.TryParse(apiPropertyModel.Value, out aDoubleValue))
+                            {
+                                newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aDoubleValue).Json;
                             }
                             break;
                         case "Boolean":
