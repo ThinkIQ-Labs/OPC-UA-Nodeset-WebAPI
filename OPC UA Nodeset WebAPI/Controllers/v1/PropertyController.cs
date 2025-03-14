@@ -261,9 +261,16 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
                                 newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aDoubleValue).Json;
                             }
                             break;
+                        case "Duration":
+                            double durationSeconds;
+                            if (double.TryParse(apiPropertyModel.Value, out durationSeconds))
+                            {
+                                TimeSpan duration = TimeSpan.FromSeconds(durationSeconds);
+                                newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(durationSeconds).Json;
+                            }
+                            break;
                         case "Boolean":
                         case "Bool":
-                            //newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Boolean");
                             Boolean aBoolValue;
                             if (Boolean.TryParse(apiPropertyModel.Value, out aBoolValue))
                             {
@@ -272,7 +279,6 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
                             break;
                         case "DateTime":
                         case "UtcTime":
-                            //newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "DateTime");
                             DateTime aDateTimeValue;
                             if (DateTime.TryParse(apiPropertyModel.Value, out aDateTimeValue))
                             {
