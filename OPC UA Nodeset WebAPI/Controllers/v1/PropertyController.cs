@@ -114,11 +114,20 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
                             existingProperty.PropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aIntValue).Json;
                         }
                         break;
+                    case "Float":
+                    case "Double":
+                        existingProperty.PropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Double");
+                        double aDoubleValue;
+                        if (double.TryParse(request.Value, out aDoubleValue))
+                        {
+                            existingProperty.PropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aDoubleValue).Json;
+                        }
+                        break;
                     case "Boolean":
                     case "Bool":
                         existingProperty.PropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Boolean");
-                        Boolean aBoolValue;
-                        if (Boolean.TryParse(request.Value, out aBoolValue))
+                        bool aBoolValue;
+                        if (bool.TryParse(request.Value.Trim(), out aBoolValue))
                         {
                             existingProperty.PropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aBoolValue).Json;
                         }
