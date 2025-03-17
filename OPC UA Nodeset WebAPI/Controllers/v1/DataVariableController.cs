@@ -7,7 +7,7 @@ using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
 {
     [ApiController]
-    [Route("api/v1/data-variable")]
+    [Route("api/v1/variable")]
     public class DataVariableController : ControllerBase
     {
         private readonly ILogger<ProjectController> _logger;
@@ -188,6 +188,23 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
                                 newDataVariableModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aBoolValue).Json;
                             }
                             break;
+                        case "Float":
+                        case "Double":
+                            double aDoubleValue;
+                            if (double.TryParse(request.Value, out aDoubleValue))
+                            {
+                                newDataVariableModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aDoubleValue).Json;
+                            }
+                            break;
+                        case "Duration":
+                            double durationSeconds;
+                            if (double.TryParse(request.Value, out durationSeconds))
+                            {
+                                TimeSpan duration = TimeSpan.FromSeconds(durationSeconds);
+                                newDataVariableModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(durationSeconds).Json;
+                            }
+                            break;
+
                         case "DateTime":
                         case "UtcTime":
                             //newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "DateTime");
