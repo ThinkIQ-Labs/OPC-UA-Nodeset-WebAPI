@@ -157,6 +157,26 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
 
         }
 
+        /**
+         * Remove a nodeset from the project
+         *
+         * @param aModelUri the URI of the nodeset to remove
+         */
+        public string RemoveNodeSet(string aModelUri)
+        {
+            if (NodeSetModels.ContainsKey(aModelUri))
+            {
+                // remove all nodes from nodeset
+                NodeSetModels.Remove(aModelUri);
+
+                // remove all references to nodeset
+                NextNodeIds.Remove(aModelUri);
+
+                return aModelUri;
+            }
+            return "Error: Nodeset not found.";
+        }
+
         public NodeModel GetNodeModelByNodeId(string nodeId)
         {
             var nodeFromNodeId = new UaNodeResponse { NodeId = nodeId };
