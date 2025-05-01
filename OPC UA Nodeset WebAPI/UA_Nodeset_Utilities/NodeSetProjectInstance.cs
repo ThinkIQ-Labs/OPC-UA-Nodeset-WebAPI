@@ -157,11 +157,38 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
 
         }
 
+        /**
+         * Remove a nodeset from the project
+         *
+         * @param aModelUri the URI of the nodeset to remove
+         */
+        public string RemoveNodeSet(string aModelUri)
+        {
+            if (NodeSetModels.ContainsKey(aModelUri))
+            {
+                // remove all nodes from nodeset
+                NodeSetModels.Remove(aModelUri);
+
+                // remove all references to nodeset
+                NextNodeIds.Remove(aModelUri);
+
+                return aModelUri;
+            }
+            return "Error: Nodeset not found.";
+        }
+
         public NodeModel GetNodeModelByNodeId(string nodeId)
         {
             var nodeFromNodeId = new UaNodeResponse { NodeId = nodeId };
-            var aNode = NodeSetModels.FirstOrDefault(x => x.Value.ModelUri == nodeFromNodeId.NameSpace).Value.AllNodesByNodeId[nodeId];
-            return aNode;
+            var modelEntry = NodeSetModels.FirstOrDefault(x => x.Value.ModelUri == nodeFromNodeId.NameSpace);
+
+            if (modelEntry.Value != null && modelEntry.Value.AllNodesByNodeId.ContainsKey(nodeId))
+            {
+                var node = modelEntry.Value.AllNodesByNodeId[nodeId];
+                return node;
+            }
+
+            throw new InvalidOperationException($"Node with ID {nodeId} not found.");
         }
 
         //public ObjectTypeModel GetObjectTypeModelByNodeId(string nodeId)

@@ -154,8 +154,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
         /// <summary>
         /// Creates a blank nodeset model.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="modelUri"></param>
+        /// <param name="request"></param>
         /// <returns>Returns a newly created blank nodeset model for a nodeset project.</returns>
         /// <response code="200">The nodeset was successfully loaded and parsed as a nodeset model.</response>
         /// <response code="400">The nodeset could not be loaded.</response>
@@ -253,6 +252,42 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
             activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Success: Add NodeSetModel from file '{uri}'.");
 
             return Ok(new Dictionary<string, NodeSetModelResponse> { { modelUriResultString.Replace("/", ""), aNodesetModel } });
+        }
+
+        /// <summary>
+        /// Removes an existing nodeset model from a nodeset project.
+        /// </summary>
+        /// <returns>A confirmation that the existing nodeset model was remove from the project</returns>
+        [HttpDelete]
+        [ProducesResponseType(200, Type = typeof(string))]
+        [ProducesResponseType(404, Type = typeof(NotFoundResult))]
+        public IActionResult Destroy([FromBody] NodesetFile request)
+        {
+            if (string.IsNullOrEmpty(request.Uri))
+            {
+                return BadRequest("Invalid request: uri is required.");
+            }
+            if (string.IsNullOrEmpty(request.ProjectId))
+            {
+                return BadRequest("Invalid request: id is required.");
+            }
+            var id = request.ProjectId;
+            var uri = request.Uri;
+            var activeNodesetProjectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
+            if (StatusCodes.Status200OK != activeNodesetProjectInstanceResult.StatusCode)
+            {
+                return activeNodesetProjectInstanceResult;
+            }
+            var activeNodeSetProjectInstance = activeNodesetProjectInstanceResult.Value as NodeSetProjectInstance;
+
+            var modelUriResultString = activeNodeSetProjectInstance.RemoveNodeSet(uri);
+            if (modelUriResultString.StartsWith("Error"))
+            {
+                activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Fail: Remove NodeSetModel '{uri}'. {modelUriResultString}");
+                return BadRequest($"{uri} - {modelUriResultString}");
+            }
+            activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Success: Remove NodeSetModel '{uri}'.");
+            return Ok(new Dictionary<string, NodeSetModelResponse> { { modelUriResultString.Replace("/", ""), new NodeSetModelResponse() } });
         }
     }
 }

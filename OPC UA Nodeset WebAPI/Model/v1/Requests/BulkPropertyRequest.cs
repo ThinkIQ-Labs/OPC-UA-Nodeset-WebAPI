@@ -1,4 +1,4 @@
-﻿using CESMII.OpcUa.NodeSetModel;
+using CESMII.OpcUa.NodeSetModel;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Opc.Ua;
@@ -7,7 +7,7 @@ using System.Xml.Linq;
 
 namespace OPC_UA_Nodeset_WebAPI.Model.v1.Requests
 {
-    public class DataVariableRequest
+    public class BulkPropertyRequest
     {
         public string ProjectId { get; set; }
 
@@ -15,23 +15,21 @@ namespace OPC_UA_Nodeset_WebAPI.Model.v1.Requests
 
         public string ParentNodeId { get; set; }
 
+        public List<Property> Types { get; set; }
+
+        public BulkPropertyRequest() { }
+    }
+
+    public class Property
+    {
         public string DisplayName { get; set; }
 
         public string DataTypeNodeId { get; set; }
-
-        public string? TypeDefinitionNodeId { get; set; }
 
         public string? Value { get; set; }
 
         public string? BrowseName { get; set; }
 
         public string? Description { get; set; }
-
-        public bool? GenerateChildren { get; set; }
-
-
-        public DataVariableRequest() { }
-
-
     }
 }

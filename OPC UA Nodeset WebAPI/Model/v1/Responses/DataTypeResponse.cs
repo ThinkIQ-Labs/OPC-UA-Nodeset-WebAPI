@@ -29,8 +29,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model.v1.Responses
                 Description = x.Description.Count == 0 ? "" : x.Description.First().Text,
                 DisplayName = x.DisplayName.Count == 0 ? "" : x.DisplayName.First().Text,
                 Name = x.Name,
-                Value = x.Value
-
+                Value = x.Value,
             }).ToList();
 
             StructureFields = aDataTypeModel.StructureFields?.Select(x => new UAStructureField()
