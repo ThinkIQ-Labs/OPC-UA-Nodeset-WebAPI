@@ -301,20 +301,112 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
             return BadRequest("A property with this name exists.");
         }
 
-        [HttpPost("BulkProperty")]
+        [HttpPost("bulk-processing")]
         [ProducesResponseType(200, Type = typeof(IActionResult))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public async Task<IActionResult> HttpPost([FromBody] BulkPropertyRequest request)
         {
+            string id = request.ProjectId;
+            string uri = request.Uri;
+            string parentNodeId = request.ParentNodeId;
             try
             {
-                var id = request.ProjectId;
-                var uri = request.Uri;
                 var propertiesListResult = Get(id, uri) as ObjectResult;
 
                 if (StatusCodes.Status200OK != propertiesListResult.StatusCode)
                 {
                     return propertiesListResult;
+                }
+
+                foreach (var type in request.Types)
+                {
+                    var propertiesList = propertiesListResult.Value as List<PropertyResponse>;
+                    var existingProperty = propertiesList.Where(x => x.ParentNodeId == parentNodeId).FirstOrDefault(x => x.DisplayName == type.DisplayName);
+
+                    if (existingProperty == null)
+                    {
+                        // add new property
+                        var projectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
+                        var activeProjectInstance = projectInstanceResult.Value as NodeSetProjectInstance;
+
+                        var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
+                        var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
+
+                        // look up parent object
+                        var parentNode = activeProjectInstance.GetNodeModelByNodeId(parentNodeId);
+
+                        // look up data type
+                        var aDataType = activeProjectInstance.GetNodeModelByNodeId(type.DataTypeNodeId) as DataTypeModel;
+
+                        var newPropertyModel = new PropertyModel
+                        {
+                            NodeSet = activeNodesetModel,
+                            NodeId = UaNodeResponse.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                            Parent = parentNode,
+                            DisplayName = new List<NodeModel.LocalizedText> { type.DisplayName },
+                            BrowseName = type.BrowseName,
+                            Description = new List<NodeModel.LocalizedText> { type.Description == null ? "" : type.Description },
+                            DataType = aDataType as DataTypeModel
+                        };
+
+                        // add value
+                        if (type.Value != null)
+                        {
+                            switch (aDataType.DisplayName.First().Text)
+                            {
+                                case "Integer":
+                                case "Int16":
+                                case "Int32":
+                                case "Int64":
+                                case "SByte":
+                                    int aIntValue;
+                                    if (Int32.TryParse(type.Value, out aIntValue))
+                                    {
+                                        newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aIntValue).Json;
+                                    }
+                                    break;
+                                case "Float":
+                                case "Double":
+                                    double aDoubleValue;
+                                    if (double.TryParse(type.Value, out aDoubleValue))
+                                    {
+                                        newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aDoubleValue).Json;
+                                    }
+                                    break;
+                                case "Duration":
+                                    double durationSeconds;
+                                    if (double.TryParse(type.Value, out durationSeconds))
+                                    {
+                                        TimeSpan duration = TimeSpan.FromSeconds(durationSeconds);
+                                        newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(durationSeconds).Json;
+                                    }
+                                    break;
+                                case "Boolean":
+                                case "Bool":
+                                    Boolean aBoolValue;
+                                    if (Boolean.TryParse(type.Value, out aBoolValue))
+                                    {
+                                        newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aBoolValue).Json;
+                                    }
+                                    break;
+                                case "DateTime":
+                                case "UtcTime":
+                                    DateTime aDateTimeValue;
+                                    if (DateTime.TryParse(type.Value, out aDateTimeValue))
+                                    {
+                                        newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(aDateTimeValue).Json;
+                                    }
+                                    break;
+                                default:
+                                    //newPropertyModel.DataType = activeProjectInstance.UaBaseModel.DataTypes.FirstOrDefault(ot => ot.DisplayName.First().Text == "Int32");
+                                    newPropertyModel.Value = activeProjectInstance.opcContext.JsonEncodeVariant(type.Value).Json;
+                                    break;
+                            }
+                        }
+
+                        parentNode.Properties.Add(newPropertyModel);
+                        activeNodesetModel.UpdateIndices();
+                    }
                 }
                 // return Ok(new request.Values as List<PropertyResponse>);
                 return Ok(new { Message = "good" });

@@ -17,7 +17,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model.v1.Requests
 
         public string DisplayName { get; set; }
 
-        public string? DataTypeNodeId { get; set; }
+        public string DataTypeNodeId { get; set; }
 
         public string? TypeDefinitionNodeId { get; set; }
 
