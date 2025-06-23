@@ -10,7 +10,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
 {
     [ApiController]
     [Route("api/v1/property")]
-    public class PropertyController : ControllerBase
+    public class PropertyController : AbstractBaseController
     {
         private readonly ILogger<ProjectController> _logger;
 
@@ -209,9 +209,9 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
                 return propertiesListResult;
             }
             var propertiesList = propertiesListResult.Value as List<PropertyResponse>;
-            var existingProperty = propertiesList.Where(x => x.ParentNodeId == request.ParentNodeId).FirstOrDefault(x => x.DisplayName == request.DisplayName);
+            FindOpcType<PropertyResponse>(propertiesList, request);
 
-            if (existingProperty == null)
+            try
             {
                 // add new property
                 var projectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
@@ -292,13 +292,16 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
                     }
                 }
 
-
-
                 parentNode.Properties.Add(newPropertyModel);
                 activeNodesetModel.UpdateIndices();
                 return Ok(new PropertyResponse(newPropertyModel));
+                return BadRequest("A property with this name exists.");
             }
-            return BadRequest("A property with this name exists.");
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating Property");
+                return BadRequest("Error creating new property: " + ex.Message);
+            }
         }
 
         [HttpPost("bulk-processing")]

@@ -14,7 +14,18 @@ public abstract class AbstractBaseController : ControllerBase
     /// <returns>void</returns>
     protected void FindOpcType<T>(List<T> opcTypes, dynamic request) where T : UaNodeResponse
     {
-        var found = opcTypes.FirstOrDefault(x => x.DisplayName == request.DisplayName);
+        T? found;
+        switch (typeof(T).Name)
+        {
+            case "DataVariableResponse":
+            case "ObjectModelResponse":
+            case "PropertyResponse":
+                found = opcTypes.FirstOrDefault(x => x.ParentNodeId == request.ParentNodeId && x.DisplayName == request.DisplayName);
+                break;
+            default:
+                found = opcTypes.FirstOrDefault(x => x.DisplayName == request.DisplayName);
+                break;
+        }
 
         if (found != null)
         {

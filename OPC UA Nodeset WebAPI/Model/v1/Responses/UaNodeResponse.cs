@@ -40,7 +40,7 @@
 
         public string? DisplayName { get; set; }
         public string? BrowseName { get; set; }
-
+        public string? ParentNodeId { get; set; }
         public string? Description { get; set; }
 
     }
