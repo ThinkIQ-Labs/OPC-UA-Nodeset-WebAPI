@@ -12,7 +12,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
 {
     [ApiController]
     [Route("api/v1/data-type")]
-    public class DataTypeController : ControllerBase
+    public class DataTypeController : AbstractBaseController
     {
         private readonly ILogger<ProjectController> _logger;
 
@@ -91,49 +91,52 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult HttpPost([FromBody] DataTypeRequest request)
         {
-            var id = request.ProjectId;
-            var uri = request.Uri;
-            var dataTypesListResult = Get(id, uri) as ObjectResult;
-
-            if (StatusCodes.Status200OK != dataTypesListResult.StatusCode)
+            try
             {
-                return dataTypesListResult;
-            }
+                var id = request.ProjectId;
+                var uri = request.Uri;
+                var dataTypesListResult = Get(id, uri) as ObjectResult;
 
-            var dataTypes = dataTypesListResult.Value as List<DataTypeResponse>;
-            var existingDataType = dataTypes.FirstOrDefault(x => x.DisplayName == request.DisplayName);
-
-            if (existingDataType != null)
-            {
-                return BadRequest("An data type with this name exists.");
-            }
-
-            // add new data type
-            var projectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
-            var activeProjectInstance = projectInstanceResult.Value as NodeSetProjectInstance;
-            var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
-            var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
-
-            var newDataTypeModel = new DataTypeModel
-            {
-                NodeSet = activeNodesetModel,
-                NodeId = UaNodeResponse.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
-                SuperType = activeProjectInstance.GetNodeModelByNodeId(request.SuperTypeNodeId) as DataTypeModel,
-                DisplayName = new List<NodeModel.LocalizedText> { request.DisplayName == null ? "" : request.DisplayName },
-                BrowseName = request.BrowseName,
-                Description = new List<NodeModel.LocalizedText> { request.Description == null ? "" : request.Description },
-                EnumFields = request.EnumFields.Select(x => new DataTypeModel.UaEnumField
+                if (StatusCodes.Status200OK != dataTypesListResult.StatusCode)
                 {
-                    Name = x.Name,
-                    Value = x.Value,
-                    Description = x.Description == null ? new List<NodeModel.LocalizedText>() : new List<NodeModel.LocalizedText> { x.Description },
-                    DisplayName = x.DisplayName == null ? new List<NodeModel.LocalizedText>() : new List<NodeModel.LocalizedText> { x.DisplayName }
-                }).ToList()
-            };
+                    return dataTypesListResult;
+                }
 
-            activeNodesetModel.DataTypes.Add(newDataTypeModel);
-            activeNodesetModel.UpdateIndices();
-            return Ok(new DataTypeResponse(newDataTypeModel));
+                var dataTypes = dataTypesListResult.Value as List<DataTypeResponse>;
+                FindOpcType<DataTypeResponse>(dataTypes, request);
+
+                // add new data type
+                var projectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
+                var activeProjectInstance = projectInstanceResult.Value as NodeSetProjectInstance;
+                var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
+                var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
+
+                var newDataTypeModel = new DataTypeModel
+                {
+                    NodeSet = activeNodesetModel,
+                    NodeId = UaNodeResponse.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                    SuperType = activeProjectInstance.GetNodeModelByNodeId(request.SuperTypeNodeId) as DataTypeModel,
+                    DisplayName = new List<NodeModel.LocalizedText> { request.DisplayName == null ? "" : request.DisplayName },
+                    BrowseName = request.BrowseName,
+                    Description = new List<NodeModel.LocalizedText> { request.Description == null ? "" : request.Description },
+                    EnumFields = request.EnumFields.Select(x => new DataTypeModel.UaEnumField
+                    {
+                        Name = x.Name,
+                        Value = x.Value,
+                        Description = x.Description == null ? new List<NodeModel.LocalizedText>() : new List<NodeModel.LocalizedText> { x.Description },
+                        DisplayName = x.DisplayName == null ? new List<NodeModel.LocalizedText>() : new List<NodeModel.LocalizedText> { x.DisplayName }
+                    }).ToList()
+                };
+
+                activeNodesetModel.DataTypes.Add(newDataTypeModel);
+                activeNodesetModel.UpdateIndices();
+                return Ok(new DataTypeResponse(newDataTypeModel));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating DataType");
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }

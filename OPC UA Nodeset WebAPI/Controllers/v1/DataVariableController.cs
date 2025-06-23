@@ -8,7 +8,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
 {
     [ApiController]
     [Route("api/v1/variable")]
-    public class DataVariableController : ControllerBase
+    public class DataVariableController : AbstractBaseController
     {
         private readonly ILogger<ProjectController> _logger;
 

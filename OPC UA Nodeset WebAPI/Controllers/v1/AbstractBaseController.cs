@@ -1,0 +1,26 @@
+using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
+
+public abstract class AbstractBaseController : ControllerBase
+{
+    /// <summary>
+    /// Validates if an object type with the specified display name already exists in the provided list of OPC Types.
+    /// Throws an exception if a duplicate is found.
+    /// </summary>
+    /// <param name="objectTypes">List of opc types to search through.</param>
+    /// <param name="request">The request containing the display name to check.</param>
+    /// <exception cref="Exception">Thrown if an object type with the same display name already exists.</exception>
+    /// <returns>void</returns>
+    protected void FindOpcType<T>(List<T> opcTypes, dynamic request) where T : UaNodeResponse
+    {
+        var found = opcTypes.FirstOrDefault(x => x.DisplayName == request.DisplayName);
+
+        if (found != null)
+        {
+            var rawName = typeof(T).Name.Replace("Response", "").Replace("Request", "");
+            var typeName = Regex.Replace(rawName, "([a-z])([A-Z])", "$1 $2");
+            throw new Exception($"'{typeName}' with DisplayName '{request.DisplayName}' already exists.");
+        }
+    }
+}
