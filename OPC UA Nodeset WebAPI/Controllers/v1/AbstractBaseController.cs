@@ -8,7 +8,7 @@ public abstract class AbstractBaseController : ControllerBase
     /// Validates if an object type with the specified display name already exists in the provided list of OPC Types.
     /// Throws an exception if a duplicate is found.
     /// </summary>
-    /// <param name="objectTypes">List of opc types to search through.</param>
+    /// <typeparam name="T">The type of the OPC Type, which should inherit from UaNodeResponse.</typeparam>
     /// <param name="request">The request containing the display name to check.</param>
     /// <exception cref="Exception">Thrown if an object type with the same display name already exists.</exception>
     /// <returns>void</returns>
@@ -20,7 +20,9 @@ public abstract class AbstractBaseController : ControllerBase
             case "DataVariableResponse":
             case "ObjectModelResponse":
             case "PropertyResponse":
-                found = opcTypes.FirstOrDefault(x => x.ParentNodeId == request.ParentNodeId && x.DisplayName == request.DisplayName);
+                found = opcTypes
+                    // .Where(x => x.ParentNodeId == request.ParentNodeId)
+                    .FirstOrDefault(x => x.DisplayName == request.DisplayName);
                 break;
             default:
                 found = opcTypes.FirstOrDefault(x => x.DisplayName == request.DisplayName);

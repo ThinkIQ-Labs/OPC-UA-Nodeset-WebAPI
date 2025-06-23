@@ -12,7 +12,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
 {
     [ApiController]
     [Route("api/v1/variable-type")]
-    public class VariableTypeController : ControllerBase
+    public class VariableTypeController : AbstractBaseController
     {
         private readonly ILogger<ProjectController> _logger;
 
@@ -92,41 +92,44 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public async Task<IActionResult> HttpPost([FromBody] VariableTypeRequest request)
         {
-            var id = request.ProjectId;
-            var uri = request.Uri;
-            var variableTypesListResult = Get(id, uri) as ObjectResult;
-
-            if (StatusCodes.Status200OK != variableTypesListResult.StatusCode)
+            try
             {
-                return variableTypesListResult;
+                var id = request.ProjectId;
+                var uri = request.Uri;
+                var variableTypesListResult = Get(id, uri) as ObjectResult;
+
+                if (StatusCodes.Status200OK != variableTypesListResult.StatusCode)
+                {
+                    return variableTypesListResult;
+                }
+                var variableTypes = variableTypesListResult.Value as List<VariableTypeResponse>;
+                FindOpcType<VariableTypeResponse>(variableTypes, request);
+
+                // add new variable type
+                var projectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
+                var activeProjectInstance = projectInstanceResult.Value as NodeSetProjectInstance;
+                var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
+                var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
+
+                var newVariableTypeModel = new VariableTypeModel
+                {
+                    NodeSet = activeNodesetModel,
+                    NodeId = UaNodeResponse.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
+                    SuperType = activeProjectInstance.GetNodeModelByNodeId(request.SuperTypeNodeId) as VariableTypeModel,
+                    DisplayName = new List<NodeModel.LocalizedText> { request.DisplayName == null ? "" : request.DisplayName },
+                    BrowseName = request.BrowseName,
+                    Description = new List<NodeModel.LocalizedText> { request.Description == null ? "" : request.Description },
+                };
+
+                activeNodesetModel.VariableTypes.Add(newVariableTypeModel);
+                activeNodesetModel.UpdateIndices();
+                return Ok(new VariableTypeResponse(newVariableTypeModel));
             }
-            var variableTypes = variableTypesListResult.Value as List<VariableTypeResponse>;
-            var existingVariableType = variableTypes.FirstOrDefault(x => x.DisplayName == request.DisplayName);
-
-            if (existingVariableType != null)
+            catch (Exception ex)
             {
-                return BadRequest("A variable type with this name exists.");
+                _logger.LogError(ex, "Error creating VariableType");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request.");
             }
-
-            // add new variable type
-            var projectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
-            var activeProjectInstance = projectInstanceResult.Value as NodeSetProjectInstance;
-            var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
-            var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
-
-            var newVariableTypeModel = new VariableTypeModel
-            {
-                NodeSet = activeNodesetModel,
-                NodeId = UaNodeResponse.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
-                SuperType = activeProjectInstance.GetNodeModelByNodeId(request.SuperTypeNodeId) as VariableTypeModel,
-                DisplayName = new List<NodeModel.LocalizedText> { request.DisplayName == null ? "" : request.DisplayName },
-                BrowseName = request.BrowseName,
-                Description = new List<NodeModel.LocalizedText> { request.Description == null ? "" : request.Description },
-            };
-
-            activeNodesetModel.VariableTypes.Add(newVariableTypeModel);
-            activeNodesetModel.UpdateIndices();
-            return Ok(new VariableTypeResponse(newVariableTypeModel));
         }
     }
 }
