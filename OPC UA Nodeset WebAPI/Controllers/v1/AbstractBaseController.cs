@@ -15,25 +15,45 @@ public abstract class AbstractBaseController : ControllerBase
     protected void FindOpcType<T>(List<T> opcTypes, dynamic request) where T : UaNodeResponse
     {
         T? found;
-        switch (typeof(T).Name)
+        var rawName = typeof(T).Name.Replace("Response", "");
+        var hashSet = new HashSet<string>(){
+            "DataVariable",
+            "ObjectModel",
+            "Property"
+        };
+        Console.WriteLine($"BaseType FullName: {typeof(T).BaseType?.FullName}");
+        Console.WriteLine($"RawName: {rawName}");
+        Console.WriteLine($"DisplayName: {request.DisplayName}");
+        foreach (var type in opcTypes)
         {
-            case "DataVariableResponse":
-            case "ObjectModelResponse":
-            case "PropertyResponse":
-                found = opcTypes
-                    .Where(x => x.ParentNodeId == request.ParentNodeId)
-                    .FirstOrDefault(x => x.DisplayName == request.DisplayName);
-                break;
-            default:
-                found = opcTypes.FirstOrDefault(x => x.DisplayName == request.DisplayName);
-                break;
+            Console.WriteLine($"type: {type.ParentNodeId} == request: {request.ParentNodeId}");
+            if (type.ParentNodeId == request.ParentNodeId)
+            {
+                Console.WriteLine($"Found ParentNodeId: {type.ParentNodeId}");
+                if (type.DisplayName == request.DisplayName)
+                {
+                    Console.WriteLine($"Found Type: {type.DisplayName}");
+                }
+            }
+        }
+
+
+        if (hashSet.Contains(rawName))
+        {
+            found = opcTypes
+                .Where(x => x.ParentNodeId == request.ParentNodeId)
+                .FirstOrDefault(x => x.DisplayName == request.DisplayName);
+        }
+        else
+        {
+            found = opcTypes.FirstOrDefault(x => x.DisplayName == request.DisplayName);
         }
 
         if (found != null)
         {
-            var rawName = typeof(T).Name.Replace("Response", "").Replace("Request", "");
             var typeName = Regex.Replace(rawName, "([a-z])([A-Z])", "$1 $2");
             throw new Exception($"'{typeName}' with DisplayName '{request.DisplayName}' already exists.");
         }
+
     }
 }
