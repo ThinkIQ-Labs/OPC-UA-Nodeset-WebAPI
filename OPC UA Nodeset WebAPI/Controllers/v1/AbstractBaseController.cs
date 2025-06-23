@@ -21,7 +21,7 @@ public abstract class AbstractBaseController : ControllerBase
             case "ObjectModelResponse":
             case "PropertyResponse":
                 found = opcTypes
-                    // .Where(x => x.ParentNodeId == request.ParentNodeId)
+                    .Where(x => x.ParentNodeId == request.ParentNodeId)
                     .FirstOrDefault(x => x.DisplayName == request.DisplayName);
                 break;
             default:
