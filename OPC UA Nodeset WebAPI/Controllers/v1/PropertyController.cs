@@ -295,7 +295,6 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
                 parentNode.Properties.Add(newPropertyModel);
                 activeNodesetModel.UpdateIndices();
                 return Ok(new PropertyResponse(newPropertyModel));
-                return BadRequest("A property with this name exists.");
             }
             catch (Exception ex)
             {
@@ -324,7 +323,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
                 foreach (var type in request.Types)
                 {
                     var propertiesList = propertiesListResult.Value as List<PropertyResponse>;
-                    FindOpcType<PropertyResponse>(propertiesList, type);
+                    FindOpcType<PropertyResponse>(propertiesList, request, type);
 
                     // add new property
                     var projectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
@@ -412,7 +411,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
             }
             catch (Exception exception)
             {
-                return NotFound("An error occurred while processing the bulk properties upload. Please try again later.");
+                return BadRequest("Error creating new property: " + exception.Message);
             }
         }
     }

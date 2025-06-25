@@ -9,7 +9,6 @@ namespace OPC_UA_Nodeset_WebAPI.Model.v1.Responses
 {
     public class DataVariableResponse : UaNodeResponse
     {
-        public string ParentNodeId { get; set; }
         public string? DataTypeNodeId { get; set; }
         public string? Value { get; set; }
         public string? TypeDefinitionNodeId { get; set; }

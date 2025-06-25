@@ -10,9 +10,10 @@ public abstract class AbstractBaseController : ControllerBase
     /// </summary>
     /// <typeparam name="T">The type of the OPC Type, which should inherit from UaNodeResponse.</typeparam>
     /// <param name="request">The request containing the display name to check.</param>
+    /// <param name="type">The type instance to check against the list.</param>
     /// <exception cref="Exception">Thrown if an object type with the same display name already exists.</exception>
     /// <returns>void</returns>
-    protected void FindOpcType<T>(List<T> opcTypes, dynamic request) where T : UaNodeResponse
+    protected void FindOpcType<T>(List<T> opcTypes, dynamic request, dynamic type = null) where T : UaNodeResponse
     {
         T? found;
         var rawName = typeof(T).Name.Replace("Response", "");
@@ -21,24 +22,15 @@ public abstract class AbstractBaseController : ControllerBase
             "ObjectModel",
             "Property"
         };
-        Console.WriteLine($"BaseType FullName: {typeof(T).BaseType?.FullName}");
-        Console.WriteLine($"RawName: {rawName}");
-        Console.WriteLine($"DisplayName: {request.DisplayName}");
-        foreach (var type in opcTypes)
+
+        if (type != null && hashSet.Contains(rawName))
         {
-            Console.WriteLine($"type: {type.ParentNodeId} == request: {request.ParentNodeId}");
-            if (type.ParentNodeId == request.ParentNodeId)
-            {
-                Console.WriteLine($"Found ParentNodeId: {type.ParentNodeId}");
-                if (type.DisplayName == request.DisplayName)
-                {
-                    Console.WriteLine($"Found Type: {type.DisplayName}");
-                }
-            }
+            found = opcTypes
+                .Where(x => x.ParentNodeId == request.ParentNodeId)
+                .FirstOrDefault(x => x.DisplayName == type.DisplayName);
+
         }
-
-
-        if (hashSet.Contains(rawName))
+        else if (hashSet.Contains(rawName))
         {
             found = opcTypes
                 .Where(x => x.ParentNodeId == request.ParentNodeId)

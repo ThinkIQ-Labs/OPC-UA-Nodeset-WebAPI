@@ -8,7 +8,6 @@ namespace OPC_UA_Nodeset_WebAPI.Model.v1.Responses
 {
     public class PropertyResponse : UaNodeResponse
     {
-        public string ParentNodeId { get; set; }
         public string DataTypeNodeId { get; set; }
         public string TypeDefinitionNodeId { get; set; }
         public string? Value { get; set; }
@@ -30,7 +29,7 @@ namespace OPC_UA_Nodeset_WebAPI.Model.v1.Responses
             BrowseName = aVariableModel.BrowseName;
             Description = aVariableModel.Description.Count == 0 ? "" : aVariableModel.Description.First().Text;
             ParentModel = aVariableModel.Parent;
-            ParentNodeId = ParentModel == null ? "" : ParentModel.NodeId;
+            ParentNodeId = aVariableModel.Parent?.NodeId ?? "";
             DataTypeNodeId = aVariableModel.DataType == null ? "" : aVariableModel.DataType.NodeId;
             TypeDefinitionNodeId = aVariableModel.TypeDefinition == null ? "" : aVariableModel.TypeDefinition.NodeId;
 
