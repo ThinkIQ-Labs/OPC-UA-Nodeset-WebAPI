@@ -27,24 +27,24 @@ public abstract class AbstractBaseController : ControllerBase
         {
             found = opcTypes
                 .Where(x => x.ParentNodeId == request.ParentNodeId)
-                .FirstOrDefault(x => x.DisplayName == type.DisplayName);
+                .FirstOrDefault(x => x.BrowseName == type.BrowseName);
 
         }
         else if (hashSet.Contains(rawName))
         {
             found = opcTypes
                 .Where(x => x.ParentNodeId == request.ParentNodeId)
-                .FirstOrDefault(x => x.DisplayName == request.DisplayName);
+                .FirstOrDefault(x => x.BrowseName == request.BrowseName);
         }
         else
         {
-            found = opcTypes.FirstOrDefault(x => x.DisplayName == request.DisplayName);
+            found = opcTypes.FirstOrDefault(x => x.BrowseName == request.BrowseName);
         }
 
         if (found != null)
         {
             var typeName = Regex.Replace(rawName, "([a-z])([A-Z])", "$1 $2");
-            throw new Exception($"'{typeName}' with DisplayName '{request.DisplayName}' already exists.");
+            throw new Exception($"'{typeName}' with BrowseName '{request.BrowseName}' already exists.");
         }
 
     }
