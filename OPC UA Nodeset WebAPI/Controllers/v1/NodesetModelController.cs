@@ -80,8 +80,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
         /// <summary>
         /// Loads a nodeset file from a file upload.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="file"></param>
+        /// <param name="request"></param>
         /// <returns>Returns a loaded nodeset model for a nodeset project.</returns>
         /// <response code="200">The nodeset was successfully loaded and parsed as a nodeset model.</response>
         /// <response code="400">The nodeset could not be loaded.</response>

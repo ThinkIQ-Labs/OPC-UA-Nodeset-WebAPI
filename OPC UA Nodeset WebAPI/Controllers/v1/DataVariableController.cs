@@ -8,7 +8,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
 {
     [ApiController]
     [Route("api/v1/variable")]
-    public class DataVariableController : ControllerBase
+    public class DataVariableController : AbstractBaseController
     {
         private readonly ILogger<ProjectController> _logger;
 
@@ -86,18 +86,19 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult Post([FromBody] DataVariableRequest request)
         {
-            var id = request.ProjectId;
-            var uri = request.Uri;
-            var dataVariablesListResult = Get(id, uri) as ObjectResult;
+            try
+            {
+                var id = request.ProjectId;
+                var uri = request.Uri;
+                var dataVariablesListResult = Get(id, uri) as ObjectResult;
 
-            if (StatusCodes.Status200OK != dataVariablesListResult.StatusCode)
-            {
-                return dataVariablesListResult;
-            }
-            var dataVariablesList = dataVariablesListResult.Value as List<DataVariableResponse>;
-            var existingDataVariable = dataVariablesList.Where(x => x.ParentNodeId == request.ParentNodeId).FirstOrDefault(x => x.DisplayName == request.DisplayName);
-            if (existingDataVariable == null)
-            {
+                if (StatusCodes.Status200OK != dataVariablesListResult.StatusCode)
+                {
+                    return dataVariablesListResult;
+                }
+                var dataVariablesList = dataVariablesListResult.Value as List<DataVariableResponse>;
+                FindOpcType<DataVariableResponse>(dataVariablesList, request);
+
                 // add new dataVariable
                 var projectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
                 var activeProjectInstance = projectInstanceResult.Value as NodeSetProjectInstance;
@@ -224,7 +225,11 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
                 activeNodesetModel.UpdateIndices();
                 return Ok(new PropertyResponse(newDataVariableModel));
             }
-            return BadRequest("A dataVariable with this name exists.");
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating DataVariable");
+                return BadRequest("Error while creating DataVariable: " + ex.Message);
+            }
         }
     }
 }
