@@ -33,16 +33,13 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
             {
                 return activeNodesetModelResult;
             }
-            else
+            var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
+            var returnObject = new List<PropertyResponse>();
+            foreach (var aProperty in activeNodesetModel.GetProperties())
             {
-                var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
-                var returnObject = new List<PropertyResponse>();
-                foreach (var aProperty in activeNodesetModel.GetProperties())
-                {
-                    returnObject.Add(new PropertyResponse(aProperty));
-                }
-                return Ok(returnObject);
+                returnObject.Add(new PropertyResponse(aProperty));
             }
+            return Ok(returnObject);
         }
 
         [HttpGet("GetByNodeId")]
@@ -306,7 +303,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
         [HttpPost("bulk-processing")]
         [ProducesResponseType(200, Type = typeof(IActionResult))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public async Task<IActionResult> HttpPost([FromBody] BulkPropertyRequest request)
+        public async Task<IActionResult> BulkProcessing([FromBody] BulkPropertyRequest request)
         {
             try
             {
@@ -317,7 +314,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
 
                 if (StatusCodes.Status200OK != propertiesListResult.StatusCode)
                 {
-                    return propertiesListResult;
+                    throw new Exception($"Error retrieving objects for project {id} and URI {uri}");
                 }
 
                 foreach (var type in request.Types)

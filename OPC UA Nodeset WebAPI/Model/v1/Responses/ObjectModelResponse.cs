@@ -10,12 +10,11 @@ namespace OPC_UA_Nodeset_WebAPI.Model.v1.Responses
 {
     public class ObjectModelResponse : UaNodeResponse
     {
-        public string TypeDefinitionNodeId { get; set; }
-
         public List<NodeAndReferenceResponse> AllReferencedNodes { get; set; }
         public List<NodeAndReferenceResponse> OtherReferencedNodes { get; set; }
         public List<NodeAndReferenceResponse> OtherReferencingNodes { get; set; }
 
+        public string? TypeDefinitionNodeId { get; set; }
         internal ObjectModel? ObjectModel { get; set; }
         internal ObjectTypeModel? TypeDefinition { get; set; }
         internal NodeModel? ParentNodeModel { get; set; }

@@ -238,19 +238,27 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
         /// <returns>An IActionResult representing the outcome.</returns>
         private async Task<IActionResult> TryLoadNodesetXmlFromServerAsync(string id, string uri)
         {
-            var activeNodesetProjectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
-
-            if (StatusCodes.Status200OK != activeNodesetProjectInstanceResult.StatusCode)
+            try
             {
-                return activeNodesetProjectInstanceResult;
+                var activeNodesetProjectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
+
+                if (StatusCodes.Status200OK != activeNodesetProjectInstanceResult.StatusCode)
+                {
+                    return activeNodesetProjectInstanceResult;
+                }
+
+                var activeNodeSetProjectInstance = activeNodesetProjectInstanceResult.Value as NodeSetProjectInstance;
+                var modelUriResultString = await activeNodeSetProjectInstance.LoadNodeSetFromFileOnServerAsync(uri);
+                var aNodesetModel = new NodeSetModelResponse(activeNodeSetProjectInstance.NodeSetModels[modelUriResultString]);
+                activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Success: Add NodeSetModel from file '{uri}'.");
+
+                return Ok(new Dictionary<string, NodeSetModelResponse> { { modelUriResultString.Replace("/", ""), aNodesetModel } });
             }
-
-            var activeNodeSetProjectInstance = activeNodesetProjectInstanceResult.Value as NodeSetProjectInstance;
-            var modelUriResultString = await activeNodeSetProjectInstance.LoadNodeSetFromFileOnServerAsync(uri);
-            var aNodesetModel = new NodeSetModelResponse(activeNodeSetProjectInstance.NodeSetModels[modelUriResultString]);
-            activeNodeSetProjectInstance.Log.Add(DateTime.UtcNow.ToString("o"), $"Success: Add NodeSetModel from file '{uri}'.");
-
-            return Ok(new Dictionary<string, NodeSetModelResponse> { { modelUriResultString.Replace("/", ""), aNodesetModel } });
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to load nodeset from URI: {uri}");
+                return BadRequest($"Error loading nodeset from URI '{uri}': {ex.Message}");
+            }
         }
 
         /// <summary>
