@@ -65,7 +65,7 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
             }
             catch (Exception e)
             {
-                throw new InvalidOperationException(e.Message);
+                throw new InvalidOperationException($"Error: File {name} did not work. {e.Message}");
             }
             ModelTableEntry modelEntry = nodeSet.Models.FirstOrDefault();
 

@@ -5,6 +5,8 @@ VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OPC UA Nodeset WebAPI", "OPC UA Nodeset WebAPI\OPC UA Nodeset WebAPI.csproj", "{BB24380C-8EE7-4882-86A8-BD8029F21202}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OPC UA Nodeset WebApi.Tests", "OPC UA Nodeset WebApi.Tests\OPC UA Nodeset WebApi.Tests.csproj", "{7EC1A040-BC7E-4268-8DCC-00B241CC2980}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{BB24380C-8EE7-4882-86A8-BD8029F21202}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB24380C-8EE7-4882-86A8-BD8029F21202}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB24380C-8EE7-4882-86A8-BD8029F21202}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EC1A040-BC7E-4268-8DCC-00B241CC2980}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EC1A040-BC7E-4268-8DCC-00B241CC2980}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EC1A040-BC7E-4268-8DCC-00B241CC2980}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EC1A040-BC7E-4268-8DCC-00B241CC2980}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
