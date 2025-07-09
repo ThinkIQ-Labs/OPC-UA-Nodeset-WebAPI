@@ -2,7 +2,7 @@
 using CESMII.OpcUa.NodeSetModel;
 using Microsoft.Extensions.Logging.Abstractions;
 using Opc.Ua.Export;
-using OPC_UA_Nodeset_WebAPI.Model;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
 using Opc.Ua;
 using static System.Net.Mime.MediaTypeNames;
 using System.Text;
@@ -60,11 +60,12 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
             UANodeSet nodeSet;
             try
             {
-                nodeSet = UANodeSet.Read(new FileStream(file, FileMode.Open));
+                var fileStream = new FileStream(file, FileMode.Open);
+                nodeSet = UANodeSet.Read(fileStream);
             }
             catch (Exception e)
             {
-                return "Error: File not found.";
+                throw new InvalidOperationException($"Error: File {name} did not work. {e.Message}");
             }
             ModelTableEntry modelEntry = nodeSet.Models.FirstOrDefault();
 
@@ -96,25 +97,23 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
             // check if namespace is already present
             if (NodeSetModels.Where(x => x.Value.ModelUri == modelEntry.ModelUri).Count() > 0)
             {
-                return $"Error: NodeSet {modelEntry.ModelUri} already exists.";
+                throw new InvalidOperationException($"Error: NodeSet {modelEntry.ModelUri} already exists.");
             }
 
             // check if all requirements are in place
-            bool allowImport = true;
             if (modelEntry.RequiredModel != null)
             {
                 foreach (var aRequiredModelUri in modelEntry.RequiredModel.Select(x => x.ModelUri))
                 {
                     if (!NodeSetModels.ContainsKey(aRequiredModelUri))
                     {
-                        allowImport = false;
-                        return $"Error: NodeSet can not be imported. {aRequiredModelUri} required.";
+                        throw new InvalidOperationException($"Error: NodeSet can not be imported: {aRequiredModelUri} required.");
                     }
                 }
             }
 
             // attempt import of nodeset
-            if (allowImport)
+            try
             {
                 await importer.LoadNodeSetModelAsync(opcContext, nodeSet);
 
@@ -122,9 +121,10 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
 
                 return modelEntry.ModelUri;
             }
-            else
+            catch (Exception e)
             {
-                return "Error: NodeSet can not be imported.";
+                Log.Add(modelEntry.ModelUri, e.Message);
+                throw new InvalidOperationException($"Error: NodeSet can not be imported: {e.Message}");
             }
         }
 
@@ -157,11 +157,38 @@ namespace OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities
 
         }
 
+        /**
+         * Remove a nodeset from the project
+         *
+         * @param aModelUri the URI of the nodeset to remove
+         */
+        public string RemoveNodeSet(string aModelUri)
+        {
+            if (NodeSetModels.ContainsKey(aModelUri))
+            {
+                // remove all nodes from nodeset
+                NodeSetModels.Remove(aModelUri);
+
+                // remove all references to nodeset
+                NextNodeIds.Remove(aModelUri);
+
+                return aModelUri;
+            }
+            return "Error: Nodeset not found.";
+        }
+
         public NodeModel GetNodeModelByNodeId(string nodeId)
         {
-            var nodeFromNodeId = new ApiUaNodeModel { NodeId = nodeId };
-            var aNode = NodeSetModels.FirstOrDefault(x => x.Value.ModelUri == nodeFromNodeId.NameSpace).Value.AllNodesByNodeId[nodeId];
-            return aNode;
+            var nodeFromNodeId = new UaNodeResponse { NodeId = nodeId };
+            var modelEntry = NodeSetModels.FirstOrDefault(x => x.Value.ModelUri == nodeFromNodeId.NameSpace);
+
+            if (modelEntry.Value != null && modelEntry.Value.AllNodesByNodeId.ContainsKey(nodeId))
+            {
+                var node = modelEntry.Value.AllNodesByNodeId[nodeId];
+                return node;
+            }
+
+            throw new InvalidOperationException($"Node with ID {nodeId} not found.");
         }
 
         //public ObjectTypeModel GetObjectTypeModelByNodeId(string nodeId)

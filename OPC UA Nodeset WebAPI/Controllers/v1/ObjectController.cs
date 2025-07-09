@@ -1,14 +1,17 @@
 ﻿using CESMII.OpcUa.NodeSetModel;
 using Microsoft.AspNetCore.Mvc;
-using OPC_UA_Nodeset_WebAPI.Model;
+using OPC_UA_Nodeset_WebAPI.Services;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Responses;
+using OPC_UA_Nodeset_WebAPI.Model.v1.Requests;
 using OPC_UA_Nodeset_WebAPI.UA_Nodeset_Utilities;
 using System.Web;
+using System.Text.Json;
 
-namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
+namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
 {
     [ApiController]
     [Route("api/v1/object")]
-    public class ObjectController : ControllerBase
+    public class ObjectController : AbstractBaseController
     {
         private readonly ILogger<ProjectController> _logger;
 
@@ -21,7 +24,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         }
 
         [HttpGet("{id}/{uri}")]
-        [ProducesResponseType(200, Type = typeof(Dictionary<string, ApiObjectModel>))]
+        [ProducesResponseType(200, Type = typeof(Dictionary<string, ObjectModelResponse>))]
         public IActionResult Get(string id, string uri)
         {
             var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
@@ -30,20 +33,17 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             {
                 return activeNodesetModelResult;
             }
-            else
+            var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
+            var returnObject = new List<ObjectModelResponse>();
+            foreach (var aObject in activeNodesetModel.GetObjects())
             {
-                var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
-                var returnObject = new List<ApiObjectModel>();
-                foreach (var aObject in activeNodesetModel.GetObjects())
-                {
-                    returnObject.Add(new ApiObjectModel(aObject));
-                }
-                return Ok(returnObject);
+                returnObject.Add(new ObjectModelResponse(aObject));
             }
+            return Ok(returnObject);
         }
 
         [HttpGet("{nodeId}")]
-        [ProducesResponseType(200, Type = typeof(ApiObjectModel))]
+        [ProducesResponseType(200, Type = typeof(ObjectModelResponse))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetByNodeId(string id, string uri, string nodeId)
         {
@@ -52,7 +52,7 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
         }
 
         [HttpGet("ByDisplayName/{displayName}")]
-        [ProducesResponseType(200, Type = typeof(List<ApiObjectModel>))]
+        [ProducesResponseType(200, Type = typeof(List<ObjectModelResponse>))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
         public IActionResult GetByDisplayName(string id, string uri, string displayName)
         {
@@ -64,106 +64,88 @@ namespace OPC_UA_Nodeset_WebAPI.api.v1.Controllers
             }
             else
             {
-                var objectsList = objectsListResult.Value as List<ApiObjectModel>;
+                var objectsList = objectsListResult.Value as List<ObjectModelResponse>;
                 var returnObject = objectsList.Where(x => x.DisplayName == displayName).ToList();
                 return Ok(returnObject);
             }
         }
 
-        [HttpPut]
-        [ProducesResponseType(200, Type = typeof(ApiObjectModel))]
+        [HttpPost]
+        [ProducesResponseType(200, Type = typeof(ObjectModelResponse))]
         [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-        public IActionResult PutAsync(string id, string uri, [FromBody] ApiNewObjectModel apiObjectModel)
+        public async Task<IActionResult> HttpPost([FromBody] ObjectRequest request)
         {
-
-            var objectsListResult = Get(id, uri) as ObjectResult;
-
-            if (StatusCodes.Status200OK != objectsListResult.StatusCode)
+            try
             {
-                return objectsListResult;
+                var id = request.ProjectId;
+                var uri = request.Uri;
+                var objectsListResult = Get(id, uri) as ObjectResult;
+
+                if (StatusCodes.Status200OK != objectsListResult.StatusCode)
+                {
+                    return objectsListResult;
+                }
+
+                var objects = objectsListResult.Value as List<ObjectModelResponse>;
+                FindOpcType<ObjectModelResponse>(objects, request);
+
+                var objectModelService = new ObjectModelService(ApplicationInstance);
+                var newObjectModel = objectModelService.CreateObjectModel(id, uri, new UaObject
+                {
+                    ParentNodeId = request.ParentNodeId,
+                    TypeDefinitionNodeId = request.TypeDefinitionNodeId,
+                    DisplayName = request.DisplayName,
+                    BrowseName = request.BrowseName,
+                    Description = request.Description,
+                    GenerateChildren = request.GenerateChildren
+                });
+
+                return Ok(new ObjectModelResponse(newObjectModel));
             }
-            else
+            catch (Exception ex)
             {
-                var objects = objectsListResult.Value as List<ApiObjectModel>;
-                var existingObject = objects.Where(x => x.ParentNodeId == apiObjectModel.ParentNodeId).FirstOrDefault(x => x.DisplayName == apiObjectModel.DisplayName);
-                if (existingObject == null)
-                {
-                    // add new object
-                    var projectInstanceResult = ApplicationInstance.GetNodeSetProjectInstance(id) as ObjectResult;
-                    var activeProjectInstance = projectInstanceResult.Value as NodeSetProjectInstance;
-
-                    var activeNodesetModelResult = ApplicationInstance.GetNodeSetModel(id, uri) as ObjectResult;
-                    var activeNodesetModel = activeNodesetModelResult.Value as NodeSetModel;
-
-                    // look up parent object
-                    var aParentModel = activeProjectInstance.NodeSetModels.FirstOrDefault(x => x.Value.ModelUri == ApiUaNodeModel.GetNameSpaceFromNodeId(apiObjectModel.ParentNodeId)).Value;
-                    var parentNode = aParentModel.AllNodesByNodeId[apiObjectModel.ParentNodeId];
-
-                    // look up type definition
-                    var aObjectTypeModel = activeProjectInstance.NodeSetModels.FirstOrDefault(x => x.Value.ModelUri == ApiUaNodeModel.GetNameSpaceFromNodeId(apiObjectModel.TypeDefinitionNodeId)).Value;
-                    var aObjectTypeDefinition = aObjectTypeModel.ObjectTypes.FirstOrDefault(ot => ot.NodeId == apiObjectModel.TypeDefinitionNodeId);
-
-                    var newObjectModel = new ObjectModel
-                    {
-                        NodeSet = activeNodesetModel,
-                        NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
-                        Parent = parentNode,
-                        TypeDefinition = aObjectTypeDefinition,
-                        DisplayName = new List<NodeModel.LocalizedText> { apiObjectModel.DisplayName },
-                        BrowseName = apiObjectModel.BrowseName,
-                        Description = new List<NodeModel.LocalizedText> { apiObjectModel.Description == null ? "" : apiObjectModel.Description },
-                        Properties = new List<VariableModel>(),
-                        DataVariables = new List<DataVariableModel>()
-                    };
-
-                    if (apiObjectModel.GenerateChildren.HasValue)
-                    {
-                        if (apiObjectModel.GenerateChildren.Value)
-                        {
-                            aObjectTypeDefinition.Properties.ForEach(aProperty =>
-                            {
-                                newObjectModel.Properties.Add(new PropertyModel
-                                {
-                                    NodeSet = activeNodesetModel,
-                                    NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
-                                    Parent = newObjectModel,
-                                    DisplayName = aProperty.DisplayName,
-                                    BrowseName = aProperty.BrowseName,
-                                    Description = aProperty.Description,
-                                    DataType = aProperty.DataType,
-                                    Value = aProperty.Value,
-                                    EngineeringUnit = aProperty.EngineeringUnit,
-                                });
-                            });
-                            aObjectTypeDefinition.DataVariables.ForEach(aDataVariable =>
-                            {
-                                newObjectModel.DataVariables.Add(new DataVariableModel
-                                {
-                                    NodeSet = activeNodesetModel,
-                                    NodeId = ApiUaNodeModel.GetNodeIdFromIdAndNameSpace((activeProjectInstance.NextNodeIds[activeNodesetModel.ModelUri]++).ToString(), activeNodesetModel.ModelUri),
-                                    Parent = newObjectModel,
-                                    DisplayName = aDataVariable.DisplayName,
-                                    BrowseName = aDataVariable.BrowseName,
-                                    Description = aDataVariable.Description,
-                                    DataType = aDataVariable.DataType,
-                                    Value = aDataVariable.Value,
-                                    EngineeringUnit = aDataVariable.EngineeringUnit,
-                                });
-                            });
-                        }
-                    }
-
-                    activeNodesetModel.Objects.Add(newObjectModel);
-                    activeNodesetModel.UpdateIndices();
-                    return Ok(new ApiObjectModel(newObjectModel));
-                }
-                else
-                {
-                    return BadRequest("A object with this name exists.");
-                }
+                _logger.LogError(ex, "Error creating new object");
+                return BadRequest("Error creating new object: " + ex.Message);
             }
         }
 
+        [HttpPost("bulk-processing")]
+        [ProducesResponseType(200, Type = typeof(List<ObjectModelResponse>))]
+        [ProducesResponseType(404, Type = typeof(NotFoundResult))]
+        public async Task<IActionResult> BulkProcessing([FromBody] BulkObjectRequest request)
+        {
+            try
+            {
+                var id = request.ProjectId;
+                var uri = request.Uri;
+                var parentNodeId = request.ParentNodeId;
+                var objectsListResult = Get(id, uri) as ObjectResult;
+                var objectInstancesCreated = new List<ObjectModelResponse>();
 
+                if (StatusCodes.Status200OK != objectsListResult.StatusCode)
+                {
+                    throw new Exception($"Error retrieving objects for project {id} and URI {uri}");
+                }
+
+                foreach (var type in request.Types)
+                {
+                    var objects = objectsListResult.Value as List<ObjectModelResponse>;
+                    var existingObject = objects.Where(x => x.ParentNodeId == type.ParentNodeId).FirstOrDefault(x => x.DisplayName == type.DisplayName);
+                    FindOpcType<ObjectModelResponse>(objects, type);
+
+                    var objectModelService = new ObjectModelService(ApplicationInstance);
+                    var newObjectModel = objectModelService.CreateObjectModel(id, uri, type);
+
+                    objectInstancesCreated.Add(new ObjectModelResponse(newObjectModel));
+                }
+
+                return Ok(objectInstancesCreated);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing bulk request");
+                return BadRequest("Error processing bulk request: " + ex.Message);
+            }
+        }
     }
 }
