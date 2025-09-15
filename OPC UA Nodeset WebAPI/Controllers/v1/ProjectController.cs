@@ -59,23 +59,15 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
             {
                 return BadRequest("Invalid request: Name and Owner are required.");
             }
-
-            var name = request.name;
-            var owner = request.owner;
-            var key = Guid.NewGuid().ToString().Split("-")[0];
-            var newProject = new NodeSetProjectInstance(name, owner, key);
-            var result = ApplicationInstance.NodeSetProjectInstances.TryAdd(key, newProject);
-
-            if (result)
+            var key = Guid.NewGuid().ToString("N")[..8];
+            var newProject = new NodeSetProjectInstance(request.name, request.owner, key);
+            if (!ApplicationInstance.NodeSetProjectInstances.TryAdd(key, newProject))
             {
-                var getByIdResult = GetById(key) as OkObjectResult;
-                var aNodesetProject = getByIdResult.Value as Dictionary<string, NodeSetProjectResponse>;
-                aNodesetProject.First().Value.AddToLog($"Project '{name}'({aNodesetProject.First().Key}) created successfully.");
-
-                return Ok(aNodesetProject.First().Value);
+                return BadRequest($"{request.name} - Failed to create project.");
             }
-
-            return BadRequest($"{name} - this did not work.");
+            var response = new NodeSetProjectResponse(newProject);
+            response.AddToLog($"Project '{request.name}'({key}) created successfully.");
+            return Ok(response);
         }
 
         /// <summary>
