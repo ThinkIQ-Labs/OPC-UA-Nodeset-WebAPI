@@ -15,7 +15,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
     [Route("api/v1/[controller]")]
     public class ProjectController : ControllerBase
     {
-
+        private const int ProjectKeyLength = 8;
         private readonly ILogger<ProjectController> _logger;
 
         private ApplicationInstance ApplicationInstance { get; set; }
@@ -46,7 +46,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
         /// <summary>
         /// Creates a new nodeset project.
         /// </summary>
-        /// <param name="request">The NodesetTrequest to create project for.</param>
+        /// <param name="request">The NodesetRequest to create project for.</param>
         /// <returns>Returns the created project.</returns>
         /// <response code="200">Project was successfully created.</response>
         /// <response code="400">The project was not created.</response>
@@ -59,7 +59,7 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
             {
                 return BadRequest("Invalid request: Name and Owner are required.");
             }
-            var key = Guid.NewGuid().ToString("N")[..8];
+            var key = GenerateProjectKey();
             var newProject = new NodeSetProjectInstance(request.name, request.owner, key);
             if (!ApplicationInstance.NodeSetProjectInstances.TryAdd(key, newProject))
             {
@@ -135,6 +135,35 @@ namespace OPC_UA_Nodeset_WebAPI.Controllers.v1
             {
                 return BadRequest($"{id} - {ex.Message}");
             }
+        }
+
+        /// <summary>
+        /// Generates a unique project key.
+        /// </summary>
+        /// <returns>A unique 8-character hexadecimal key.</returns>
+        private string GenerateProjectKey()
+        {
+            // Generate a unique key and ensure it doesn't already exist
+            string key;
+            int attempts = 0;
+            const int maxGenerationAttempts = 100;
+
+            do
+            {
+                key = Guid.NewGuid().ToString("N")[..ProjectKeyLength];
+                attempts++;
+
+                if (attempts >= maxGenerationAttempts)
+                {
+                    // Fallback to full GUID if we can't generate a unique short key
+                    key = Guid.NewGuid().ToString("N");
+                    _logger.LogWarning("Failed to generate unique short key after {Attempts} attempts, using full GUID", attempts);
+                    break;
+                }
+            }
+            while (ApplicationInstance.NodeSetProjectInstances.ContainsKey(key));
+
+            return key;
         }
     }
 }
